@@ -2,6 +2,7 @@
 .shadow-cljs/
 node_modules/
 out/
+public/css/
 public/js/
 
 .nrepl-port

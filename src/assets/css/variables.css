@@ -1,0 +1,8 @@
+:root {
+  /* COLORS */
+  --colors-tooltip-background: #b0c4de;
+
+  /* TYPOGRAPHY */
+  --typography-font-family-primary: 'Lobster', sans-serif;
+  --typography-font-size: 1rem;
+}

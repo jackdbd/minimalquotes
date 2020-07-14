@@ -6,6 +6,8 @@
   "author": "Giacomo Debidda <jackdebidda@gmail.com>",
   "license": "MIT",
   "scripts": {
+    "build": "yarn clean && yarn build:css && shadow-cljs release app",
+    "build:css": "tailwindcss build src/assets/css/styles.css -o public/css/output.css",
     "cards": "shadow-cljs watch cards",
     "clean": "rimraf public/js",
     "deploy:rules": "firebase deploy --only firestore:rules",

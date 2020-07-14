@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+
+@tailwind utilities;
+
+/* @import "variables.css"; */
+
+.quote {
+  /* font-family: var(--typography-font-family-primary); */
+  font-family: "Lobster", sans-serif;
+}
