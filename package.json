@@ -8,6 +8,7 @@
   "scripts": {
     "cards": "shadow-cljs watch cards",
     "clean": "rimraf public/js",
+    "deploy:rules": "firebase deploy --only firestore:rules",
     "dev": "shadow-cljs watch app",
     "lint": "clj-kondo --lint src",
     "sc": "shadow-cljs",
