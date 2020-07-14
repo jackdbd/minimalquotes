@@ -12,4 +12,4 @@
      [header {:on-login #(auth/sign-in-with-google)
               :on-logout #(auth/sign-out)
               :user user}]
-     [quotes]]))
+     [quotes @state/quotes]]))

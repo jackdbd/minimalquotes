@@ -19,6 +19,8 @@
     (rdom/unmount-component-at-node root-el)
     (rdom/render [app] root-el)))
 
+(declare goog.DEBUG)
+
 (defn ^:export main
   "Run application startup logic."
   []

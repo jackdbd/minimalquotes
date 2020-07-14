@@ -6,5 +6,9 @@
   ^{:key id} [:li {:class ["quote"]} (str text " ― " author)])
 
 (defn quotes
+  [m-quotes]
+  [:ul {:class ["quotes"]} (map m->li m-quotes)])
+
+(defn quotes-container
   []
-  [:ul {:class ["quotes"]} (map m->li @state/quotes)])
+  [quotes @state/quotes])
