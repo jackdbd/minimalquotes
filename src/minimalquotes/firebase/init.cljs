@@ -6,6 +6,7 @@
    ["firebase/analytics"]
    ["firebase/auth"]
    ["firebase/firestore"]
+   ["firebase/performance"]
    [minimalquotes.firebase.auth :refer [on-auth-state-changed]]
    [minimalquotes.state :as state]))
 
@@ -22,5 +23,6 @@
         :projectId "minimalquotes-5c472"
         :storageBucket "minimalquotes-5c472.appspot.com"})
   (firebase/analytics)
+  (firebase/performance)
   (reset! state/db (firebase/firestore))
   (on-auth-state-changed))

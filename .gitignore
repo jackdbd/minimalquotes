@@ -1,4 +1,5 @@
 .clj-kondo/
+.firebase/
 .shadow-cljs/
 node_modules/
 out/
