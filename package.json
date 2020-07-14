@@ -1,0 +1,28 @@
+{
+  "name": "minimalquotes",
+  "version": "1.0.0",
+  "description": "A minimal app for inspirational quotes",
+  "main": "index.js",
+  "author": "Giacomo Debidda <jackdebidda@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "cards": "shadow-cljs watch cards",
+    "clean": "rimraf public/js",
+    "dev": "shadow-cljs watch app",
+    "lint": "clj-kondo --lint src",
+    "sc": "shadow-cljs",
+    "server": "shadow-cljs stop && shadow-cljs start",
+    "test": "shadow-cljs compile test && node out/test.js",
+    "test:watch": "shadow-cljs watch test --config-merge \"{:autorun true}\""
+  },
+  "dependencies": {
+    "create-react-class": "^15.6.3",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "tailwindcss": "^1.4.6"
+  },
+  "devDependencies": {
+    "rimraf": "^3.0.2",
+    "shadow-cljs": "^2.10.14"
+  }
+}
