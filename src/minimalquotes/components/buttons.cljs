@@ -1,6 +1,21 @@
 (ns minimalquotes.components.buttons
   (:require [minimalquotes.components.icons :refer [icon-login]]))
 
+(defn button
+  [{:keys [data-attributes icon on-click text]
+    :or {data-attributes {}}}]
+  (let [button-props {:class ["font-bold" "rounded" "bg-transparent" "text-blue-500"
+                              "px-4" "py-2"
+                              "border" "border-blue-500"
+                              "hover:bg-blue-700" "hover:text-white" "hover:border-transparent"]
+                      :on-click on-click
+                      :type "button"}
+        icon-props {:css-classes ["w-4" "h-4" "fill-current" "ml-2"]}]
+    [:button (merge button-props data-attributes)
+     [:span data-attributes text]
+     (when icon
+       [icon (merge icon-props {:data-attributes data-attributes})])]))
+
 (defn cancel
   [{:keys [on-click]}]
   [:button {:class ["font-bold" "rounded" "bg-transparent" "text-blue-500"

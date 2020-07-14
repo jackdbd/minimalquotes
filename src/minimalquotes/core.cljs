@@ -3,7 +3,9 @@
   (:require
    [devtools.core :as devtools]
    [minimalquotes.components.app :refer [app]]
+   [minimalquotes.firebase.firestore :refer [db-docs-subscribe!]]
    [minimalquotes.firebase.init :refer [init-firebase!]]
+   [minimalquotes.state :as state]
    [reagent.dom :as rdom]))
 
 (defn dev-setup []
@@ -19,13 +21,14 @@
     (rdom/unmount-component-at-node root-el)
     (rdom/render [app] root-el)))
 
-(declare goog.DEBUG)
-
 (defn ^:export main
   "Run application startup logic."
   []
   (when goog.DEBUG
-    (println "=== Check if devtools is setup ===" {:a 123 :b "BBB" :c {:d "d" :e #{1 2 3}}})
+    ; (println "=== Check if devtools is setup ===" {:a 123 :b "BBB" :c {:d "d" :e #{1 2 3}}})
     (dev-setup))
   (init-firebase!)
+  (db-docs-subscribe! {:collection "quotes"
+                       :firestore @state/db
+                       :ratom-collection state/quotes})
   (mount-root))

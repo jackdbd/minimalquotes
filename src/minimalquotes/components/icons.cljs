@@ -20,19 +20,22 @@
                14.38,14.348,14.849z"}]])
 
 (defn icon-login
-  [{:keys [css-classes]}]
-  [:svg {:class css-classes
-         :viewBox view-box
-         :xmlns xmlns}
-   [:path {:d "M14 10L8 5v3H1v4h7v3l6-5zm3 7H9v2h8c1.1 0 2-.9 2-2V3c0-1.1-.9-2-2-2H9v2h8v14z"}]])
+  [{:keys [css-classes data-attributes]}]
+  (let [svg-props {:class css-classes
+                   :viewBox view-box
+                   :xmlns xmlns}
+        path-props {:d "M14 10L8 5v3H1v4h7v3l6-5zm3 7H9v2h8c1.1 0 2-.9 2-2V3c0-1.1-.9-2-2-2H9v2h8v14z"}]
+    [:svg (merge svg-props data-attributes)
+     [:path (merge path-props data-attributes)]]))
 
 (defn icon-minus
   [{:keys [css-classes data-attributes]}]
   (let [svg-props {:class css-classes
-                   :xmlns xmlns
-                   :viewBox view-box}
+                   :viewBox view-box
+                   :xmlns xmlns}
         path-props {:d "M16 10c0 .553-.048 1-.601 1H4.601C4.049 11 4 10.553 4
                         10c0-.553.049-1 .601-1H15.4c.552 0 .6.447.6 1z"}]
+    (prn "props" data-attributes css-classes)
     [:svg (merge svg-props data-attributes)
      [:path (merge path-props data-attributes)]]))
 

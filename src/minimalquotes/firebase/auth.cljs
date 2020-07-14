@@ -23,18 +23,17 @@
 (defn- next-or-observer
   "Observer for changes to the user's sign-in state."
   [user]
-  ; (println "=== user ===" (js/JSON.stringify user))
   (if user
     (let [uid (.-uid user)
           m {:display-name (.-displayName user)
              :email (.-email user)
              :photo-url (.-photoURL user)
              :uid uid}]
-      (db-docs-subscribe! {:collection "quotes"
-                           :firestore @state/db
-                           :ratom-collection state/quotes})
+      ; (db-docs-subscribe! {:collection "quotes"
+      ;                      :firestore @state/db
+      ;                      :ratom-collection state/quotes})
       (reset! state/user m)
-      (db-path-upsert! {:doc-path (str "users/" uid) :m m}))
+      (db-path-upsert! {:doc-path (str "users/" uid) :firestore @state/db :m m}))
     (reset! state/user nil)))
 
 (defn- on-error [e]
