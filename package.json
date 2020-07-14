@@ -17,11 +17,13 @@
   },
   "dependencies": {
     "create-react-class": "^15.6.3",
+    "firebase": "^7.16.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "tailwindcss": "^1.4.6"
   },
   "devDependencies": {
+    "firebase-tools": "^8.5.0",
     "rimraf": "^3.0.2",
     "shadow-cljs": "^2.10.14"
   }

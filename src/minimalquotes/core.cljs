@@ -3,9 +3,7 @@
   (:require
    [devtools.core :as devtools]
    [minimalquotes.components.app :refer [app]]
-;;    [minimalquotes.firebase.db :refer [db-docs-subscribe!]]
-;;    [minimalquotes.firebase.init :refer [init-firebase!]]
-;;    [minimalquotes.state :as state]
+   [minimalquotes.firebase.init :refer [init-firebase!]]
    [reagent.dom :as rdom]))
 
 (defn dev-setup []
@@ -27,8 +25,5 @@
   (when goog.DEBUG
     (println "=== Check if devtools is setup ===" {:a 123 :b "BBB" :c {:d "d" :e #{1 2 3}}})
     (dev-setup))
-;;   (init-firebase!)
-;;   (db-docs-subscribe! {:collection "quotes"
-;;                        :firestore @state/db
-;;                        :ratom-collection state/quotes})
+  (init-firebase!)
   (mount-root))
