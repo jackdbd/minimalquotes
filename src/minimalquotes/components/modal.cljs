@@ -1,6 +1,9 @@
 (ns minimalquotes.components.modal
   (:require [reagent.core :as r]))
 
+; https://code.thheller.com/blog/shadow-cljs/2017/11/06/improved-externs-inference.html
+(set! *warn-on-infer* true)
+
 (def modal-window-id "modal-window")
 (def modal-event-type "modal")
 
@@ -61,7 +64,7 @@
                          (.removeEventListener elem modal-event-type modal-listener)
                          (when should-close-on-esc
                            (.removeEventListener js/document "keydown" on-keydown))))
-        on-backdrop-click (fn [e]
+        on-backdrop-click (fn [^js e]
                             (when (.. e -target -dataset -backdrop)
                               (close-modal)))
         reagent-render (fn []
