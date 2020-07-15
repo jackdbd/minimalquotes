@@ -86,3 +86,9 @@
   https://firebase.google.com/docs/reference/js/firebase.firestore.Timestamp#static-now"
   []
   (.now (.. firebase -firestore -Timestamp)))
+
+(defn server-timestamp
+  "ClojureScript wrapper for firebase.firestore.FieldValue.serverTimestamp()
+  https://medium.com/firebase-developers/the-secrets-of-firestore-fieldvalue-servertimestamp-revealed-29dd7a38a82b"
+  []
+  (.serverTimestamp (.. firebase -firestore -FieldValue)))

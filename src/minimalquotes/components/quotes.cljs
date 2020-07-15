@@ -4,7 +4,8 @@
    [minimalquotes.firebase.firestore :refer [db-doc-create!
                                              db-path-delete!
                                              db-path-upsert!
-                                             now]]
+                                             now
+                                             server-timestamp]]
    [minimalquotes.components.icons :refer [icon-login]]
    [minimalquotes.components.quote-editor :refer [button-add-new-quote-modal
                                                   button-delete-quote-modal
@@ -100,7 +101,7 @@
              :on-add-quote (fn [m]
                              (db-doc-create! {:collection "quotes"
                                               :firestore firestore
-                                              :m (merge m {:createdAt (now)
+                                              :m (merge m {:createdAt (server-timestamp)
                                                            :createdBy user-id})}))
              :delete-quote! (fn [quote-id]
                               (db-path-delete! {:doc-path (str "quotes/" quote-id)
@@ -108,7 +109,7 @@
              :edit-quote! (fn [quote-id m-old m-new]
                             (db-path-upsert! {:doc-path (str "quotes/" quote-id)
                                               :firestore firestore
-                                              :m (merge m-old m-new {:lastEditedAt (now)
+                                              :m (merge m-old m-new {:lastEditedAt (server-timestamp)
                                                                      :lastEditedBy user-id})}))
              :on-like-quote (fn [quote-id]
                               (let [doc-path (str "quotes/" quote-id)
