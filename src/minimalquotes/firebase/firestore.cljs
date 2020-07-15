@@ -1,4 +1,5 @@
-(ns minimalquotes.firebase.firestore)
+(ns minimalquotes.firebase.firestore
+  (:require ["firebase/app" :as firebase]))
 
 (defn- on-successful-creation
   [doc]
@@ -79,3 +80,9 @@
      (.delete doc-ref)
      (.then on-resolve)
      (.catch on-reject))))
+
+(defn now
+  "ClojureScript wrapper for firebase.firestore.Timestamp.now()
+  https://firebase.google.com/docs/reference/js/firebase.firestore.Timestamp#static-now"
+  []
+  (.now (.. firebase -firestore -Timestamp)))

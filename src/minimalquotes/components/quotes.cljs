@@ -1,7 +1,10 @@
 (ns minimalquotes.components.quotes
   (:require
    [minimalquotes.components.buttons :as btn]
-   [minimalquotes.firebase.firestore :refer [db-doc-create! db-path-delete! db-path-upsert!]]
+   [minimalquotes.firebase.firestore :refer [db-doc-create!
+                                             db-path-delete!
+                                             db-path-upsert!
+                                             now]]
    [minimalquotes.components.icons :refer [icon-login]]
    [minimalquotes.components.quote-editor :refer [button-add-new-quote-modal
                                                   button-delete-quote-modal
@@ -94,17 +97,19 @@
         firestore @state/db
         user-id (:uid @state/user)]
     [quotes {:entries entries
-             :on-add-quote (fn [quote]
+             :on-add-quote (fn [m]
                              (db-doc-create! {:collection "quotes"
                                               :firestore firestore
-                                              :m (merge quote {:createdBy user-id})}))
+                                              :m (merge m {:createdAt (now)
+                                                           :createdBy user-id})}))
              :delete-quote! (fn [quote-id]
                               (db-path-delete! {:doc-path (str "quotes/" quote-id)
                                                 :firestore firestore}))
-             :edit-quote! (fn [quote-id updated-quote]
+             :edit-quote! (fn [quote-id m-old m-new]
                             (db-path-upsert! {:doc-path (str "quotes/" quote-id)
                                               :firestore firestore
-                                              :m updated-quote}))
+                                              :m (merge m-old m-new {:lastEditedAt (now)
+                                                                     :lastEditedBy user-id})}))
              :on-like-quote (fn [quote-id]
                               (let [doc-path (str "quotes/" quote-id)
                                     k (keyword quote-id)
