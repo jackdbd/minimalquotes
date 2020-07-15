@@ -30,5 +30,5 @@
   (init-firebase!)
   (db-docs-subscribe! {:collection "quotes"
                        :firestore @state/db
-                       :ratom-collection state/quotes})
+                       :ratom state/quotes})
   (mount-root))

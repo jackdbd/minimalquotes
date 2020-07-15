@@ -2,7 +2,7 @@
   "Handle authentication in Firebase with several authentication providers."
   (:require
    ["firebase/app" :as firebase]
-   [minimalquotes.firebase.firestore :refer [db-docs-subscribe! db-path-upsert!]]
+   [minimalquotes.firebase.firestore :refer [db-path-upsert!]]
    [minimalquotes.state :as state]))
 
 (defn sign-in-with-google
@@ -29,9 +29,6 @@
              :email (.-email user)
              :photo-url (.-photoURL user)
              :uid uid}]
-      ; (db-docs-subscribe! {:collection "quotes"
-      ;                      :firestore @state/db
-      ;                      :ratom-collection state/quotes})
       (reset! state/user m)
       (db-path-upsert! {:doc-path (str "users/" uid) :firestore @state/db :m m}))
     (reset! state/user nil)))

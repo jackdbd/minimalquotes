@@ -23,19 +23,25 @@
   (js/console.error "=== Error: cannot delete document === ")
   (js/console.error err))
 
-(defn- update-from-firestore!
-  "Update local app state with a document from Firestore."
-  [ratom-collection doc]
+(defn- update-state-from-firestore!
+  "Sync a reagent atom-like object (e.g. a reagent cursor) with a document from
+  Firestore. When syncing from Firestore, you could optionally add the document
+  id in the document itself.
+  TODO: to keywordize or not to keywordize?"
+  [{:keys [include-doc-id? ratom]
+    :or {include-doc-id? false}} doc]
   (let [k (keyword (.. doc -id))
         m (js->clj (.data doc) :keywordize-keys true)
         v (assoc m :id k)]
-    (swap! ratom-collection assoc k v)))
+    (if include-doc-id?
+      (swap! ratom assoc k v)
+      (swap! ratom assoc k m))))
 
 (defn db-docs-subscribe!
   "Listen to the changes in a Firestore collection and update local app state."
-  [{:keys [collection firestore ratom-collection]}]
+  [{:keys [collection firestore ratom]}]
   (let [coll-ref (.collection firestore collection)
-        f (partial update-from-firestore! ratom-collection)]
+        f (partial update-state-from-firestore! {:ratom ratom})]
     (.onSnapshot coll-ref (fn [query-snapshot]
                             (.forEach query-snapshot f)))))
 

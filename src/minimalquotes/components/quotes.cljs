@@ -43,8 +43,8 @@
   (fn m->li [[k-quote-id m]]
     (let [doc-id (k->str k-quote-id)
           delete! (partial delete-quote! doc-id)
-          edit! (partial edit-quote! doc-id)]
-      ; (prn "m->li" "k-quote-id" k-quote-id "doc-id" doc-id "user-id" user-id)
+          edit! (partial edit-quote! doc-id m)]
+      ; (prn "m->li" "k-quote-id" k-quote-id "doc-id" doc-id "user-id" user-id "m" m)
       ^{:key doc-id} [:li
                       [quote-card {:author (:author m)
                                    :delete! delete!
