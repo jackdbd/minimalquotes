@@ -8,7 +8,6 @@
 
 (defcard "## Quote card for an unauthenticated user")
 
-(declare quote-unauthenticated-card)
 (defcard quote-unauthenticated-card
   (let [props {:author "Leon Battista Alberti"
                :id fakes/quote-id-0
@@ -19,7 +18,6 @@
 
 (defcard "## Quote card for an authenticated user")
 
-(declare quote-authenticated-card)
 (defcard quote-authenticated-card
   (let [props {:author "Leon Battista Alberti"
                :id fakes/quote-id-0
@@ -33,7 +31,6 @@
 
 (defcard "## Quotes for an unauthenticated user")
 
-(declare quotes-unauthenticated-card)
 (defcard quotes-unauthenticated-card
   (let [props {:entries fakes/quotes
                :on-delete-quote (fn [user-id quote-id]
@@ -49,7 +46,6 @@
 
 (defcard "## Quotes for an authenticated user")
 
-(declare quotes-authenticated-card)
 (defcard quotes-authenticated-card
   (let [props {:entries fakes/quotes
                :on-delete-quote (fn [user-id quote-id]

@@ -1,0 +1,18 @@
+
+{:linters {:missing-docstring {:level :off}
+           ; goog.DEBUG is signaled as unresolved symbol. This is already fixed,
+           ; but the clj-kondo version on NPM is a bit older and still has the bug.
+           ; https://github.com/borkdude/clj-kondo/pull/860
+           :unresolved-symbol {:exclude [(devcards.core/defcard [app-modal-card
+                                                                 cancel-button-card
+                                                                 login-button-card
+                                                                 logout-button-card
+                                                                 quote-authenticated-card
+                                                                 quote-unauthenticated-card
+                                                                 quotes-authenticated-card
+                                                                 quotes-unauthenticated-card
+                                                                 quote-editor-form-card
+                                                                 quote-editor-modal-card
+                                                                 submit-button-card])
+                                         (devcards.core/deftest [quote-editor-form-tests-card])]}
+           :unused-referred-var {:exclude {minimalquotes.firebase.firestore [now]}}}}
