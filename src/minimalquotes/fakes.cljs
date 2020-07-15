@@ -12,21 +12,26 @@
 (def quote-id-4 "lhhGqYQrNsVb0ZyrV1NW")
 (def quote-id-5 "tTZSa7xGoY61lePYs2YX")
 
-(def quotes {quote-id-0 {:author "Jeff Atwood"
-                         :id quote-id-0
-                         :text "You can never have too little minimalism."}
+(def author-0 "Jeff Atwood")
+(def text-0 "You can never have too little minimalism.")
+
+(def quote-0 {:author author-0
+              :id quote-id-0
+              :text text-0})
+
+(def quotes {quote-id-0 quote-0
              quote-id-1 {:author "Mark Twain"
                          :id quote-id-1
                          :text "Too much of anything is bad, but too much whiskey is just enough."}
              quote-id-2 {:author "Nicolò Machiavelli"
                          :id quote-id-2
                          :text "Both fortune and virtue are needed to become a prince. Without virtue, no fortune can last; without fortune, your virtues may be useless."}
-             quote-id-3 {:author "Mark Twain"
+             quote-id-3 {:author "Zen master"
                          :id quote-id-3
-                         :text "Too much of anything is bad, but too much whiskey is just enough"}
+                         :text "If you walk, just walk. If you sit, just sit; but whatever you do, don't wobble"}
              quote-id-4 {:author "Leon Battista Alberti"
                          :id quote-id-4
-                         :text "No art, however minor, demands less than total dedication if you want to excel in it"}
+                         :text "No art, however minor, demands less than total dedication if you want to excel in it."}
              quote-id-5 {:author "It doesn’t matter how beautiful your theory is, it doesn’t matter how smart you are. If it doesn’t agree with experiment, it’s wrong."
                          :id quote-id-5
                          :text "Richard Feynman"}})

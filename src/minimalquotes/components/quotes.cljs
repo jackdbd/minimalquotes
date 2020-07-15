@@ -1,30 +1,30 @@
 (ns minimalquotes.components.quotes
   (:require
    [minimalquotes.components.buttons :as btn]
-   [minimalquotes.firebase.firestore :refer [db-path-delete! db-path-upsert!]]
+   [minimalquotes.firebase.firestore :refer [db-doc-create! db-path-delete! db-path-upsert!]]
    [minimalquotes.components.icons :refer [icon-login]]
-   [minimalquotes.state :as state]))
+   [minimalquotes.components.quote-editor :refer [button-add-new-quote-modal
+                                                  button-delete-quote-modal
+                                                  button-edit-quote-modal]]
+   [minimalquotes.state :as state]
+   [minimalquotes.utils :refer [k->str]]))
 
 (defn quote-card
   "A card for a single quote. If the user is authenticated, he can
   edit/delete/like/share the quote."
-  [{:keys [author id on-delete on-edit on-like on-share text user-id]}]
+  [{:keys [author delete! edit! id on-like on-share text user-id]}]
   [:div {:class ["quote" "rounded" "overflow-hidden" "shadow-lg"
                  "max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl"]}
    [:p (str text " ― " author)]
    [:div "tags"]
    [:div
     (when user-id
-      [btn/button {:data-attributes {:data-id id
-                                     :data-operation "edit"}
-                   :icon icon-login
-                   :on-click on-edit
-                   :text "Edit"}])
-    (when user-id
-      [btn/button {:data-attributes {:data-id id
-                                     :data-operation "delete"}
-                   :on-click on-delete
-                   :text "Delete"}])
+      [:<>
+       [button-edit-quote-modal {:author author
+                                 :on-confirm edit!
+                                 :text text}]
+       [button-delete-quote-modal {:author author
+                                   :on-confirm delete!}]])
     (when user-id
       [btn/button {:data-attributes {:data-id id
                                      :data-operation "like"}
@@ -37,68 +37,84 @@
                  :text "Share"}]]])
 
 (defn make-m->li
-  "Given a user id, return a function that maps a quote (i.e. a map which
-  contains the quote's author, id and text) to a <li> element."
-  [user-id]
-  (fn m->li [{:keys [author id text]}]
-    ^{:key id} [:li
-                [quote-card {:author author :id id :text text :user-id user-id}]]))
+  "Given a user id and the callbacks that perform side-effects on a quote,
+  return a function that maps a quote (id + values) to a <li> element."
+  [{:keys [delete-quote! edit-quote! user-id]}]
+  (fn m->li [[k-quote-id m]]
+    (let [doc-id (k->str k-quote-id)
+          delete! (partial delete-quote! doc-id)
+          edit! (partial edit-quote! doc-id)]
+      ; (prn "m->li" "k-quote-id" k-quote-id "doc-id" doc-id "user-id" user-id)
+      ^{:key doc-id} [:li
+                      [quote-card {:author (:author m)
+                                   :delete! delete!
+                                   :edit! edit!
+                                   :id doc-id
+                                   :text (:text m)
+                                   :user-id user-id}]])))
 
 (defn make-on-quotes-click
-  "Exploit DOM event delegation and create a single event handler for all
-  operations on all quotes. Each quote must have the necessary data-attributes
-  for this handler to work properly."
-  [{:keys [on-delete-quote on-edit-quote on-like-quote on-share-quote user-id]}]
+  "Create a single on-click event handler for operations on quotes that don't
+  require confirmation from the user (i.e. no modals appear).
+  This single event handler exploits DOM event delegation. For this to work
+  property, each quote must have the necessary data-attributes.
+  TODO: decide which operations should be allowed for anonymous users."
+  [{:keys [on-like-quote on-share-quote user-id]}]
   (fn on-click [e]
     (let [quote-id (.. e -target -dataset -id)
           op (.. e -target -dataset -operation)]
+      ; (prn "make-on-quotes-click" user-id quote-id op)
       (when (and user-id quote-id op)
         (case op
-          "delete" (on-delete-quote user-id quote-id)
-          "edit" (on-edit-quote user-id quote-id)
-          "like" (on-like-quote user-id quote-id)
-          "share" (on-share-quote user-id quote-id)
+          "like" (on-like-quote quote-id)
+          "share" (on-share-quote quote-id)
           (println "Operation not implemented:" op))))))
 
 (defn quotes
   "List of the quotes currently on screen, arranged in a grid layout.
   TODO: add filters for quotes."
-  [{:keys [entries on-delete-quote on-edit-quote on-like-quote on-share-quote user-id]}]
-  (let [on-click (make-on-quotes-click {:on-delete-quote on-delete-quote
-                                        :on-edit-quote on-edit-quote
-                                        :on-like-quote on-like-quote
+  [{:keys [delete-quote! edit-quote! entries on-add-quote on-like-quote on-share-quote user-id]}]
+  (let [on-click (make-on-quotes-click {:on-like-quote on-like-quote
                                         :on-share-quote on-share-quote
                                         :user-id user-id})
-        m->li (make-m->li user-id)]
+        m->li (make-m->li {:delete-quote! delete-quote!
+                           :edit-quote! edit-quote!
+                           :user-id user-id})]
     [:ul {:class ["grid"
                   "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6"
                   "gap-4"]
           :on-click on-click}
-     (map m->li (vals entries))]))
+     [button-add-new-quote-modal {:on-confirm on-add-quote}]
+     (map m->li entries)]))
 
 (defn quotes-container
   "Quotes component that extracts its required props from the app state."
   []
-  [quotes {:entries @state/quotes
-           :on-delete-quote (fn [user-id quote-id]
+  (let [entries @state/quotes
+        firestore @state/db
+        user-id (:uid @state/user)]
+    [quotes {:entries entries
+             :on-add-quote (fn [quote]
+                             (db-doc-create! {:collection "quotes"
+                                              :firestore firestore
+                                              :m (merge quote {:createdBy user-id})}))
+             :delete-quote! (fn [quote-id]
                               (db-path-delete! {:doc-path (str "quotes/" quote-id)
-                                                :firestore @state/db}))
-           :on-edit-quote (fn [user-id quote-id]
-                            (let [k (keyword quote-id)
-                                  quote (k @state/quotes)]
-                              (db-path-upsert! {:doc-path (str "quotes/" quote-id)
-                                                :firestore @state/db
-                                                :m (merge quote {:author "John Smith"})})))
-           :on-like-quote (fn [user-id quote-id]
-                            (let [doc-path (str "quotes/" quote-id)
-                                  k (keyword quote-id)
-                                  quote (k @state/quotes)]
-                              (if (:likes quote)
-                                (db-path-upsert! {:doc-path doc-path
-                                                  :firestore @state/db
-                                                  :m (update quote :likes inc)})
-                                (db-path-upsert! {:doc-path doc-path
-                                                  :firestore @state/db
-                                                  :m (merge quote {:likes 1})}))))
-           :on-share-quote (fn [] (prn "TODO"))
-           :user-id (:uid @state/user)}])
+                                                :firestore firestore}))
+             :edit-quote! (fn [quote-id updated-quote]
+                            (db-path-upsert! {:doc-path (str "quotes/" quote-id)
+                                              :firestore firestore
+                                              :m updated-quote}))
+             :on-like-quote (fn [quote-id]
+                              (let [doc-path (str "quotes/" quote-id)
+                                    k (keyword quote-id)
+                                    quote (k entries)]
+                                (if (:likes quote)
+                                  (db-path-upsert! {:doc-path doc-path
+                                                    :firestore firestore
+                                                    :m (update quote :likes inc)})
+                                  (db-path-upsert! {:doc-path doc-path
+                                                    :firestore firestore
+                                                    :m (merge quote {:likes 1})}))))
+             :on-share-quote (fn [] (prn "TODO: share quote"))
+             :user-id user-id}]))

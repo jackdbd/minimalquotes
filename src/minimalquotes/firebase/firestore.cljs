@@ -1,14 +1,25 @@
-(ns minimalquotes.firebase.firestore
-  ; (:require [minimalquotes.state :as state])
-  )
+(ns minimalquotes.firebase.firestore)
+
+(defn- on-successful-creation
+  [doc]
+  (js/console.log "Doc written to Firestore with ID:" (.. doc -id)))
+
+(defn- on-failed-creation
+  [err]
+  (js/console.error "=== Error: cannot create document === ")
+  (js/console.error err))
 
 (defn- on-successful-update [])
-(defn- on-failed-update [err]
+
+(defn- on-failed-update
+  [err]
   (js/console.error "=== Error: cannot update document === ")
   (js/console.error err))
 
 (defn- on-successful-deletion [])
-(defn- on-failed-deletion [err]
+
+(defn- on-failed-deletion
+  [err]
   (js/console.error "=== Error: cannot delete document === ")
   (js/console.error err))
 
@@ -27,6 +38,18 @@
         f (partial update-from-firestore! ratom-collection)]
     (.onSnapshot coll-ref (fn [query-snapshot]
                             (.forEach query-snapshot f)))))
+
+(defn db-doc-create!
+  "Create a new Firestore document."
+  [{:keys [collection firestore m on-reject on-resolve]
+    :or {on-reject on-failed-creation
+         on-resolve on-successful-creation}}]
+  (let [coll-ref (.collection firestore collection)
+        doc (clj->js m)]
+    (->
+     (.add coll-ref doc)
+     (.then on-resolve)
+     (.catch on-reject))))
 
 (defn db-path-upsert!
   "Update an existing Firestore document or create a new one."

@@ -8,6 +8,8 @@
             [devcards.core :refer [start-devcard-ui!]]
             [minimalquotes.components.buttons-cards]
             [minimalquotes.components.header-cards]
+            [minimalquotes.components.modal-cards]
+            [minimalquotes.components.quote-editor-cards]
             [minimalquotes.components.quotes-cards]
             ["jsdom-global" :as jsdom-global]))
 
