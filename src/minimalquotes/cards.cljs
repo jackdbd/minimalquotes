@@ -6,11 +6,14 @@
             ; devcards needs cljsjs.react and cljsjs.react.dom to be imported
             ; separately for shadow-cljs to add shims.
             [devcards.core :refer [start-devcard-ui!]]
+            [minimalquotes.components.actions-cards]
             [minimalquotes.components.buttons-cards]
             [minimalquotes.components.header-cards]
             [minimalquotes.components.modal-cards]
             [minimalquotes.components.quote-editor-cards]
+            [minimalquotes.components.quote-cards]
             [minimalquotes.components.quotes-cards]
+            [minimalquotes.components.tags-cards]
             ["jsdom-global" :as jsdom-global]))
 
 ; Set jsdom to mock a dom environment for node testing.

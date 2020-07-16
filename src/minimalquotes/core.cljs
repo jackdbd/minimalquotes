@@ -3,7 +3,7 @@
   (:require
    [devtools.core :as devtools]
    [minimalquotes.components.app :refer [app]]
-   [minimalquotes.firebase.firestore :refer [db-docs-subscribe!]]
+   [minimalquotes.firebase.firestore :refer [db-docs-subscribe! db-docs-change-subscribe!]]
    [minimalquotes.firebase.init :refer [init-firebase!]]
    [minimalquotes.state :as state]
    [reagent.dom :as rdom]))
@@ -21,14 +21,33 @@
     (rdom/unmount-component-at-node root-el)
     (rdom/render [app] root-el)))
 
+(defn log-change!
+  [doc-change]
+  (prn (str "Document id " (.. doc-change -doc -id) " " (.. doc-change -type))))
+
+(defn set-public-subscriptions!
+  "Set subscriptions for publicly accessible documents and collections.
+  Private documents and collections (e.g. favorite quotes) cannot be subscribed
+  to at this point, only later when the user authenticates."
+  []
+  (let [unsubscribe-from-quotes! (db-docs-subscribe! {:collection "quotes"
+                                                      :firestore @state/db
+                                                      :ratom state/quotes})
+        unsubscribe-from-tags! (db-docs-subscribe! {:collection "tags"
+                                                    :firestore @state/db
+                                                    :ratom state/tags})
+        unsubscribe-from-quotes-changes! (db-docs-change-subscribe! {:collection "quotes"
+                                                                     :f log-change!
+                                                                     :firestore @state/db})]
+    (swap! state/subscriptions assoc :quotes unsubscribe-from-quotes!)
+    (swap! state/subscriptions assoc :quotes-changes unsubscribe-from-quotes-changes!)
+    (swap! state/subscriptions assoc :tags unsubscribe-from-tags!)))
+
 (defn ^:export main
   "Run application startup logic."
   []
   (when goog.DEBUG
-    ; (println "=== Check if devtools is setup ===" {:a 123 :b "BBB" :c {:d "d" :e #{1 2 3}}})
     (dev-setup))
   (init-firebase!)
-  (db-docs-subscribe! {:collection "quotes"
-                       :firestore @state/db
-                       :ratom state/quotes})
+  (set-public-subscriptions!)
   (mount-root))

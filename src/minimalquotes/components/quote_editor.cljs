@@ -2,7 +2,9 @@
   (:require
    [clojure.string :as str]
    [minimalquotes.components.buttons :as btn]
-   [minimalquotes.components.modal :refer [modal!]]))
+   [minimalquotes.components.icons :refer [icon-edit icon-trash]]
+   [minimalquotes.components.modal :refer [modal!]]
+   [minimalquotes.utils :refer [k->str]]))
 
 (def add-quote-form-id "add-quote-form")
 (def delete-quote-form-id "delete-quote-form")
@@ -23,6 +25,7 @@
 (defn form-field-values
   [form-id]
   {:author (form-field-value form-id "author")
+   :tags (.split (form-field-value form-id "tags") ",")
    :text (form-field-value form-id "text")})
 
 (defn form-field
@@ -42,13 +45,14 @@
 (defn quote-editor-form
   "Form with mutable fields (to avoid re-rendering this component every time we
   make a change to any one of its fields)."
-  [{:keys [author text id on-cancel on-submit]
+  [{:keys [author id on-cancel on-submit tags text]
     :or {author "" text ""}}]
   [:form {:class ["bg-white" "shadow-md" "rounded" "px-8" "pt-6" "pb-8"]
           :id id
           :on-submit on-submit}
    [form-field {:autofocus true :id "text" :value text}]
    [form-field {:id "author" :value author}]
+   [form-field {:id "tags" :value tags}]
    [:div {:class ["flex" "items-center" "justify-between"]}
     [btn/cancel {:on-click on-cancel}]
     [btn/submit]]])
@@ -66,18 +70,23 @@
                                                         :on-submit on-submit}])}]))
 
 (defn button-edit-quote-modal
-  [{:keys [author text on-confirm]}]
+  [{:keys [author tags text on-confirm]}]
+  ;; (prn "TAGS in modal" (reduce + "," (map k->str (keys tags))) (interpose "," (keys tags)))
+  ;; (prn "interpose" (apply str (interpose "," (map k->str (keys tags)))))
   (let [on-cancel #(modal! nil)
         on-submit (fn [e]
                     (.preventDefault e)
                     (on-confirm (form-field-values edit-quote-form-id))
-                    (modal! nil))]
-    [btn/button {:text "Edit"
+                    (modal! nil))
+        tags-string (apply str (interpose "," (map k->str (keys tags))))]
+    [btn/button {:icon icon-edit
                  :on-click #(modal! [quote-editor-form {:author author
                                                         :id edit-quote-form-id
                                                         :on-cancel on-cancel
                                                         :on-submit on-submit
-                                                        :text text}])}]))
+                                                        :tags tags-string
+                                                        :text text}])
+                 :text "Edit"}]))
 
 (defn delete-quote-form
   [{:keys [author on-cancel on-submit]
@@ -97,7 +106,8 @@
                     (.preventDefault e)
                     (on-confirm)
                     (modal! nil))]
-    [btn/button {:text "Delete"
+    [btn/button {:icon icon-trash
                  :on-click #(modal! [delete-quote-form {:author author
                                                         :on-cancel on-cancel
-                                                        :on-submit on-submit}])}]))
+                                                        :on-submit on-submit}])
+                 :text "Delete"}]))

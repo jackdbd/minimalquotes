@@ -22,6 +22,7 @@
                             (.preventDefault e)
                             (let [values (form-field-values "quote-editor-form-card")]
                               (js/alert values)))
+               :tags "money,love"
                :text fakes/text-0}]
     (dc/reagent [quote-editor-form props])))
 

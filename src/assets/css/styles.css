@@ -1,11 +1,49 @@
 @tailwind base;
 @tailwind components;
-
 @tailwind utilities;
 
 /* @import "variables.css"; */
 
 .quote {
-  /* font-family: var(--typography-font-family-primary); */
-  font-family: "Lobster", sans-serif;
+    /* font-family: var(--typography-font-family-primary); */
+    font-family: "Lobster", sans-serif;
+}
+
+.tooltip {
+    position: relative;
+}
+
+.tooltip::after {
+    background: rgba(69, 77, 93, .9);
+    border-radius: 6px;
+    color: #fff;
+    content: attr(data-tooltip);
+    display: block;
+    font-size: .8rem;
+    max-width: 320px;
+    opacity: 0;
+    overflow: hidden;
+    padding: .3rem .5rem;
+    pointer-events: none;
+    position: absolute;
+    text-overflow: ellipsis;
+    transform: translate(-50%, .4rem);
+    transition: all .2s ease;
+    white-space: pre;
+    z-index: 300;
+    bottom: 50%;
+    left: auto;
+    right: 100%;
+    transform: translate(.4rem, 50%);
+}
+
+.tooltip:focus::after,
+.tooltip:hover::after {
+    opacity: 1;
+    transform: translate(-.2rem, 50%);
+}
+
+.tooltip[disabled],
+.tooltip.disabled {
+    pointer-events: auto;
 }

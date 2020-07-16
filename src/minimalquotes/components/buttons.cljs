@@ -2,12 +2,16 @@
   (:require [minimalquotes.components.icons :refer [icon-login]]))
 
 (defn button
-  [{:keys [data-attributes icon on-click text]
-    :or {data-attributes {}}}]
-  (let [button-props {:class ["font-bold" "rounded" "bg-transparent" "text-blue-500"
+  [{:keys [color data-attributes icon on-click text]
+    :or {color "blue"
+         data-attributes {}}}]
+  (let [button-props {:class ["font-bold" "rounded" "bg-transparent"
+                              (str "text-" color "-500")
                               "px-4" "py-2"
-                              "border" "border-blue-500"
-                              "hover:bg-blue-700" "hover:text-white" "hover:border-transparent"]
+                              (when (:data-tooltip data-attributes) "tooltip")
+                              "border" (str "border-" color "-500")
+                              (str "hover:bg-" color "-700")
+                              "hover:text-white" "hover:border-transparent"]
                       :on-click on-click
                       :type "button"}
         icon-props {:css-classes ["w-4" "h-4" "fill-current" "ml-2"]}]

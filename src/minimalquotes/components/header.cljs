@@ -6,8 +6,11 @@
   [:header
    [:div {:class ["flex" "justify-end"]}
     (if user
-      [btn/logout {:on-click on-logout
-                   :user user}]
+      [:div {:class ["flex" "items-center"]}
+       [btn/button {:on-click #(js/alert (str "TODO: show favorite quotes for the user " (:uid user)))
+                    :text "Favorite quotes"}]
+       [btn/logout {:on-click on-logout
+                    :user user}]]
       [btn/login {:on-click on-login}])]
    [:img {:alt "minimalquotes logo"
           :class ["m-auto"]

@@ -3,7 +3,9 @@
            ; goog.DEBUG is signaled as unresolved symbol. This is already fixed,
            ; but the clj-kondo version on NPM is a bit older and still has the bug.
            ; https://github.com/borkdude/clj-kondo/pull/860
-           :unresolved-symbol {:exclude [(devcards.core/defcard [app-modal-card
+           :unresolved-symbol {:exclude [(devcards.core/defcard [actions-authenticated-card
+                                                                 actions-unauthenticated-card
+                                                                 app-modal-card
                                                                  cancel-button-card
                                                                  login-button-card
                                                                  logout-button-card
@@ -13,6 +15,10 @@
                                                                  quotes-unauthenticated-card
                                                                  quote-editor-form-card
                                                                  quote-editor-modal-card
-                                                                 submit-button-card])
-                                         (devcards.core/deftest [quote-editor-form-tests-card])]}
+                                                                 submit-button-card
+                                                                 tag-card
+                                                                 tags-card
+                                                                 tags-custom-margins-card])
+                                         (devcards.core/deftest [quote-editor-form-tests-card
+                                                                 tags-tests-card])]}
            :unused-referred-var {:exclude {minimalquotes.firebase.firestore [now]}}}}

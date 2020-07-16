@@ -7,7 +7,6 @@
 
 (defn sign-in-with-google
   []
-  (println "sign-in-with-google")
   (let [provider (firebase/auth.GoogleAuthProvider.)]
     (.signInWithPopup (firebase/auth) provider)))
 
@@ -17,12 +16,11 @@
 
 (defn sign-out
   []
-  (println "sign-out")
   (.signOut (firebase/auth)))
 
 (defn- next-or-observer
   "Observer for changes to the user's sign-in state."
-  [user]
+  [^js user]
   (if user
     (let [uid (.-uid user)
           m {:display-name (.-displayName user)
@@ -34,10 +32,9 @@
     (reset! state/user nil)))
 
 (defn- on-error [e]
-  (.error js/console "ERROR ===" e))
+  (js/console.error "=== Error: onAuthStateChanged ===" e))
 
 (defn on-auth-state-changed
   "Adds an observer for changes to the user's sign-in state."
   []
-  (println "on-auth-state-changed")
   (.onAuthStateChanged (firebase/auth) next-or-observer on-error))
