@@ -56,5 +56,7 @@
         [btn/button {:data-attributes {:data-id id
                                        :data-operation "share"
                                        :data-tooltip "Share this quote"}
+                     ; :direction "rtl" the direction is a user's preference,
+                     ; so it should come from the user's document
                      :icon icon-share
                      :text "Share"}]]]]]))

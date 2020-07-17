@@ -3,22 +3,15 @@
    ["@testing-library/react" :refer [cleanup render]]
    [cljs.test :include-macros true :refer [is]]
    [devcards.core :as dc :refer [defcard deftest]]
-   [minimalquotes.components.header :refer [header header-container]]
+   [minimalquotes.components.header :refer [header]]
    [minimalquotes.fakes :as fakes]
    [minimalquotes.utils :refer [testing-container]]
    [reagent.core :as r]))
 
 (defcard "# Header component")
 
-(defcard "## Header for an unauthenticated user.")
-
-(declare header-unauthenticated-card)
-(declare header-unauthenticated-tests-card)
-(declare header-authenticated-card)
-(declare header-authenticated-tests-card)
-(declare header-container-card)
-
 (defcard header-unauthenticated-card
+  "Header for an unauthenticated user."
   (let [props {:on-login (fn [_] (js/alert "Login"))}]
     (dc/reagent [header props])))
 
@@ -29,9 +22,8 @@
     (is (nil? (.queryByAltText tr "user avatar")) "Should not contain a user avatar")
     (cleanup)))
 
-(defcard "## Header for an authenticated user.")
-
 (defcard header-authenticated-card
+  "Header for an authenticated user."
   (let [props {:on-logout (fn [_] (js/alert "Logout"))
                :user fakes/user}]
     (dc/reagent [header props])))
@@ -43,6 +35,14 @@
     (is (.queryByAltText tr "user avatar") "Should contain a user avatar")
     (is (nil? (.queryByText tr "Login")) "Should not contain a 'Login'")
     (cleanup)))
+
+(defn header-container
+  [ratom]
+  (let [m @ratom
+        user (:user m)]
+    [header {:on-login #(reset! ratom {:user fakes/user})
+             :on-logout #(swap! ratom dissoc :user)
+             :user user}]))
 
 (defcard header-container-card
   (dc/reagent header-container)

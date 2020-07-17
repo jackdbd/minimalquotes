@@ -6,8 +6,13 @@
            :unresolved-symbol {:exclude [(devcards.core/defcard [actions-authenticated-card
                                                                  actions-unauthenticated-card
                                                                  app-modal-card
+                                                                 buttons-left-to-right-card
+                                                                 buttons-right-to-left-card
+                                                                 buttons-with-no-icons
                                                                  cancel-button-card
-                                                                 login-button-card
+                                                                 header-authenticated-card
+                                                                 header-container-card
+                                                                 header-unauthenticated-card
                                                                  logout-button-card
                                                                  quote-authenticated-card
                                                                  quote-unauthenticated-card
@@ -19,6 +24,8 @@
                                                                  tag-card
                                                                  tags-card
                                                                  tags-custom-margins-card])
-                                         (devcards.core/deftest [quote-editor-form-tests-card
+                                         (devcards.core/deftest [header-authenticated-tests-card
+                                                                 header-unauthenticated-tests-card
+                                                                 quote-editor-form-tests-card
                                                                  tags-tests-card])]}
            :unused-referred-var {:exclude {minimalquotes.firebase.firestore [now]}}}}

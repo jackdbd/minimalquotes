@@ -54,7 +54,8 @@
    [form-field {:id "author" :value author}]
    [form-field {:id "tags" :value tags}]
    [:div {:class ["flex" "items-center" "justify-between"]}
-    [btn/cancel {:on-click on-cancel}]
+    [btn/button {:on-click on-cancel
+                 :text "Cancel"}]
     [btn/submit]]])
 
 (defn button-add-new-quote-modal
@@ -96,7 +97,8 @@
           :on-submit on-submit}
    [:p (str "Are you sure you want to delete this quote by " author "?")]
    [:div {:class ["flex" "items-center" "justify-between"]}
-    [btn/cancel {:on-click on-cancel}]
+    [btn/button {:on-click on-cancel
+                 :text "Cancel"}]
     [btn/submit]]])
 
 (defn button-delete-quote-modal

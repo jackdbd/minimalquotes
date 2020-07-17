@@ -1,61 +1,45 @@
-(ns minimalquotes.components.buttons
-  (:require [minimalquotes.components.icons :refer [icon-login]]))
+(ns minimalquotes.components.buttons)
+
+; (def debug-css "border border-red-500 border-dashed")
+(def debug-css "")
 
 (defn button
-  [{:keys [color data-attributes icon on-click text]
+  [{:keys [color data-attributes direction icon on-click text]
     :or {color "blue"
-         data-attributes {}}}]
-  (let [button-props {:class ["font-bold" "rounded" "bg-transparent"
+         data-attributes {}
+         direction "ltr"}}]
+  (let [margin-tailwind-class (if (= "ltr" direction) "ml-1" "mr-1")
+        button-props {:class ["font-bold" "rounded" "bg-transparent"
+                              "px-2" "py-2"
                               (str "text-" color "-500")
-                              "px-4" "py-2"
                               (when (:data-tooltip data-attributes) "tooltip")
                               "border" (str "border-" color "-500")
                               (str "hover:bg-" color "-700")
                               "hover:text-white" "hover:border-transparent"]
                       :on-click on-click
+                      :style {:direction direction}
                       :type "button"}
-        icon-props {:css-classes ["w-4" "h-4" "fill-current" "ml-2"]}]
+        icon-props {:css-classes ["w-4" "h-4" "fill-current" margin-tailwind-class]}
+        ]
     [:button (merge button-props data-attributes)
-     [:span data-attributes text]
-     (when icon
-       [icon (merge icon-props {:data-attributes data-attributes})])]))
-
-(defn cancel
-  [{:keys [on-click]}]
-  [:button {:class ["font-bold" "rounded" "bg-transparent" "text-blue-500"
-                    "px-4" "py-2"
-                    "border" "border-blue-500"
-                    "hover:bg-blue-700" "hover:text-white" "hover:border-transparent"]
-            :on-click on-click
-            :type "button"}
-   [:span "Cancel"]])
-
-(defn login
-  [{:keys [on-click]}]
-  [:button {:class ["font-bold" "rounded"
-                    "bg-transparent" "text-blue-500"
-                    "px-4" "py-2"
-                    "border" "border-blue-500"
-                    "tooltip"
-                    "inline-flex"
-                    "items-center"
-                    "hover:bg-blue-700" "hover:text-white" "hover:border-transparent"]
-            :data-tooltip "Login"
-            :on-click on-click
-            :type "button"}
-   [:span "Login"]
-   [icon-login {:css-classes ["w-4" "h-4" "fill-current" "ml-2"]}]])
+     [:div {:class ["inline-flex" "items-center" debug-css]}
+      [:span data-attributes text]
+      (when icon
+        [icon (merge icon-props {:data-attributes data-attributes})])]]))
 
 (defn logout
-  [{:keys [on-click user]}]
-  [:button {:class ["font-bold" "rounded" "items-center"
-                    "bg-transparent" "text-blue-500"
-                    "px-2" "py-1"
-                    "border" "border-blue-500"
+  [{:keys [color logout! user]
+    :or {color "blue"}}]
+  [:button {:class ["font-bold" "rounded" "bg-transparent"
+                    "px-2" "py-2"
+                    (str "text-" color "-500")
+                    "items-center"
                     "tooltip"
-                    "hover:bg-blue-700" "hover:text-white" "hover:border-transparent"]
+                    "border" (str "border-" color "-500")
+                    (str "hover:bg-" color "-700")
+                    "hover:text-white" "hover:border-transparent"]
             :data-tooltip "Logout"
-            :on-click on-click
+            :on-click #(logout! user)
             :type "button"}
    [:figure
     [:img {:alt "user avatar"
@@ -63,9 +47,11 @@
            :src (:photo-url user)}]]])
 
 (defn submit
-  []
-  [:button {:class ["font-bold" "rounded" "bg-blue-500" "text-white"
-                    "px-4" "py-2"
-                    "hover:bg-blue-700"
+  [{:keys [color]
+    :or {color "blue"}}]
+  [:button {:class ["font-bold" "rounded" "text-white"
+                    "px-2" "py-2"
+                    (str "bg-" color "-500")
+                    (str "hover:bg-" color "-700")
                     "focus:outline-none" "focus:shadow-outline"]
             :type "input"} "Submit"])

@@ -4,7 +4,7 @@
 
 (def user {:display-name "John Doe"
            :email "john.doe@emailprovider.com"
-           :photo-url "img/minimalquotes-icon.png"
+           :photo-url "https://api.adorable.io/avatars/285/abott@adorable.png"
            :uid user-id})
 
 (def tag-art {:color "indigo"
