@@ -27,3 +27,11 @@
 (defn k->str
   [k]
   (str/replace (str k) ":" ""))
+
+(defn log-error
+  "TODO: print better stack traces, either in JS or CLJS."
+  [err]
+  (js/console.groupCollapsed (str "%c" (.. err -name) ": " (.. err -message)) "background: #fff; color: red;")
+  (when (.. err -code) (js/console.error (.. err -code)))
+  (js/console.trace err)
+  (js/console.groupEnd))

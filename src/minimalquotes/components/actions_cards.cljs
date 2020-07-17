@@ -31,17 +31,17 @@
 
 (defn actions-example
   []
-  (let [props {:author fakes/author-0
-               :delete! (fn []
-                          (js/alert "delete"))
-               :edit! (fn [m-form]
-                        (js/alert (js/JSON.stringify (clj->js m-form) nil 2)))
-               :id fakes/quote-id-0
+  (let [props {:id fakes/quote-id-0
                :on-click-action on-click-action
+               :on-delete (fn [author]
+                            (js/alert (str "Delete quote by " author)))
+               :on-edit (fn [values]
+                          (js/alert (js/JSON.stringify (clj->js values) nil 2)))
                :on-like on-like
                :on-share on-share
+               :quote-author fakes/author-0
+               :quote-text fakes/text-0
                :tags fakes/tags
-               :text fakes/text-0
                :user fakes/user}]
     [:<>
      [modal-window]

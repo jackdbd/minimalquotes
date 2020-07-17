@@ -1,5 +1,7 @@
+# clj-kondo linter
 .clj-kondo/*
 !.clj-kondo/config.edn
+
 .firebase/
 .shadow-cljs/
 node_modules/
@@ -10,3 +12,7 @@ public/js/
 .nrepl-port
 report.html
 yarn-error.log
+
+# Firebase emulators
+firestore-debug.log
+ui-debug.log

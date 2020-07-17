@@ -18,7 +18,14 @@
                  :target :node-test}}
  :dependencies [[binaryage/devtools "1.0.2"]
                 [devcards "0.2.6"]
-                [reagent "1.0.0-alpha2"]]
+                [fork "2.0.4"]
+                [metosin/reitit "0.5.5"]
+                [metosin/reitit-dev "0.4.2"]
+                [pez/clerk "1.0.0"]
+                [reagent "1.0.0-alpha2"]
+                [reagent-utils "0.3.3"]
+                [venantius/accountant "0.2.5"]
+                [vlad "3.3.2"]]
  :dev-http {3000 "public"}
  :nrepl {:port 3333}
  :source-paths ["src"]}

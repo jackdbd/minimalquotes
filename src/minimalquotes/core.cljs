@@ -1,12 +1,34 @@
 (ns minimalquotes.core
-  "This namespace contains the entrypoint of the app."
   (:require
+   [accountant.core :as accountant]
+   [clerk.core :as clerk]
    [devtools.core :as devtools]
-   [minimalquotes.components.app :refer [app]]
+   [minimalquotes.pages.core :refer [current-page page-for]]
    [minimalquotes.firebase.firestore :refer [db-docs-subscribe! db-docs-change-subscribe!]]
    [minimalquotes.firebase.init :refer [init-firebase!]]
+   [minimalquotes.routes :refer [router]]
    [minimalquotes.state :as state]
-   [reagent.dom :as rdom]))
+   [reagent.core :as r]
+   [reagent.dom :as rdom]
+   [reagent.session :as session]
+   [reitit.frontend :as rf]))
+
+(defn hook-browser-navigation!
+  "Replace the browser's scrolling restoration with clerk's and configure
+  accountant as History API navigation manager."
+  []
+  (clerk/initialize!)
+  (accountant/configure-navigation!
+   {:nav-handler (fn [path]
+                   (let [match (rf/match-by-path router path)
+                         name (:name (:data  match))
+                         route-params (:path-params match)]
+                     (r/after-render clerk/after-render!)
+                     (session/put! :route {:current-page (page-for name)
+                                           :route-params route-params})
+                     (clerk/navigate-page! path)))
+    :path-exists? (fn [path]
+                    (boolean (rf/match-by-path router path)))}))
 
 (defn dev-setup []
   ;; enable https://github.com/binaryage/cljs-devtools
@@ -19,7 +41,7 @@
   []
   (let [root-el (.getElementById js/document "app")]
     (rdom/unmount-component-at-node root-el)
-    (rdom/render [app] root-el)))
+    (rdom/render [current-page] root-el)))
 
 (defn log-change!
   [doc-change]
@@ -50,4 +72,6 @@
     (dev-setup))
   (init-firebase!)
   (set-public-subscriptions!)
+  (hook-browser-navigation!)
+  (accountant/dispatch-current!)
   (mount-root))

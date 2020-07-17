@@ -18,20 +18,21 @@
   "Given a user id and the callbacks that perform side-effects on a quote,
   return a function that maps a quote (id + values) to a <li> element."
   [{:keys [delete-quote! edit-quote! user]}]
-  (fn m->li [[k {:keys [author tags text]
-                 :as m}]]
-    ; (prn "m->li" "m" m "user" user)
+  (fn m->li
+    [[k {:keys [author tags text]
+         :as m}]]
+    ;; (prn "m->li" "m" m "user" user)
     (let [doc-id (k->str k)
           delete! (partial delete-quote! doc-id)
           edit! (partial edit-quote! doc-id m)]
       ^{:key doc-id} [:li {:class ["flex" "items-stretch"
                                    debug-css]}
-                      [quote-card {:author author
-                                   :delete! delete!
+                      [quote-card {:delete! delete!
                                    :edit! edit!
                                    :id doc-id
                                    :tags tags
-                                   :text text
+                                   :quote-author author
+                                   :quote-text text
                                    :user user}]])))
 
 (defn make-on-quotes-click
@@ -59,6 +60,7 @@
   TODO: add filters for quotes."
   [{:keys [delete-quote! edit-quote! entries on-add-quote on-click-tag
            on-like-quote on-share-quote user]}]
+  ;; (prn "=== quotes entries ===" entries)
   (let [on-click (make-on-quotes-click {:on-click-tag on-click-tag
                                         :on-like-quote on-like-quote
                                         :on-share-quote on-share-quote
@@ -80,6 +82,8 @@
         f (fn [acc cv] (assoc acc (keyword cv) true))]
     (reduce f {} tag-names)))
 
+;; TODO: spec for entries
+
 (defn quotes-container
   "Quotes component that extracts its required props from the app state."
   []
@@ -93,8 +97,6 @@
               ;; (prn "entry" entry "k" k)
               entry))
         entries (reduce into {} (map f @state/quotes))]
-    ;; (prn "@state/quotes" @state/quotes)
-    ;; (prn "entries" entries)
     [quotes {:entries entries
              :on-add-quote (fn [m-form]
                              (let [m-tag (form-tags->m-tag (:tags m-form))

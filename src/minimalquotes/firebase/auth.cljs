@@ -3,7 +3,8 @@
   (:require
    ["firebase/app" :as firebase]
    [minimalquotes.firebase.firestore :refer [db-path-upsert!]]
-   [minimalquotes.state :as state]))
+   [minimalquotes.state :as state]
+   [minimalquotes.utils :refer [log-error]]))
 
 (defn sign-in-with-google
   []
@@ -31,10 +32,7 @@
       (db-path-upsert! {:doc-path (str "users/" uid) :firestore @state/db :m m}))
     (reset! state/user nil)))
 
-(defn- on-error [e]
-  (js/console.error "=== Error: onAuthStateChanged ===" e))
-
 (defn on-auth-state-changed
   "Adds an observer for changes to the user's sign-in state."
   []
-  (.onAuthStateChanged (firebase/auth) next-or-observer on-error))
+  (.onAuthStateChanged (firebase/auth) next-or-observer log-error))

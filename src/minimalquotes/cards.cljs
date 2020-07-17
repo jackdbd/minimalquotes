@@ -8,6 +8,7 @@
             [devcards.core :refer [start-devcard-ui!]]
             [minimalquotes.components.actions-cards]
             [minimalquotes.components.buttons-cards]
+            [minimalquotes.components.error-boundary-cards]
             [minimalquotes.components.header-cards]
             [minimalquotes.components.modal-cards]
             [minimalquotes.components.quote-forms-cards]

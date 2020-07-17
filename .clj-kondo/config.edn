@@ -10,22 +10,23 @@
                                                                  buttons-right-to-left-card
                                                                  buttons-with-no-icons
                                                                  cancel-button-card
+                                                                 footer-card
                                                                  header-authenticated-card
                                                                  header-container-card
                                                                  header-unauthenticated-card
                                                                  logout-button-card
                                                                  quote-authenticated-card
+                                                                 quote-form-card
+                                                                 quote-form-modal-buttons-card
                                                                  quote-unauthenticated-card
                                                                  quotes-authenticated-card
                                                                  quotes-unauthenticated-card
-                                                                 quote-editor-form-card
-                                                                 quote-editor-modal-card
                                                                  submit-button-card
                                                                  tag-card
                                                                  tags-card
                                                                  tags-custom-margins-card])
                                          (devcards.core/deftest [header-authenticated-tests-card
                                                                  header-unauthenticated-tests-card
-                                                                 quote-editor-form-tests-card
+                                                                 quote-form-tests-card
                                                                  tags-tests-card])]}
            :unused-referred-var {:exclude {minimalquotes.firebase.firestore [now]}}}}

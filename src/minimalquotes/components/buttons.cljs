@@ -47,11 +47,12 @@
            :src (:photo-url user)}]]])
 
 (defn submit
-  [{:keys [color]
-    :or {color "blue"}}]
+  [{:keys [color disabled text]
+    :or {color "blue" disabled false text "Submit"}}]
   [:button {:class ["font-bold" "rounded" "text-white"
                     "px-2" "py-2"
                     (str "bg-" color "-500")
                     (str "hover:bg-" color "-700")
                     "focus:outline-none" "focus:shadow-outline"]
-            :type "input"} "Submit"])
+            :disabled disabled
+            :type "submit"} text])

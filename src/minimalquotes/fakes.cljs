@@ -35,15 +35,15 @@
                  :description "A tag about wisdom"
                  :name "wisdom"})
 
-(def tags {:art tag-art
-           :cool tag-cool
-           :friendship tag-friendship
-           :love tag-love
-           :money tag-money
-           :motivation tag-motivation
-           :skill tag-skill
-           :style tag-style
-           :wisdom tag-wisdom})
+(def tags {"art-tag-id" tag-art
+           "cool-tag-id" tag-cool
+           "friendship-tag-id" tag-friendship
+           "love-tag-id" tag-love
+           "money-tag-id" tag-money
+           "motivation-tag-id" tag-motivation
+           "skill-tag-id" tag-skill
+           "style-tag-id" tag-style
+           "wisdom-tag-id" tag-wisdom})
 
 (def quote-id-0 "Hvx2oAFAQ3GWKHUcqRdu")
 (def quote-id-1 "ftnfLpbqkBKdWegivYZa")

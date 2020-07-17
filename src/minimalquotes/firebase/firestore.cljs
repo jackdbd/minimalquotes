@@ -2,7 +2,8 @@
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require
    [cljs.core.async.interop :refer-macros [<p!]]
-   ["firebase/app" :as firebase]))
+   ["firebase/app" :as firebase]
+   [minimalquotes.utils :refer [log-error]]))
 
 ; https://code.thheller.com/blog/shadow-cljs/2017/11/06/improved-externs-inference.html
 (set! *warn-on-infer* true)
@@ -14,14 +15,6 @@
 (defn- on-successful-update [])
 
 (defn- on-successful-deletion [])
-
-(defn- on-error
-  "TODO: print better stack traces, either in JS or CLJS."
-  [err]
-  (js/console.groupCollapsed (str "%c" (.. err -name) ": "(.. err -message)) "background: #fff; color: red;")
-  (js/console.error (.. err -code))
-  (js/console.trace err)
-  (js/console.groupEnd))
 
 (defn- update-state-from-firestore!
   "Sync a reagent atom-like object (e.g. a reagent cursor) with a document from
@@ -50,7 +43,7 @@
         on-query-snapshot (fn [^js query-snapshot]
                             (reset! ratom {})
                             (.forEach query-snapshot f))]
-    (.onSnapshot coll-ref on-query-snapshot on-error)))
+    (.onSnapshot coll-ref on-query-snapshot log-error)))
 
 (defn db-docs-change-subscribe!
   "Subscribe to changes to query results between query snapshots. Whenever a
@@ -62,12 +55,12 @@
         on-query-snapshot (fn [^js query-snapshot]
                             (let [doc-changes (.docChanges query-snapshot)]
                               (.forEach doc-changes f)))]
-    (.onSnapshot coll-ref on-query-snapshot on-error)))
+    (.onSnapshot coll-ref on-query-snapshot log-error)))
 
 (defn db-doc-create!
   "Create a new Firestore document."
   [{:keys [collection firestore m on-reject on-resolve]
-    :or {on-reject on-error
+    :or {on-reject log-error
          on-resolve on-successful-creation}}]
   (let [coll-ref (.collection firestore collection)
         doc (clj->js m)]
@@ -79,7 +72,7 @@
 (defn db-path-upsert!
   "Update an existing Firestore document or create a new one."
   [{:keys [doc-path firestore m on-reject on-resolve]
-    :or {on-reject on-error
+    :or {on-reject log-error
          on-resolve on-successful-update}}]
   (let [doc-ref (.doc firestore doc-path)
         doc (clj->js m)]
@@ -91,7 +84,7 @@
 (defn db-path-delete!
   "Delete a document in Firestore."
   [{:keys [doc-path firestore on-reject on-resolve]
-    :or {on-reject on-error
+    :or {on-reject log-error
          on-resolve on-successful-deletion}}]
   (let [doc-ref (.doc firestore doc-path)]
     (->
