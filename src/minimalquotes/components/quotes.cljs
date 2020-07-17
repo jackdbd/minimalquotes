@@ -7,7 +7,7 @@
                                              quotes-with-tag
                                              server-timestamp]]
    [minimalquotes.components.quote :refer [quote-card]]
-   [minimalquotes.components.quote-editor :refer [button-add-new-quote-modal]]
+   [minimalquotes.components.quote-forms :refer [button-add-new-quote-modal]]
    [minimalquotes.state :as state]
    [minimalquotes.utils :refer [k->str]]))
 

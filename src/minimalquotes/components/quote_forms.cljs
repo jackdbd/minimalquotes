@@ -1,4 +1,4 @@
-(ns minimalquotes.components.quote-editor
+(ns minimalquotes.components.quote-forms
   (:require
    [clojure.string :as str]
    [minimalquotes.components.buttons :as btn]

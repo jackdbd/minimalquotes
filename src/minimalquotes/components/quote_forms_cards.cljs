@@ -1,17 +1,17 @@
-(ns minimalquotes.components.quote-editor-cards
+(ns minimalquotes.components.quote-forms-cards
   (:require
    ["@testing-library/react" :refer [cleanup render]]
    [cljs.test :include-macros true :refer [is]]
    [devcards.core :as dc :refer [defcard deftest]]
-   [minimalquotes.components.quote-editor :refer [button-add-new-quote-modal
-                                                  form-field-values
-                                                  quote-editor-form]]
+   [minimalquotes.components.quote-forms :refer [button-add-new-quote-modal
+                                                 form-field-values
+                                                 quote-editor-form]]
    [minimalquotes.components.modal :refer [modal-window]]
    [minimalquotes.fakes :as fakes]
    [minimalquotes.utils :refer [testing-container]]
    [reagent.core :as r]))
 
-(defcard "Quote editor form.")
+(defcard "# Quote forms")
 
 (defcard quote-editor-form-card
   (let [props {:author fakes/author-0
@@ -20,8 +20,8 @@
                             (js/alert "Cancel"))
                :on-submit (fn [e]
                             (.preventDefault e)
-                            (let [values (form-field-values "quote-editor-form-card")]
-                              (js/alert values)))
+                            (let [m (form-field-values "quote-editor-form-card")]
+                              (js/alert (js/JSON.stringify (clj->js m) nil 2))))
                :tags "money,love"
                :text fakes/text-0}]
     (dc/reagent [quote-editor-form props])))
@@ -41,7 +41,7 @@
 
 (defcard quote-editor-modal-card
   (let [props {:on-confirm (fn [m]
-                             (js/alert (js/JSON.stringify (clj->js m))))}]
+                             (js/alert (js/JSON.stringify (clj->js m) nil 2)))}]
     (dc/reagent [:div
                  [modal-window]
                  [button-add-new-quote-modal props]])))

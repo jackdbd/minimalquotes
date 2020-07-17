@@ -10,7 +10,7 @@
             [minimalquotes.components.buttons-cards]
             [minimalquotes.components.header-cards]
             [minimalquotes.components.modal-cards]
-            [minimalquotes.components.quote-editor-cards]
+            [minimalquotes.components.quote-forms-cards]
             [minimalquotes.components.quote-cards]
             [minimalquotes.components.quotes-cards]
             [minimalquotes.components.tags-cards]

@@ -2,8 +2,8 @@
   (:require
    [minimalquotes.components.buttons :as btn]
    [minimalquotes.components.icons :refer [icon-like icon-share]]
-   [minimalquotes.components.quote-editor :refer [button-delete-quote-modal
-                                                  button-edit-quote-modal]]))
+   [minimalquotes.components.quote-forms :refer [button-delete-quote-modal
+                                                 button-edit-quote-modal]]))
 
 ; (def debug-css "bg-green-300")
 (def debug-css "")
