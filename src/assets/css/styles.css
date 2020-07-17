@@ -47,3 +47,10 @@
 .tooltip.disabled {
     pointer-events: auto;
 }
+
+/* https://www.svgbackgrounds.com/#flat-mountains */
+.bg-flat-mountains {
+    background-color: #fff;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 900'%3E%3Cpolygon fill='%23bab397' points='957 450 539 900 1396 900'/%3E%3Cpolygon fill='%23384037' points='957 450 872.9 900 1396 900'/%3E%3Cpolygon fill='%239fae92' points='-60 900 398 662 816 900'/%3E%3Cpolygon fill='%231d443a' points='337 900 398 662 816 900'/%3E%3Cpolygon fill='%2382a995' points='1203 546 1552 900 876 900'/%3E%3Cpolygon fill='%2300474d' points='1203 546 1552 900 1162 900'/%3E%3Cpolygon fill='%2368a19e' points='641 695 886 900 367 900'/%3E%3Cpolygon fill='%2300476b' points='587 900 641 695 886 900'/%3E%3Cpolygon fill='%235b96a7' points='1710 900 1401 632 1096 900'/%3E%3Cpolygon fill='%23004284' points='1710 900 1401 632 1365 900'/%3E%3Cpolygon fill='%236189aa' points='1210 900 971 687 725 900'/%3E%3Cpolygon fill='%23303088' points='943 900 1210 900 971 687'/%3E%3C/svg%3E");
+    background-size: cover;
+}

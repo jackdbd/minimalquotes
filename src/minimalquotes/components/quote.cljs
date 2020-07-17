@@ -9,6 +9,9 @@
 ; (def debug-css "bg-gray-300")
 (def debug-css "")
 
+(def pattern-classes "bg-flat-mountains")
+; (def pattern-classes "")
+
 (defn quote-card
   "A card for a single quote. If the user is authenticated, he can
   edit/delete/like/share the quote."
@@ -16,10 +19,11 @@
   [:div {:class ["rounded-lg" "overflow-hidden" "shadow-lg"
                  "p-4"
                  "quote"
+                 pattern-classes
                  "flex" "flex-col" "justify-between"
                  debug-css-card
                  "max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl"]}
-   [:p (str text " ― " author)]
+   [:p {:class ["text-gray-800"]} (str text " ― " author)]
    [:div {:class [debug-css]}
     [tags-ns/tags {:entries tags}]
     [actions {:author author
