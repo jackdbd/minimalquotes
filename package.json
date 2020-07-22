@@ -10,6 +10,7 @@
     "build:css": "tailwindcss build src/assets/css/styles.css -o public/css/output.css",
     "cards": "shadow-cljs watch cards",
     "clean": "rimraf public/js",
+    "deploy": "yarn build && firebase deploy",
     "deploy:rules": "firebase deploy --only firestore:rules",
     "dev": "shadow-cljs watch app",
     "emulators": "firebase emulators:start",

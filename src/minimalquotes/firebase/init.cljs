@@ -27,6 +27,7 @@
     (swap! state/state assoc :firebase-ui ui)
     (swap! state/state assoc :firebase-ui-config ui-config)))
 
+;; TODO: make it generic for dev, staging, production environments.
 (defn init-firebase!
   "Initialize Firebase auth and Firestore database."
   []
@@ -41,6 +42,7 @@
         :storageBucket "minimalquotes-5c472.appspot.com"})
   (firebase/analytics)
   (firebase/performance)
-  (init-firebase-ui! "http://localhost:3000/")
+  (init-firebase-ui! "https://minimalquotes-5c472.web.app/")
+  ;; (init-firebase-ui! "http://localhost:3000/")
   (reset! state/db (firebase/firestore))
   (on-auth-state-changed))
