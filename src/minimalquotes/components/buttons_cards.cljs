@@ -71,14 +71,14 @@
                               :direction direction
                               :text "Wi-Fi"}]])))
 
-(defcard logout-button-card
-  (let [props {:logout! (fn [user]
-                          (js/alert (str "User " (:display-name user) " logs out")))
-               :user fakes/user}]
-    (dc/reagent [:div
-                 [btn/logout props]
-                 [btn/logout (merge props {:color "red"})]
-                 [btn/logout (merge props {:color "green"})]])))
+;; (defcard logout-button-card
+;;   (let [props {:logout! (fn [user]
+;;                           (js/alert (str "User " (:display-name user) " logs out")))
+;;                :user fakes/user}]
+;;     (dc/reagent [:div
+;;                  [btn/logout props]
+;;                  [btn/logout (merge props {:color "red"})]
+;;                  [btn/logout (merge props {:color "green"})]])))
 
 (defcard submit-button-card
   (dc/reagent [:div

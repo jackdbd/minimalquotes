@@ -27,24 +27,24 @@
       (when icon
         [icon (merge icon-props {:data-attributes data-attributes})])]]))
 
-(defn logout
-  [{:keys [color logout! user]
-    :or {color "blue"}}]
-  [:button {:class ["font-bold" "rounded" "bg-transparent"
-                    "px-2" "py-2"
-                    (str "text-" color "-500")
-                    "items-center"
-                    "tooltip"
-                    "border" (str "border-" color "-500")
-                    (str "hover:bg-" color "-700")
-                    "hover:text-white" "hover:border-transparent"]
-            :data-tooltip "Logout"
-            :on-click #(logout! user)
-            :type "button"}
-   [:figure
-    [:img {:alt "user avatar"
-           :class ["w-8 h-auto"]
-           :src (:photo-url user)}]]])
+;; (defn logout
+;;   [{:keys [color logout! user]
+;;     :or {color "blue"}}]
+;;   [:button {:class ["font-bold" "rounded" "bg-transparent"
+;;                     "px-2" "py-2"
+;;                     (str "text-" color "-500")
+;;                     "items-center"
+;;                     "tooltip"
+;;                     "border" (str "border-" color "-500")
+;;                     (str "hover:bg-" color "-700")
+;;                     "hover:text-white" "hover:border-transparent"]
+;;             :data-tooltip "Logout"
+;;             :on-click #(logout!)
+;;             :type "button"}
+;;    [:figure
+;;     [:img {:alt "user avatar"
+;;            :class ["w-8 h-auto"]
+;;            :src (:photo-url user)}]]])
 
 (defn submit
   [{:keys [color disabled text]

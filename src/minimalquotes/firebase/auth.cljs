@@ -27,7 +27,9 @@
           m {:display-name (.-displayName user)
              :email (.-email user)
              :photo-url (.-photoURL user)
+             :provider-data (.-providerData user)
              :uid uid}]
+      ;; (prn "USER m" m)
       (reset! state/user m)
       (db-path-upsert! {:doc-path (str "users/" uid) :firestore @state/db :m m}))
     (reset! state/user nil)))

@@ -7,8 +7,25 @@
    ["firebase/auth"]
    ["firebase/firestore"]
    ["firebase/performance"]
+   ["firebaseui" :as firebaseui]
    [minimalquotes.firebase.auth :refer [on-auth-state-changed]]
    [minimalquotes.state :as state]))
+
+(defn init-firebase-ui!
+  "Initialize the FirebaseUI widget with authentication providers and a redirect
+  to a URL. We cannot mount it in the DOM yet."
+  [sign-in-success-url]
+  (let [AuthUI (.. firebaseui -auth -AuthUI)
+        ui (AuthUI. (firebase/auth))
+        google (.. firebase -auth -GoogleAuthProvider -PROVIDER_ID)
+        facebook (.. firebase -auth -FacebookAuthProvider -PROVIDER_ID)
+        twitter (.. firebase -auth -TwitterAuthProvider -PROVIDER_ID)
+        email #js {:provider (.. firebase -auth -EmailAuthProvider -PROVIDER_ID)
+                   :requireDisplayName true}
+        ui-config #js {:signInOptions #js [google facebook twitter email]
+                       :signInSuccessUrl sign-in-success-url}]
+    (swap! state/state assoc :firebase-ui ui)
+    (swap! state/state assoc :firebase-ui-config ui-config)))
 
 (defn init-firebase!
   "Initialize Firebase auth and Firestore database."
@@ -24,5 +41,6 @@
         :storageBucket "minimalquotes-5c472.appspot.com"})
   (firebase/analytics)
   (firebase/performance)
+  (init-firebase-ui! "http://localhost:3000/")
   (reset! state/db (firebase/firestore))
   (on-auth-state-changed))

@@ -7,6 +7,7 @@
    [minimalquotes.components.quotes :refer [quotes-container]]
    [minimalquotes.firebase.auth :as auth]
    [minimalquotes.state :as state]
+   [reagent.core :as r]
    [reagent.session :as session]))
 
 (defn f-quote->li
@@ -28,7 +29,18 @@
 
 (defn sign-in-page-content []
   (fn []
-    [:div "Sign-in page"]))
+    (let [user @state/user
+          ui (get @state/state :firebase-ui)
+          ui-config (get @state/state :firebase-ui-config)
+          did-mount (fn [_]
+                      (.start ui "#firebaseui-auth-container" ui-config))
+          reagent-render (fn []
+                           [:div {:id "firebaseui-auth-container"}])]
+      (if user
+        [:p "already signed in"]
+        (r/create-class {:display-name "modal-window"
+                         :component-did-mount did-mount
+                         :reagent-render reagent-render})))))
 
 (defn current-page []
   (fn []
@@ -38,8 +50,7 @@
       [:<>
        [modal-window]
        [:div {:class ["container"]}
-        [header {:on-login #(auth/sign-in-with-google)
-                 :on-logout #(auth/sign-out)
+        [header {:on-logout #(auth/sign-out)
                  :user user}]]
        (comment
          [ul-debug-quotes])

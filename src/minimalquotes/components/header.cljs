@@ -6,7 +6,7 @@
 
 ;; TODO: reuse layout from tags component (maybe create cluster component?)
 (defn header
-  [{:keys [margin-tailwind-class on-login on-logout user]
+  [{:keys [margin-tailwind-class on-logout user]
     :or {margin-tailwind-class "m-1"}}]
   [:header
    [:div {:class ["flex" "justify-between"]}
@@ -17,18 +17,14 @@
       [:li {:class [margin-tailwind-class]}
        [btn/button {:text [:a {:href (path-for :about)} "About"]}]]
       [:li {:class [margin-tailwind-class]}
-       [btn/button {:text [:a {:href (path-for :sign-in)} "Sign in"]}]]]]
+       (if user
+         [btn/button {:on-click #(on-logout) :text "Logout"}]
+         [btn/button {:icon icon-login :text [:a {:href (path-for :sign-in)} "Sign in"]}])]]]
     [:div
-     (if user
-       [:div {:class ["flex" "items-center"]}
-        [btn/button {:color "red"
-                     :text "Favorite quotes"
-                     :on-click #(js/alert (str "TODO: show favorite quotes for the user " (:uid user)))}]
-        [btn/logout {:on-click on-logout
-                     :user user}]]
-       [btn/button {:icon icon-login
-                    :on-click on-login
-                    :text "Login"}])]]
+     (when user
+       [btn/button {:color "red"
+                    :on-click #(js/alert (str "TODO: show favorite quotes for the user " (:uid user)))
+                    :text "Favorite quotes"}])]]
    [:img {:alt "minimalquotes logo"
           :class ["m-auto"]
           :src "img/minimalquotes-logo.svg"}]])
