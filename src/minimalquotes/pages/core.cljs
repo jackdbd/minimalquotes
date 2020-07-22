@@ -5,6 +5,9 @@
    [minimalquotes.components.header :refer [header]]
    [minimalquotes.components.modal :refer [modal-window]]
    [minimalquotes.components.quotes :refer [quotes-container]]
+   [minimalquotes.components.tags :refer [tags]]
+   [minimalquotes.fakes :as fakes]
+   [minimalquotes.routes :refer [path-for]]
    [minimalquotes.firebase.auth :as auth]
    [minimalquotes.state :as state]
    [reagent.core :as r]
@@ -32,15 +35,22 @@
     (let [user @state/user
           ui (get @state/state :firebase-ui)
           ui-config (get @state/state :firebase-ui-config)
+          container-id "firebaseui-auth-container"
           did-mount (fn [_]
-                      (.start ui "#firebaseui-auth-container" ui-config))
+                      (.start ui (str "#" container-id) ui-config))
           reagent-render (fn []
-                           [:div {:id "firebaseui-auth-container"}])]
+                           [:div {:class ["shadow-lg" "bg-blue-200"]}
+                            [:div {:id container-id}]])]
       (if user
         [:p "already signed in"]
         (r/create-class {:display-name "modal-window"
                          :component-did-mount did-mount
                          :reagent-render reagent-render})))))
+
+(defn tags-page-content []
+  (fn []
+    [:div
+     [tags {:entries fakes/tags}]]))
 
 (defn current-page []
   (fn []
@@ -50,7 +60,11 @@
       [:<>
        [modal-window]
        [:div {:class ["container"]}
-        [header {:on-logout #(auth/sign-out)
+        [header {:about-href (path-for :about)
+                 :home-href (path-for :index)
+                 :login-href (path-for :sign-in)
+                 :on-logout #(auth/sign-out)
+                 :tags-href (path-for :tags)
                  :user user}]]
        (comment
          [ul-debug-quotes])
@@ -63,4 +77,5 @@
   (case route-name
     :about #'about-page-content
     :index #'home-page-content
-    :sign-in #'sign-in-page-content))
+    :sign-in #'sign-in-page-content
+    :tags #'tags-page-content))

@@ -8,7 +8,8 @@
   (rf/router
    [["/" :index]
     ["/about" :about]
-    ["/sign-in" :sign-in]]))
+    ["/sign-in" :sign-in]
+    ["/tags" :tags]]))
 
 (defn path-for
   "Name-based (reverse) routing."

@@ -1,6 +1,6 @@
 (ns minimalquotes.components.tags-cards
   (:require
-   ["@testing-library/react" :refer [cleanup fireEvent render]]
+  ;;  ["@testing-library/react" :refer [cleanup fireEvent render]]
    [cljs.test :include-macros true :refer [is]]
    [devcards.core :as dc :refer [defcard deftest]]
    [minimalquotes.components.tags :refer [tag tags]]
@@ -33,15 +33,15 @@
                :on-click-tag on-click-tag}]
     (dc/reagent [tags props])))
 
-(deftest tags-tests-card
-  (let [counter (atom 0)
-        props {:entries {:love fakes/tag-love :money fakes/tag-money}
-               :on-click-tag (fn [_] (swap! counter inc))}
-        tr (render (r/as-element [tags props]) #js {:container (testing-container)})
-        tag-love (.queryByText tr "love")
-        tag-money (.queryByText tr "money")]
-    (is (= 0 @counter) "Precondition: no clicks")
-    (.click fireEvent tag-love)
-    (.click fireEvent tag-money)
-    (is (= 2 @counter) "After 2 clicks, counter is 2")
-    (cleanup)))
+;; (deftest tags-tests-card
+;;   (let [counter (atom 0)
+;;         props {:entries {:love fakes/tag-love :money fakes/tag-money}
+;;                :on-click-tag (fn [_] (swap! counter inc))}
+;;         tr (render (r/as-element [tags props]) #js {:container (testing-container)})
+;;         tag-love (.queryByText tr "love")
+;;         tag-money (.queryByText tr "money")]
+;;     (is (= 0 @counter) "Precondition: no clicks")
+;;     (.click fireEvent tag-love)
+;;     (.click fireEvent tag-money)
+;;     (is (= 2 @counter) "After 2 clicks, counter is 2")
+;;     (cleanup)))

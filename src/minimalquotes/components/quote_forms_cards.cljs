@@ -1,6 +1,6 @@
 (ns minimalquotes.components.quote-forms-cards
   (:require
-   ["@testing-library/react" :refer [cleanup render]]
+  ;;  ["@testing-library/react" :refer [cleanup render]]
    [cljs.test :include-macros true :refer [is]]
    [devcards.core :as dc :refer [defcard deftest]]
    [minimalquotes.components.quote-forms :refer [button-add-new-quote-modal
@@ -31,16 +31,16 @@
                :tags fakes/tags}]
     (dc/reagent [quote-form props])))
 
-(deftest quote-form-tests-card
-  (let [props {:on-click-cancel on-click-cancel
-               :on-submitted-values on-submitted-values
-               :quote-author fakes/author-0
-               :quote-text fakes/text-0
-               :tags fakes/tags}
-        tr (render (r/as-element [quote-form props]) #js {:container (testing-container)})]
-    (is (.getByTestId tr "quote-author") "Should have an input for the quote's author")
-    (is (.getByTestId tr "quote-text") "Should have an input for the quote's text")
-    (cleanup)))
+;; (deftest quote-form-tests-card
+;;   (let [props {:on-click-cancel on-click-cancel
+;;                :on-submitted-values on-submitted-values
+;;                :quote-author fakes/author-0
+;;                :quote-text fakes/text-0
+;;                :tags fakes/tags}
+;;         tr (render (r/as-element [quote-form props]) #js {:container (testing-container)})]
+;;     (is (.getByTestId tr "quote-author") "Should have an input for the quote's author")
+;;     (is (.getByTestId tr "quote-text") "Should have an input for the quote's text")
+;;     (cleanup)))
 
 (defcard quote-form-modal-buttons-card
   "These buttons show a modal with the form or a dialog inside."
