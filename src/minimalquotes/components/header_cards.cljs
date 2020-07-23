@@ -8,13 +8,15 @@
             [reagent.core :as r]))
 
 ;; TODO: shadow-cljs fails to load react testing library. It was working fine
-;; some days ago.
+;; some days ago. I think there is something wrong with the tests running in a
+;; real browser, or with the devcards config, because the tests run without an
+;; issue in the jsdom (i.e. in a Node.js environment).
 
 (defcard "# Header component")
 
 (defcard header-unauthenticated-card
-         "Header for an unauthenticated user."
-         (let [props {}] (dc/reagent [header props])))
+  "Header for an unauthenticated user."
+  (let [props {}] (dc/reagent [header props])))
 
 (deftest header-unauthenticated-tests-card
   (let [props {:on-login (fn [_])}
@@ -24,10 +26,10 @@
     (cleanup)))
 
 (defcard header-authenticated-card
-         "Header for an authenticated user."
-         (let [props {:on-logout (fn [_] (js/alert "Logout")),
-                      :user fakes/user}]
-           (dc/reagent [header props])))
+  "Header for an authenticated user."
+  (let [props {:on-logout (fn [_] (js/alert "Logout"))
+               :user fakes/user}]
+    (dc/reagent [header props])))
 
 (deftest header-authenticated-tests-card
   (let [props {:on-logout (fn [_]), :user fakes/user}

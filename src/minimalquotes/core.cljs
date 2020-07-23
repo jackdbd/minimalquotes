@@ -1,7 +1,6 @@
 (ns minimalquotes.core
   (:require [accountant.core :as accountant]
             [clerk.core :as clerk]
-            [devtools.core :as devtools]
             [minimalquotes.pages.core :refer [current-page page-for]]
             [minimalquotes.firebase.firestore :refer
              [db-docs-subscribe! db-docs-change-subscribe!]]
@@ -32,10 +31,7 @@
 
 (defn dev-setup
   []
-  ;; enable https://github.com/binaryage/cljs-devtools
-  (devtools/install!)
-  ;; This line allows us to use `(println "foo")` in place of (.log js/console
-  ;; "foo")
+  ;; allow to use (prn "foo") in place of (.log js/console "foo")
   (enable-console-print!))
 
 (defn ^:dev/after-load mount-root
