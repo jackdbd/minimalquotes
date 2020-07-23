@@ -5,14 +5,15 @@ const {
   hover,
   screenshot,
   closeBrowser,
+  screencast,
 } = require('taiko')
 
 const debug = true
 
 const browserOptions = debug
   ? {
-      headless: false,
-      observe: true,
+      headless: true,
+      observe: false,
     }
   : {}
 
@@ -21,14 +22,18 @@ const browserOptions = debug
 const systemUnderTest = async () => {
   try {
     await openBrowser(browserOptions)
+    await screencast.startScreencast(
+      'out/go-to-tags-page-and-hover-wisdom-tag.gif'
+    )
     await goto('localhost:3000')
 
     await click('Tags')
     await hover('wisdom')
-    await screenshot({ path: 'screenshots/hover-on-wisdom-tag.png' })
+    await screenshot({ path: 'out/hover-on-wisdom-tag.png' })
   } catch (error) {
     console.error(error)
   } finally {
+    await screencast.stopScreencast()
     await closeBrowser()
   }
 }
