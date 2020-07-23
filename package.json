@@ -14,7 +14,7 @@
     "deploy:rules": "firebase deploy --only firestore:rules",
     "dev": "shadow-cljs watch app",
     "e2e:css": "node e2e/unused-css.js",
-    "e2e:format": "prettier --write 'e2e/*.js'",
+    "e2e:format": "prettier --write e2e",
     "e2e:login": "node e2e/login-user.js",
     "e2e:perf": "node e2e/performance.js",
     "e2e:screenshot": "node e2e/make-screenshot-after-hover-on-tag.js",

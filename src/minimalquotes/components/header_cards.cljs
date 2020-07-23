@@ -15,8 +15,8 @@
 (defcard "# Header component")
 
 (defcard header-unauthenticated-card
-  "Header for an unauthenticated user."
-  (let [props {}] (dc/reagent [header props])))
+         "Header for an unauthenticated user."
+         (let [props {}] (dc/reagent [header props])))
 
 (deftest header-unauthenticated-tests-card
   (let [props {:on-login (fn [_])}
@@ -26,10 +26,10 @@
     (cleanup)))
 
 (defcard header-authenticated-card
-  "Header for an authenticated user."
-  (let [props {:on-logout (fn [_] (js/alert "Logout"))
-               :user fakes/user}]
-    (dc/reagent [header props])))
+         "Header for an authenticated user."
+         (let [props {:on-logout (fn [_] (js/alert "Logout")),
+                      :user fakes/user}]
+           (dc/reagent [header props])))
 
 (deftest header-authenticated-tests-card
   (let [props {:on-logout (fn [_]), :user fakes/user}

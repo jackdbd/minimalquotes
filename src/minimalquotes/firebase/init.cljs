@@ -5,6 +5,7 @@
             ["firebase/analytics"]
             ["firebase/auth"]
             ["firebase/firestore"]
+            ["firebase/functions"]
             ["firebase/performance"]
             ["firebaseui" :as firebaseui]
             [minimalquotes.firebase.auth :refer [on-auth-state-changed]]

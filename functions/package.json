@@ -1,0 +1,28 @@
+{
+  "name": "minimalquotes-functions",
+  "version": "1.0.0",
+  "description": "Functions for the minimalquotes Firebase project",
+  "main": "index.js",
+  "author": "Giacomo Debidda <jackdebidda@gmail.com>",
+  "license": "MIT",
+  "engines": {
+    "node": "10"
+  },
+  "private": true,
+  "scripts": {
+    "format": "prettier --write index.js",
+    "lint": "eslint --max-warnings=0 ."
+  },
+  "dependencies": {
+    "faker": "^4.1.0",
+    "firebase-admin": "^9.0.0",
+    "firebase-functions": "^3.8.0",
+    "firebase-tools": "^8.6.0"
+  },
+  "devDependencies": {
+    "eslint": "^7.5.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "prettier": "^2.0.5"
+  }
+}
