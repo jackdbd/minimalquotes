@@ -1,9 +1,8 @@
 (ns minimalquotes.firebase.firestore
   (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require
-   [cljs.core.async.interop :refer-macros [<p!]]
-   ["firebase/app" :as firebase]
-   [minimalquotes.utils :refer [log-error]]))
+  (:require [cljs.core.async.interop :refer-macros [<p!]]
+            ["firebase/app" :as firebase]
+            [minimalquotes.utils :refer [log-error]]))
 
 ; https://code.thheller.com/blog/shadow-cljs/2017/11/06/improved-externs-inference.html
 (set! *warn-on-infer* true)
@@ -25,24 +24,20 @@
         cljs? Probably that's better performance-wise.
         id would be (.. doc -id)
         the object itself would be (.data doc)"
-  [{:keys [include-doc-id? ratom]
-    :or {include-doc-id? false}} doc]
+  [{:keys [include-doc-id? ratom], :or {include-doc-id? false}} doc]
   (let [k (keyword (.. doc -id))
         m (js->clj (.data doc) :keywordize-keys true)
         v (assoc m :id k)]
     ;; (prn "update-state-from-firestore!" (.. doc -id) doc)
-    (if include-doc-id?
-      (swap! ratom assoc k v)
-      (swap! ratom assoc k m))))
+    (if include-doc-id? (swap! ratom assoc k v) (swap! ratom assoc k m))))
 
 (defn db-docs-subscribe!
   "Listen to the changes in a Firestore collection and update local app state."
   [{:keys [collection firestore ratom]}]
   (let [^js coll-ref (.collection firestore collection)
         f (partial update-state-from-firestore! {:ratom ratom})
-        on-query-snapshot (fn [^js query-snapshot]
-                            (reset! ratom {})
-                            (.forEach query-snapshot f))]
+        on-query-snapshot
+        (fn [^js query-snapshot] (reset! ratom {}) (.forEach query-snapshot f))]
     (.onSnapshot coll-ref on-query-snapshot log-error)))
 
 (defn db-docs-change-subscribe!
@@ -59,38 +54,32 @@
 
 (defn db-doc-create!
   "Create a new Firestore document."
-  [{:keys [collection firestore m on-reject on-resolve]
-    :or {on-reject log-error
-         on-resolve on-successful-creation}}]
+  [{:keys [collection firestore m on-reject on-resolve],
+    :or {on-reject log-error, on-resolve on-successful-creation}}]
   (let [coll-ref (.collection firestore collection)
         doc (clj->js m)]
-    (->
-     (.add coll-ref doc)
-     (.then on-resolve)
-     (.catch on-reject))))
+    (-> (.add coll-ref doc)
+        (.then on-resolve)
+        (.catch on-reject))))
 
 (defn db-path-upsert!
   "Update an existing Firestore document or create a new one."
-  [{:keys [doc-path firestore m on-reject on-resolve]
-    :or {on-reject log-error
-         on-resolve on-successful-update}}]
+  [{:keys [doc-path firestore m on-reject on-resolve],
+    :or {on-reject log-error, on-resolve on-successful-update}}]
   (let [doc-ref (.doc firestore doc-path)
         doc (clj->js m)]
-    (->
-     (.set doc-ref doc)
-     (.then on-resolve)
-     (.catch on-reject))))
+    (-> (.set doc-ref doc)
+        (.then on-resolve)
+        (.catch on-reject))))
 
 (defn db-path-delete!
   "Delete a document in Firestore."
-  [{:keys [doc-path firestore on-reject on-resolve]
-    :or {on-reject log-error
-         on-resolve on-successful-deletion}}]
+  [{:keys [doc-path firestore on-reject on-resolve],
+    :or {on-reject log-error, on-resolve on-successful-deletion}}]
   (let [doc-ref (.doc firestore doc-path)]
-    (->
-     (.delete doc-ref)
-     (.then on-resolve)
-     (.catch on-reject))))
+    (-> (.delete doc-ref)
+        (.then on-resolve)
+        (.catch on-reject))))
 
 (defn now
   "ClojureScript wrapper for firebase.firestore.Timestamp.now()
@@ -110,8 +99,8 @@
   (let [ref (-> (.collection firestore "quotes")
                 (.where (str "tags." tag-name) "==" true))
         f (partial update-state-from-firestore! {:ratom ratom})]
-    (go (try
-          (let [query-snapshot (<p! (.get ref))]
-            (reset! ratom {})
-            (.forEach query-snapshot f))
-          (catch js/Error err (.log js/console (str "=== Error === " (ex-cause err))))))))
+    (go (try (let [query-snapshot (<p! (.get ref))]
+               (reset! ratom {})
+               (.forEach query-snapshot f))
+             (catch js/Error err
+               (.log js/console (str "=== Error === " (ex-cause err))))))))

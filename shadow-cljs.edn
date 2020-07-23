@@ -10,9 +10,6 @@
                   :modules {:main {:init-fn minimalquotes.cards/main}}
                   :output-dir "public/js"
                   :target :browser}
-          :e2e {:ns-regexp "e2e.*"
-                :output-to "out/e2e.js"
-                :target :node-test}
           :test {:ns-regexp "minimalquotes.cards"
                  :output-to "out/test.js"
                  :target :node-test}}

@@ -1,5 +1,3 @@
 (ns minimalquotes.components.footer)
 
-(defn footer
-  []
-  [:footer "Footer here"])
+(defn footer [] [:footer "Footer here"])

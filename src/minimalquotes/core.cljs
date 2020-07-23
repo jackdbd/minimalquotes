@@ -1,17 +1,17 @@
 (ns minimalquotes.core
-  (:require
-   [accountant.core :as accountant]
-   [clerk.core :as clerk]
-   [devtools.core :as devtools]
-   [minimalquotes.pages.core :refer [current-page page-for]]
-   [minimalquotes.firebase.firestore :refer [db-docs-subscribe! db-docs-change-subscribe!]]
-   [minimalquotes.firebase.init :refer [init-firebase!]]
-   [minimalquotes.routes :refer [router]]
-   [minimalquotes.state :as state]
-   [reagent.core :as r]
-   [reagent.dom :as rdom]
-   [reagent.session :as session]
-   [reitit.frontend :as rf]))
+  (:require [accountant.core :as accountant]
+            [clerk.core :as clerk]
+            [devtools.core :as devtools]
+            [minimalquotes.pages.core :refer [current-page page-for]]
+            [minimalquotes.firebase.firestore :refer
+             [db-docs-subscribe! db-docs-change-subscribe!]]
+            [minimalquotes.firebase.init :refer [init-firebase!]]
+            [minimalquotes.routes :refer [router]]
+            [minimalquotes.state :as state]
+            [reagent.core :as r]
+            [reagent.dom :as rdom]
+            [reagent.session :as session]
+            [reitit.frontend :as rf]))
 
 (defn hook-browser-navigation!
   "Replace the browser's scrolling restoration with clerk's and configure
@@ -21,19 +21,21 @@
   (accountant/configure-navigation!
    {:nav-handler (fn [path]
                    (let [match (rf/match-by-path router path)
-                         name (:name (:data  match))
+                         name (:name (:data match))
                          route-params (:path-params match)]
                      (r/after-render clerk/after-render!)
-                     (session/put! :route {:current-page (page-for name)
-                                           :route-params route-params})
-                     (clerk/navigate-page! path)))
-    :path-exists? (fn [path]
-                    (boolean (rf/match-by-path router path)))}))
+                     (session/put! :route
+                                   {:current-page (page-for name),
+                                    :route-params route-params})
+                     (clerk/navigate-page! path))),
+    :path-exists? (fn [path] (boolean (rf/match-by-path router path)))}))
 
-(defn dev-setup []
+(defn dev-setup
+  []
   ;; enable https://github.com/binaryage/cljs-devtools
   (devtools/install!)
-  ;; This line allows us to use `(println "foo")` in place of (.log js/console "foo")
+  ;; This line allows us to use `(println "foo")` in place of (.log js/console
+  ;; "foo")
   (enable-console-print!))
 
 (defn ^:dev/after-load mount-root
@@ -52,24 +54,25 @@
   Private documents and collections (e.g. favorite quotes) cannot be subscribed
   to at this point, only later when the user authenticates."
   []
-  (let [unsubscribe-from-quotes! (db-docs-subscribe! {:collection "quotes"
-                                                      :firestore @state/db
+  (let [unsubscribe-from-quotes! (db-docs-subscribe! {:collection "quotes",
+                                                      :firestore @state/db,
                                                       :ratom state/quotes})
-        unsubscribe-from-tags! (db-docs-subscribe! {:collection "tags"
-                                                    :firestore @state/db
+        unsubscribe-from-tags! (db-docs-subscribe! {:collection "tags",
+                                                    :firestore @state/db,
                                                     :ratom state/tags})
-        unsubscribe-from-quotes-changes! (db-docs-change-subscribe! {:collection "quotes"
-                                                                     :f log-change!
-                                                                     :firestore @state/db})]
+        unsubscribe-from-quotes-changes!
+        (db-docs-change-subscribe!
+         {:collection "quotes", :f log-change!, :firestore @state/db})]
     (swap! state/subscriptions assoc :quotes unsubscribe-from-quotes!)
-    (swap! state/subscriptions assoc :quotes-changes unsubscribe-from-quotes-changes!)
+    (swap! state/subscriptions assoc
+      :quotes-changes
+      unsubscribe-from-quotes-changes!)
     (swap! state/subscriptions assoc :tags unsubscribe-from-tags!)))
 
 (defn ^:export main
   "Run application startup logic."
   []
-  (when goog.DEBUG
-    (dev-setup))
+  (when goog.DEBUG (dev-setup))
   (init-firebase!)
   (set-public-subscriptions!)
   (hook-browser-navigation!)

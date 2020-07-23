@@ -2,11 +2,8 @@
   (:require [reagent.core :as r]))
 
 ;; db will be the Firestore database
-(def state (r/atom {:db nil
-                    :quotes {}
-                    :subscriptions {}
-                    :tags {}
-                    :user {}}))
+(def state
+  (r/atom {:db nil, :quotes {}, :subscriptions {}, :tags {}, :user {}}))
 
 (def db (r/cursor state [:db]))
 (def quotes (r/cursor state [:quotes]))

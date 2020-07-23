@@ -1,10 +1,9 @@
 (ns minimalquotes.firebase.auth
   "Handle authentication in Firebase with several authentication providers."
-  (:require
-   ["firebase/app" :as firebase]
-   [minimalquotes.firebase.firestore :refer [db-path-upsert!]]
-   [minimalquotes.state :as state]
-   [minimalquotes.utils :refer [log-error]]))
+  (:require ["firebase/app" :as firebase]
+            [minimalquotes.firebase.firestore :refer [db-path-upsert!]]
+            [minimalquotes.state :as state]
+            [minimalquotes.utils :refer [log-error]]))
 
 (defn sign-in-with-google
   []
@@ -15,23 +14,22 @@
 ; TODO sign-in-with-github
 ; TODO sign-in-with-twitter
 
-(defn sign-out
-  []
-  (.signOut (firebase/auth)))
+(defn sign-out [] (.signOut (firebase/auth)))
 
 (defn- next-or-observer
   "Observer for changes to the user's sign-in state."
   [^js user]
   (if user
     (let [uid (.-uid user)
-          m {:display-name (.-displayName user)
-             :email (.-email user)
-             :photo-url (.-photoURL user)
-             :provider-data (.-providerData user)
+          m {:display-name (.-displayName user),
+             :email (.-email user),
+             :photo-url (.-photoURL user),
+             :provider-data (.-providerData user),
              :uid uid}]
       ;; (prn "USER m" m)
       (reset! state/user m)
-      (db-path-upsert! {:doc-path (str "users/" uid) :firestore @state/db :m m}))
+      (db-path-upsert!
+       {:doc-path (str "users/" uid), :firestore @state/db, :m m}))
     (reset! state/user nil)))
 
 (defn on-auth-state-changed
