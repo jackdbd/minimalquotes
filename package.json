@@ -13,7 +13,10 @@
     "deploy": "yarn build && firebase deploy",
     "deploy:rules": "firebase deploy --only firestore:rules",
     "dev": "shadow-cljs watch app",
+    "e2e:css": "node e2e/unused-css.js",
+    "e2e:format": "prettier --write 'e2e/*.js'",
     "e2e:login": "node e2e/login-user.js",
+    "e2e:perf": "node e2e/performance.js",
     "e2e:screenshot": "node e2e/make-screenshot-after-hover-on-tag.js",
     "emulators": "firebase emulators:start",
     "format": "zprint-clj --hang --input \"./src/**/*.{clj,cljs,cljc,edn}\" -o ./",
@@ -40,9 +43,10 @@
     "http-server": "^0.12.3",
     "jsdom": "^16.3.0",
     "jsdom-global": "^3.0.2",
+    "prettier": "^2.0.5",
     "rimraf": "^3.0.2",
     "shadow-cljs": "^2.10.14",
-    "taiko": "^1.0.14",
+    "taiko": "^1.0.15",
     "taiko-diagnostics": "^0.4.0",
     "zprint-clj": "^0.8.0"
   }

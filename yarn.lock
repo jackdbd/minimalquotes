@@ -1516,6 +1516,11 @@ commander@^5.0.0:
   resolved "https://registry.yarnpkg.com/commander/-/commander-5.1.0.tgz#46abbd1652f8e059bddaef99bbdcb2ad9cf179ae"
   integrity sha512-P0CysNDQ7rtVw4QIQtm+MRxV66vKFSvlsQvGYXZWR3qFU0jlMKHZZZgw8e+8DSah4UDKMqnknRDQz+xuQXQ/Zg==
 
+commander@^6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/commander/-/commander-6.0.0.tgz#2b270da94f8fb9014455312f829a1129dbf8887e"
+  integrity sha512-s7EA+hDtTYNhuXkTlhqew4txMZVdszBmKWSPEMxGr8ru8JXR7bLUFIAtPhcSuFdJQ0ILMxnJi8GkQL0yvDy/YA==
+
 compare-semver@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/compare-semver/-/compare-semver-1.1.0.tgz#7c0a79a27bb80b6c6994445f82958259d3d02153"
@@ -4770,6 +4775,11 @@ prepend-http@^3.0.1:
   resolved "https://registry.yarnpkg.com/prepend-http/-/prepend-http-3.0.1.tgz#3e724d58fd5867465b300bb9615009fa2f8ee3b6"
   integrity sha512-BLxfZh+m6UiAiCPZFJ4+vYoL7NrRs5XgCTRrjseATAggXhdZKKxn+JUNmuVYWY23bDHgaEHodxw8mnmtVEDtHw==
 
+prettier@^2.0.5:
+  version "2.0.5"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.0.5.tgz#d6d56282455243f2f92cc1716692c08aa31522d4"
+  integrity sha512-7PtVymN48hGcO4fGjybyBSIWDsLU4H4XlvOHfq91pz9kkGlonzwTfYkaIEwiRg/dAJF9YlbsduBAgtYLi+8cFg==
+
 pretty-bytes@^5.2.0:
   version "5.3.0"
   resolved "https://registry.yarnpkg.com/pretty-bytes/-/pretty-bytes-5.3.0.tgz#f2849e27db79fb4d6cfe24764fc4134f165989f2"
@@ -5829,14 +5839,14 @@ taiko-diagnostics@^0.4.0:
     speedline "^1.4.2"
     truncate-url "^1.0.0"
 
-taiko@^1.0.14:
-  version "1.0.14"
-  resolved "https://registry.yarnpkg.com/taiko/-/taiko-1.0.14.tgz#8dbed64edc5ff01105571cf5dc4dfc0e3207936f"
-  integrity sha512-nIkf/b73YwQju9HEsBq1NB0rjSGA432fTFsW4nyJgaPDbvoru+CHUoIoK/sGMgZscee6c7slQgcW3QpoRFWXAA==
+taiko@^1.0.15:
+  version "1.0.15"
+  resolved "https://registry.yarnpkg.com/taiko/-/taiko-1.0.15.tgz#2093deb0ec3682ab5a11f8000a40bd0f2c82f2b7"
+  integrity sha512-X6WGR9xmazLv6w34JL6qT/HvBDIXz2n8ILJ+ltKDlsaBrCa23y92PiiXnMtzkIZja2lTJq6qSYPzpMx2xFAEmw==
   dependencies:
     "@babel/parser" "^7.9.4"
     chrome-remote-interface "^0.28.1"
-    commander "^5.0.0"
+    commander "^6.0.0"
     debug "^4.1.1"
     extract-zip "^2.0.0"
     fs-extra "^9.0.0"
