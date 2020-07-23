@@ -6,6 +6,7 @@ const admin = require('firebase-admin');
 // The Firebase Admin SDK can also be initialized with no parameters.
 // In this case, the SDK uses Google Application Default Credentials and reads
 // options from the FIREBASE_CONFIG environment variable.
+
 admin.initializeApp();
 
 //set seed for consistent results

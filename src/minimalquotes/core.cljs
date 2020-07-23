@@ -21,10 +21,14 @@
    {:nav-handler (fn [path]
                    (let [match (rf/match-by-path router path)
                          name (:name (:data match))
-                         route-params (:path-params match)]
+                         route-params (:path-params match)
+                         query-params (:query-params match)]
+                     ;  (prn "route-params" route-params)
+                     ;  (prn "query-params" query-params)
                      (r/after-render clerk/after-render!)
                      (session/put! :route
                                    {:current-page (page-for name),
+                                    :query-params query-params,
                                     :route-params route-params})
                      (clerk/navigate-page! path))),
     :path-exists? (fn [path] (boolean (rf/match-by-path router path)))}))

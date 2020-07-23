@@ -13,6 +13,6 @@ public/js/
 report.html
 yarn-error.log
 
-# Firebase emulators
+firebase-debug.log
 firestore-debug.log
 ui-debug.log

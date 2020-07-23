@@ -21,7 +21,12 @@
 
 (defn about-page-content [] (fn [] [:div "About page"]))
 
-(defn home-page-content [] (fn [] [quotes-container]))
+(defn home-page-content
+  []
+  (fn []
+    (let [tag (get-in (session/get :route) [:query-params :tag])]
+      (prn (str "=== TODO: show only quotes with tag " tag " ==="))
+      [quotes-container])))
 
 (defn sign-in-page-content
   []
@@ -63,5 +68,6 @@
   (case route-name
     :about #'about-page-content
     :index #'home-page-content
+    :quotes #'home-page-content
     :sign-in #'sign-in-page-content
     :tags #'tags-page-content))

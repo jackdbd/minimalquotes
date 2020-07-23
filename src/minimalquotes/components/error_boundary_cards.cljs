@@ -2,8 +2,6 @@
   (:require [devcards.core :as dc :refer [defcard]]
             [minimalquotes.components.buttons :as btn]
             [minimalquotes.components.error-boundary :refer [error-boundary]]
-            [minimalquotes.components.modal :refer [modal-window]]
-            [minimalquotes.fakes :as fakes]
             [reagent.core :as r]))
 
 (defn throw-in-3-seconds
@@ -27,7 +25,7 @@
  "An error boundary does not catch errors inside event handlers
           https://reactjs.org/docs/error-boundaries.html#how-about-event-handlers")
 
-(defcard error-boundary-2-card
+(defcard error-boundary-event-handler-card
          (dc/reagent [error-boundary
                       [btn/button
                        {:on-click #(throw (js/Error. "Boom")),

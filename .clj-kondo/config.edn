@@ -10,6 +10,8 @@
                                                                  buttons-right-to-left-card
                                                                  buttons-with-no-icons
                                                                  cancel-button-card
+                                                                 error-boundary-card
+                                                                 error-boundary-event-handler-card
                                                                  footer-card
                                                                  header-authenticated-card
                                                                  header-container-card
