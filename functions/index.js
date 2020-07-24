@@ -1,6 +1,6 @@
 const faker = require('faker');
 const functions = require('firebase-functions');
-const firebase_tools = require('firebase-tools');
+
 const admin = require('firebase-admin');
 
 // The Firebase Admin SDK can also be initialized with no parameters.
@@ -106,6 +106,7 @@ const recursiveDelete = functions
     memory: '2GB',
   })
   .https.onCall(async (data, context) => {
+    const firebase_tools = require('firebase-tools');
     // Only allow admin users to execute this function.
     if (!(context.auth && context.auth.token && context.auth.token.admin)) {
       throw new functions.https.HttpsError(
