@@ -38,7 +38,7 @@
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged",
-      "pre-push": "if git-branch-is master; then yarn test; fi"
+      "pre-push": "yarn test"
     }
   },
   "lint-staged": {
