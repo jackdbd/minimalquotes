@@ -10,9 +10,10 @@ public/css/
 public/js/
 
 .nrepl-port
-report.html
 yarn-error.log
 
+# Logs from the Firebase emulator suite
 firebase-debug.log
 firestore-debug.log
+pubsub-debug.log
 ui-debug.log
