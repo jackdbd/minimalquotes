@@ -1,19 +1,32 @@
 # clj-kondo linter
 .clj-kondo/*
+# unignore the configuration because I want to keep it tracked
 !.clj-kondo/config.edn
 
+# Firebase cache
 .firebase/
+
+# Shadow CLJS cache
 .shadow-cljs/
+
 node_modules/
+
+# compiled JS (from ClojureScript)
 out/
+
+# CSS assets (they are generated at every tailwind build)
 public/css/
+
+# CSS assets (they are generated at every shadow-cljs build)
 public/js/
 
-.nrepl-port
-yarn-error.log
+# .nrepl-port
 
-# Logs from the Firebase emulator suite
+# logs from the Firebase emulator suite
 firebase-debug.log
 firestore-debug.log
 pubsub-debug.log
 ui-debug.log
+
+# logs from yarn
+yarn-error.log

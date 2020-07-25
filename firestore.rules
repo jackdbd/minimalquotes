@@ -1,17 +1,29 @@
 rules_version = '2';
 service cloud.firestore {
+
+  function isSignedIn() {
+    return request.auth != null;
+  }
+
   match /databases/{database}/documents {
+    function isAdmin() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+    }
+
     match /quotes/{quoteId} {
       allow read: if true;
-      allow create: if request.auth != null;
-      allow update, delete: if request.auth != null && resource.data.createdBy == request.auth.uid;
+      allow update: if isSignedIn() && resource.data.createdBy == request.auth.uid;
+      allow create, delete: if isSignedIn() && isAdmin();
     }
+
     match /tags/{tagId} {
       allow read: if true;
+      allow create, update, delete: if isSignedIn() && isAdmin();
     }
+
     match /users/{userId} {
-      allow create: if request.auth != null;
-      allow read, update, delete: if request.auth != null && request.auth.uid == userId;
+      allow create: if isSignedIn();
+      allow read, update: if isSignedIn() && (request.auth.uid == userId || isAdmin());
     }
   }
 }
