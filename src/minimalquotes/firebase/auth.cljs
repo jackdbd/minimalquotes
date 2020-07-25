@@ -1,8 +1,9 @@
 (ns minimalquotes.firebase.auth
   "Handle authentication in Firebase with several authentication providers."
   (:require ["firebase/app" :as firebase]
-            [minimalquotes.firebase.firestore :refer [db-path-upsert!]]
+            [minimalquotes.firebase.firestore :refer [add-user-if-first-time!]]
             [minimalquotes.state :as state]
+            [minimalquotes.subscriptions :refer [subscribe-user!]]
             [minimalquotes.utils :refer [log-error]]))
 
 (defn sign-in-with-google
@@ -16,23 +17,22 @@
 
 (defn sign-out [] (.signOut (firebase/auth)))
 
-(defn- next-or-observer
-  "Observer for changes to the user's sign-in state."
-  [^js user]
-  (if user
-    (let [uid (.-uid user)
-          m {:display-name (.-displayName user),
-             :email (.-email user),
-             :photo-url (.-photoURL user),
-             :provider-data (.-providerData user),
-             :uid uid}]
-      ;; (prn "USER m" m)
-      (reset! state/user m)
-      (db-path-upsert!
-       {:doc-path (str "users/" uid), :firestore @state/db, :m m}))
-    (reset! state/user nil)))
+(defn on-next
+  "This is the `next` callback for the observer of changes to the user's sign-in
+  state."
+  [^js auth-user]
+  (if auth-user
+    (let [uid (goog.object/get auth-user "uid")]
+      (add-user-if-first-time!
+       {:auth-user auth-user, :firestore @state/db, :uid uid})
+      (subscribe-user! uid))
+    (when-let [unsubscribe-user! (get @state/subscriptions :user)]
+      (unsubscribe-user!)
+      (reset! state/user nil))))
 
-(defn on-auth-state-changed
-  "Adds an observer for changes to the user's sign-in state."
-  []
-  (.onAuthStateChanged (firebase/auth) next-or-observer log-error))
+; I would like to make this observer :private, but it's not possible to enforce
+; def or defn as private in ClojureScript.
+; https://clojurescript.org/about/differences#_special_forms
+(def observer #js {:error log-error, :next on-next})
+
+(defn on-auth-state-changed [] (.onAuthStateChanged (firebase/auth) observer))

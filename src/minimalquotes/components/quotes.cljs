@@ -52,8 +52,8 @@
 (defn quotes
   "List of the quotes currently on screen, arranged in a grid layout.
   TODO: add filters for quotes."
-  [{:keys [delete-quote! edit-quote! entries on-add-quote on-click-tag
-           on-like-quote on-share-quote user]}]
+  [{:keys [delete-quote! edit-quote! entries on-click-tag on-like-quote
+           on-share-quote user]}]
   ;; (prn "=== quotes entries ===" entries)
   (let [on-click (make-on-quotes-click {:on-click-tag on-click-tag,
                                         :on-like-quote on-like-quote,
@@ -66,7 +66,7 @@
      {:class ["grid" "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
               "gap-4"],
       :on-click on-click}
-     (when user [button-add-new-quote-modal {:on-confirm on-add-quote}])
+     ;  (when user [button-add-new-quote-modal {:on-confirm on-add-quote}])
      (map m->li entries)]))
 
 (defn form-tags->m-tag
@@ -85,22 +85,24 @@
         user-id (:uid user)
         ; A quote in @state/quotes contains only a map (or array?) of tags
         f (fn [[k m]]
+            ; (prn "TAGS" "app state" @state/tags)
+            (prn "TAGS" "quote from" (:author m) (:tags m))
             (let [tags (select-keys @state/tags (keys (:tags m)))
                   entry {k (assoc m :tags tags)}]
-              ;; (prn "entry" entry "k" k)
+              ; (prn "entry" entry "k" k)
               entry))
         entries (reduce into {} (map f @state/quotes))]
     [quotes
      {:entries entries,
-      :on-add-quote (fn [m-form]
-                      (let [m-tag (form-tags->m-tag (:tags m-form))
-                            q (assoc m-form :tags m-tag)]
-                        (db-doc-create!
-                         {:collection "quotes",
-                          :firestore firestore,
-                          :m (merge q
-                                    {:createdAt (server-timestamp),
-                                     :createdBy user-id})}))),
+      ; :on-add-quote (fn [m-form]
+      ;                 (let [m-tag (form-tags->m-tag (:tags m-form))
+      ;                       q (assoc m-form :tags m-tag)]
+      ;                   (db-doc-create!
+      ;                    {:collection "quotes",
+      ;                     :firestore firestore,
+      ;                     :m (merge q
+      ;                               {:createdAt (server-timestamp),
+      ;                                :createdBy user-id})}))),
       :on-click-tag (fn [name] (quotes-with-tag firestore state/quotes name)),
       :delete-quote! (fn [quote-id]
                        (db-path-delete! {:doc-path (str "quotes/" quote-id),

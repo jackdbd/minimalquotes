@@ -19,26 +19,48 @@
   "Sync a reagent atom-like object (e.g. a reagent cursor) with a document from
   Firestore. When syncing from Firestore, you could optionally add the document
   id in the document itself.
-  TODO: to keywordize or not to keywordize?
-  TODO: should I store in state the original JS object, without converting it to
-        cljs? Probably that's better performance-wise.
-        id would be (.. doc -id)
-        the object itself would be (.data doc)"
-  [{:keys [include-doc-id? ratom], :or {include-doc-id? false}} doc]
+  TODO: to keywordize or not to keywordize?"
+  [{:keys [include-doc-id? ratom], :or {include-doc-id? false}} ^js doc]
   (let [k (keyword (.. doc -id))
         m (js->clj (.data doc) :keywordize-keys true)
         v (assoc m :id k)]
-    ;; (prn "update-state-from-firestore!" (.. doc -id) doc)
+    ; (prn "update-state-from-firestore!" (.. doc -id))
     (if include-doc-id? (swap! ratom assoc k v) (swap! ratom assoc k m))))
+
+(defn update-state!
+  [{:keys [^js doc-snapshot ratom]}]
+  (let [m (js->clj (.data doc-snapshot) :keywordize-keys true)]
+    (reset! ratom m)))
+
+(defn db-doc-subscribe!
+  "Listen to the changes of a Firestore document and update local app state."
+  [{:keys [doc-path firestore ratom]}]
+  (let [^js doc-ref (.doc firestore doc-path)
+        observer
+        #js
+         {:error log-error,
+          :next (fn [^js doc-snapshot]
+                  (let [hasPendingWrites (goog.object/getValueByKeys
+                                          doc-snapshot
+                                          #js ["metadata" "hasPendingWrites"])]
+                    (when hasPendingWrites (prn "Source: Local (what to do?)"))
+                    (when (goog.object/get (.data doc-snapshot) "isAdmin")
+                      (prn " === WELCOME BACK ADMIN ==="))
+                    (update-state! {:doc-snapshot doc-snapshot,
+                                    :ratom ratom})))}]
+    (.onSnapshot doc-ref observer)))
 
 (defn db-docs-subscribe!
   "Listen to the changes in a Firestore collection and update local app state."
   [{:keys [collection firestore ratom]}]
   (let [^js coll-ref (.collection firestore collection)
         f (partial update-state-from-firestore! {:ratom ratom})
-        on-query-snapshot
-        (fn [^js query-snapshot] (reset! ratom {}) (.forEach query-snapshot f))]
-    (.onSnapshot coll-ref on-query-snapshot log-error)))
+        observer #js
+                  {:error log-error,
+                   :next (fn [^js query-snapshot]
+                           (reset! ratom {})
+                           (.forEach query-snapshot f))}]
+    (.onSnapshot coll-ref observer)))
 
 (defn db-docs-change-subscribe!
   "Subscribe to changes to query results between query snapshots. Whenever a
@@ -47,10 +69,12 @@
   you no longer need this subscription."
   [{:keys [collection f firestore]}]
   (let [^js coll-ref (.collection firestore collection)
-        on-query-snapshot (fn [^js query-snapshot]
-                            (let [doc-changes (.docChanges query-snapshot)]
-                              (.forEach doc-changes f)))]
-    (.onSnapshot coll-ref on-query-snapshot log-error)))
+        observer #js
+                  {:error log-error,
+                   :next (fn [^js query-snapshot]
+                           (let [doc-changes (.docChanges query-snapshot)]
+                             (.forEach doc-changes f)))}]
+    (.onSnapshot coll-ref observer)))
 
 (defn db-doc-create!
   "Create a new Firestore document."
@@ -70,6 +94,26 @@
         doc (clj->js m)]
     (-> (.set doc-ref doc)
         (.then on-resolve)
+        (.catch on-reject))))
+
+(defn add-user-if-first-time!
+  "First-time users that authenticate (e.g. by using an identity provider like
+  google.com) aren't yet users of this application. So the first time they
+  authenticate, we create a document for them in the users collection."
+  [{:keys [^js auth-user firestore on-reject uid], :or {on-reject log-error}}]
+  (let [doc-path (str "users/" uid)
+        doc-ref (.doc firestore doc-path)
+        f (fn [doc-snapshot]
+            (when (not (.-exists doc-snapshot))
+              (let [m {:displayName (goog.object/get auth-user "displayName"),
+                       :email (goog.object/get auth-user "email"),
+                       :isAdmin false,
+                       :photoUrl (goog.object/get auth-user "photoUrl"),
+                       :uid uid}]
+                (db-path-upsert!
+                 {:doc-path doc-path, :firestore firestore, :m m}))))]
+    (-> (.get doc-ref)
+        (.then f)
         (.catch on-reject))))
 
 (defn db-path-delete!

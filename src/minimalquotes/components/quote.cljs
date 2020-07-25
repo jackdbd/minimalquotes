@@ -16,6 +16,7 @@
   edit/delete/like/share the quote."
   [{:keys [id on-delete on-edit on-like on-share quote-author quote-text tags
            user]}]
+  (prn "=== quote-card tags ===" tags)
   [:div
    {:class ["rounded-lg" "overflow-hidden" "shadow-lg" "p-4" "quote"
             pattern-classes "flex" "flex-col" "justify-between" debug-css-card

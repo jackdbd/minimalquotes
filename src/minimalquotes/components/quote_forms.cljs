@@ -27,6 +27,7 @@
   (fn quote-form-inner [{:keys [errors form-id handle-blur handle-change
                                 handle-submit submitting? state touched
                                 values]}]
+    ; (prn "quote-form-inner" "tags" tags "state" state "values" values)
     [:form {:class form-css-classes, :id form-id, :on-submit handle-submit}
      [:div {:class ["mb-4"]}
       [:label {:class label-css-classes, :for "quote-text"} "Text:"]
@@ -64,8 +65,12 @@
         :multiple true,
         :on-blur handle-blur,
         :on-change (fn [^js js-values]
+                     ;  (prn "input-tags-typeahead change" js-values)
                      (let [values (js->clj js-values)
+                           values-k (js->clj js-values :keywordize-keys true)
                            names (map #(get % "name") values)]
+                       (prn "=== values" values)
+                       (prn "=== values-k" values-k)
                        (swap! state assoc-in [:values :tags] names))),
         :options (map tag->tag-with-id tags)}]]
      [:div {:class ["flex" "items-center" "justify-between"]}
@@ -95,6 +100,8 @@
 
 (defn button-add-new-quote-modal
   [{:keys [on-submitted-values tags]}]
+  ; (prn "on-submitted-values" on-submitted-values)
+  (prn "tags" tags)
   (let [on-click-cancel #(modal! nil)
         f (fn [values] (on-submitted-values values) (modal! nil))]
     [btn/button

@@ -1,8 +1,13 @@
 (ns minimalquotes.pages.core
   "Page components and translation from routes to pages."
-  (:require [minimalquotes.components.footer :refer [footer]]
+  (:require [minimalquotes.firebase.firestore :refer
+             [db-doc-create! now server-timestamp]]
+            [minimalquotes.components.buttons :as btn]
+            [minimalquotes.components.footer :refer [footer]]
             [minimalquotes.components.header :refer [header]]
             [minimalquotes.components.modal :refer [modal-window]]
+            [minimalquotes.components.quote-forms :refer
+             [button-add-new-quote-modal]]
             [minimalquotes.components.quotes :refer [quotes-container]]
             [minimalquotes.components.tags :refer [tags]]
             [minimalquotes.fakes :as fakes]
@@ -20,6 +25,29 @@
 (defn ul-debug-quotes [] [:ul (map f-quote->li @state/quotes)])
 
 (defn about-page-content [] (fn [] [:div "About page"]))
+
+(defn admin-page-content
+  []
+  (fn []
+    (let [on-submitted-values
+          (fn [m-form]
+            (let [firestore @state/db
+                  user @state/user
+                  user-id (:uid user)
+                  q (assoc m-form :tags "TODO-m-tag")]
+              (prn "=== on-submitted-values q ===" q "user" user)
+              (db-doc-create! {:collection "quotes",
+                               :firestore firestore,
+                               :m (merge q
+                                         {:createdAt (server-timestamp),
+                                          :createdBy user-id})})))
+          tags @state/tags]
+      [:div
+       [button-add-new-quote-modal
+        {:on-submitted-values on-submitted-values, :tags tags}]
+       [btn/button {:text "Add tag", :on-click #(js/alert "TODO: add tag")}]
+       [btn/button
+        {:text "Add user", :on-click #(js/alert "TODO: add user")}]])))
 
 (defn home-page-content
   []
@@ -51,22 +79,27 @@
   (fn []
     (let [user @state/user
           page (:current-page (session/get :route))]
-      ;; (prn "PAGE" page)
       [:<> [modal-window]
        [:div {:class ["container"]}
         [header
-         {:about-href (path-for :about),
-          :home-href (path-for :index),
+         {:links [{:href (path-for :index), :label "Home"}
+                  {:href (path-for :tags), :label "Tags"}
+                  {:href (path-for :about), :label "About"}],
           :login-href (path-for :sign-in),
           :on-logout #(auth/sign-out),
-          :tags-href (path-for :tags),
           :user user}]] (comment [ul-debug-quotes]) [page] [footer]])))
 
+; TODO: a non-admin user could access HOST/admin by typing in the address bar.
+; How to avoid it? With a check in this page-for? By redirecting him to home?
+; What do I have to do with accountant and the browser history?
 (defn page-for
   "Translate routes -> page components."
   [route-name]
+  ; (prn "route-name" route-name)
   (case route-name
     :about #'about-page-content
+    :admin #'admin-page-content
+    ; :admin (if @state/user #'admin-page-content #'sign-in-page-content)
     :index #'home-page-content
     :quotes #'home-page-content
     :sign-in #'sign-in-page-content
