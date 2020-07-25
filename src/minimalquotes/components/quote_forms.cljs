@@ -12,14 +12,6 @@
   ["shadow" "appearance-none" "rounded" "w-full" "border" "leading-tight"
    "text-gray-700" "py-2 px-3" "focus:outline-none" "focus:shadow-outline"])
 
-; (defn tag->option
-;   [[tag-id tag]]
-;   ^{:key tag-id} [:option {:value (:name tag)}])
-
-; (defn f->li
-;   []
-;   [:li "one datalist with all tags, per tag selected"])
-
 (defn tag->tag-with-id [[tag-id tag]] (merge tag {:id tag-id}))
 
 (defn- make-quote-form
@@ -140,7 +132,7 @@
      [:div {:class ["mb-4"]}
       [:label {:class label-css-classes, :for "color"} "Color:"]
       [:select
-       {:class input-css-classes, ;TODO: improve styling
+       {:class input-css-classes,   ;TODO: improve styling
         :id "color",
         :name "color",
         :on-blur handle-blur,

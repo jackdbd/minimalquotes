@@ -2,6 +2,7 @@
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [cljs.core.async.interop :refer-macros [<p!]]
             ["firebase/app" :as firebase]
+            [minimalquotes.state :as state]
             [minimalquotes.utils :refer [log-error]]))
 
 ; https://code.thheller.com/blog/shadow-cljs/2017/11/06/improved-externs-inference.html
@@ -32,6 +33,18 @@
   (let [m (js->clj (.data doc-snapshot) :keywordize-keys true)]
     (reset! ratom m)))
 
+(defn db-docs-subscribe!
+  "Listen to the changes in a Firestore collection and update local app state."
+  [{:keys [collection firestore ratom]}]
+  (let [^js coll-ref (.collection firestore collection)
+        f (partial update-state-from-firestore! {:ratom ratom})
+        observer #js
+                  {:error log-error,
+                   :next (fn [^js query-snapshot]
+                           (reset! ratom {})
+                           (.forEach query-snapshot f))}]
+    (.onSnapshot coll-ref observer)))
+
 (defn db-doc-subscribe!
   "Listen to the changes of a Firestore document and update local app state."
   [{:keys [doc-path firestore ratom]}]
@@ -45,22 +58,14 @@
                                           #js ["metadata" "hasPendingWrites"])]
                     (when hasPendingWrites (prn "Source: Local (what to do?)"))
                     (when (goog.object/get (.data doc-snapshot) "isAdmin")
-                      (prn " === WELCOME BACK ADMIN ==="))
+                      (prn " === WELCOME BACK ADMIN ===")
+                      (let [unsub! (db-docs-subscribe! {:collection "users",
+                                                        :firestore firestore,
+                                                        :ratom state/users})]
+                        (prn "== unsub! ==" unsub!)))
                     (update-state! {:doc-snapshot doc-snapshot,
                                     :ratom ratom})))}]
     (.onSnapshot doc-ref observer)))
-
-(defn db-docs-subscribe!
-  "Listen to the changes in a Firestore collection and update local app state."
-  [{:keys [collection firestore ratom]}]
-  (let [^js coll-ref (.collection firestore collection)
-        f (partial update-state-from-firestore! {:ratom ratom})
-        observer #js
-                  {:error log-error,
-                   :next (fn [^js query-snapshot]
-                           (reset! ratom {})
-                           (.forEach query-snapshot f))}]
-    (.onSnapshot coll-ref observer)))
 
 (defn db-docs-change-subscribe!
   "Subscribe to changes to query results between query snapshots. Whenever a

@@ -26,6 +26,10 @@
 
 (defn about-page-content [] (fn [] [:div "About page"]))
 
+(def label-css-classes ["block" "text-gray-700" "text-sm" "font-bold" "mb-2"])
+
+(defn user->li [[k m]] ^{:key k} [:li (:displayName m)])
+
 (defn admin-page-content
   []
   (fn []
@@ -55,8 +59,9 @@
        [button-add-new-quote-modal
         {:on-submitted-values on-submit-quote-form, :tags tags}]
        [button-add-new-tag-modal {:on-submitted-values on-submit-tag-form}]
-       [btn/button
-        {:text "Add user", :on-click #(js/alert "TODO: add user")}]])))
+       [btn/button {:text "Add user", :on-click #(js/alert "TODO: add user")}]
+       [:label {:class label-css-classes, :for "users"} "Users:"]
+       [:ol {:title "users"} (map user->li @state/users)]])))
 
 (defn home-page-content
   []

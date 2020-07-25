@@ -28,7 +28,11 @@
       (subscribe-user! uid))
     (when-let [unsubscribe-user! (get @state/subscriptions :user)]
       (unsubscribe-user!)
-      (reset! state/user nil))))
+      (reset! state/user nil)
+      ;; If the user was an admin, he subscribed to users inside the
+      ;; subscription for user.
+      ;; TODO: I don't know if this is the best approach. Maybe not...
+      (reset! state/users {}))))
 
 ; I would like to make this observer :private, but it's not possible to enforce
 ; def or defn as private in ClojureScript.
