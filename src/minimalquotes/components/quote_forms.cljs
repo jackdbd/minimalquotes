@@ -132,7 +132,7 @@
      [:div {:class ["mb-4"]}
       [:label {:class label-css-classes, :for "color"} "Color:"]
       [:select
-       {:class input-css-classes,   ;TODO: improve styling
+       {:class input-css-classes,      ;TODO: improve styling
         :id "color",
         :name "color",
         :on-blur handle-blur,

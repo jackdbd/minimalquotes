@@ -1,19 +1,21 @@
 (ns minimalquotes.pages.core
   "Page components and translation from routes to pages."
   (:require [minimalquotes.firebase.firestore :refer
-             [db-doc-create! now server-timestamp]]
+             [db-doc-create! db-path-upsert! now server-timestamp]]
             [minimalquotes.components.buttons :as btn]
             [minimalquotes.components.footer :refer [footer]]
             [minimalquotes.components.header :refer [header]]
+            [minimalquotes.components.icons :refer [icon-signal icon-trash]]
             [minimalquotes.components.modal :refer [modal-window]]
             [minimalquotes.components.quote-forms :refer
              [button-add-new-quote-modal button-add-new-tag-modal]]
             [minimalquotes.components.quotes :refer [quotes-container]]
             [minimalquotes.components.tags :refer [tags]]
             [minimalquotes.fakes :as fakes]
-            [minimalquotes.routes :refer [path-for]]
             [minimalquotes.firebase.auth :as auth]
+            [minimalquotes.routes :refer [path-for]]
             [minimalquotes.state :as state]
+            [minimalquotes.utils :refer [k->str]]
             [reagent.core :as r]
             [reagent.session :as session]))
 
@@ -28,7 +30,28 @@
 
 (def label-css-classes ["block" "text-gray-700" "text-sm" "font-bold" "mb-2"])
 
-(defn user->li [[k m]] ^{:key k} [:li (:displayName m)])
+(defn user->li
+  [[k m]]
+  ^{:key k}
+  [:li {:class ["flex" "justify-between" "border" "items-center"]}
+   [:span (:displayName m)]
+   [:div
+    [btn/button
+     {:icon icon-signal,
+      :data-attributes {:data-user-id (k->str k)},
+      ; TODO: move in parent and use event delegation
+      :on-click (fn [e]
+                  (prn "dataset user id" (.. e -target -dataset -userId))
+                  (let [user-id (k->str k)
+                        user (k @state/users)]
+                    (db-path-upsert!
+                     {:doc-path (str "users/" user-id),
+                      :firestore @state/db,
+                      :m (merge user
+                                {:isAdmin true,
+                                 :lastEditedAt (server-timestamp),
+                                 :lastEditedBy (:uid @state/user)})}))),
+      :text "Make Admin"}] [btn/button {:icon icon-trash, :text "Delete"}]]])
 
 (defn admin-page-content
   []
@@ -59,7 +82,6 @@
        [button-add-new-quote-modal
         {:on-submitted-values on-submit-quote-form, :tags tags}]
        [button-add-new-tag-modal {:on-submitted-values on-submit-tag-form}]
-       [btn/button {:text "Add user", :on-click #(js/alert "TODO: add user")}]
        [:label {:class label-css-classes, :for "users"} "Users:"]
        [:ol {:title "users"} (map user->li @state/users)]])))
 
