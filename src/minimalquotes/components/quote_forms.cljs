@@ -77,7 +77,7 @@
       [btn/button {:on-click on-click-cancel, :text "Cancel"}]
       [btn/submit {:disabled submitting?, :text "Confirm"}]]]))
 
-(def validation
+(def quote-form-validation
   (vlad/join (vlad/attr ["quote-text"]
                         (vlad/chain (vlad/present) (vlad/length-over 5)))
              (vlad/attr ["quote-author"]
@@ -94,7 +94,7 @@
                                  "quote-text" quote-text},
                 :on-submit (fn [m] (on-submitted-values (:values m))),
                 :prevent-default? true,
-                :validation #(vlad/field-errors validation %)}
+                :validation #(vlad/field-errors quote-form-validation %)}
         f (make-quote-form {:on-click-cancel on-click-cancel, :tags tags})]
     [fork/form config f]))
 
@@ -110,6 +110,89 @@
                            :on-submitted-values f,
                            :tags tags}]),
       :text "Add quote"}]))
+
+(def tag-form-validation
+  (vlad/join (vlad/attr ["name"]
+                        (vlad/chain (vlad/present) (vlad/length-over 3)))
+             (vlad/attr ["description"]
+                        (vlad/chain (vlad/present) (vlad/length-in 1 48)))))
+
+; TODO: use fieldset?
+
+(defn- make-tag-form
+  [{:keys [on-click-cancel]}]
+  (fn tag-form-inner [{:keys [errors form-id handle-blur handle-change
+                              handle-submit submitting? touched values]}]
+    ; (prn "tag-form-inner" "state" state "values" values)
+    [:form {:class form-css-classes, :id form-id, :on-submit handle-submit}
+     [:div {:class ["mb-4"]}
+      [:label {:class label-css-classes, :for "name"} "Name:"]
+      [:input
+       {:id "name",
+        :auto-focus true,
+        :class input-css-classes,
+        :data-testid "name",
+        :name "name",
+        :on-blur handle-blur,
+        :on-change handle-change,
+        :value (values "name")}]
+      (when (touched "name") [:div (first (get errors (list "name")))])]
+     [:div {:class ["mb-4"]}
+      [:label {:class label-css-classes, :for "color"} "Color:"]
+      [:select
+       {:class input-css-classes, ;TODO: improve styling
+        :id "color",
+        :name "color",
+        :on-blur handle-blur,
+        :on-change handle-change,
+        :value (values "color")} [:option {:value "blue"} "blue"]
+       [:option {:value "gray"} "gray"] [:option {:value "green"} "green"]
+       [:option {:value "indigo"} "indigo"] [:option {:value "orange"} "orange"]
+       [:option {:value "purple"} "purple"] [:option {:value "pink"} "pink"]
+       [:option {:value "red"} "red"] [:option {:value "teal"} "teal"]
+       [:option {:value "yellow"} "yellow"]]]
+     [:div {:class ["mb-4"]}
+      [:label {:class label-css-classes, :for "description"} "Description:"]
+      [:input
+       {:id "description",
+        :class input-css-classes,
+        :data-testid "description",
+        :name "description",
+        :on-blur handle-blur,
+        :on-change handle-change,
+        :value (values "description")}]
+      (when (touched "description")
+        [:div (first (get errors (list "description")))])]
+     [:div {:class ["flex" "items-center" "justify-between"]}
+      [btn/button {:on-click on-click-cancel, :text "Cancel"}]
+      [btn/submit {:disabled submitting?, :text "Confirm"}]]]))
+
+(defn tag-form
+  "Stateful form to create/edit a tag.
+  Form's state is managed by fork. Form's validation is implemented with vlad."
+  [{:keys [on-click-cancel on-submitted-values tag-color tag-description
+           tag-name],
+    :or {tag-color "red", tag-description "", tag-name ""}}]
+  (let [config {:clean-on-unmount? true,
+                :initial-values {"color" tag-color,
+                                 "description" tag-description,
+                                 "name" tag-name},
+                :on-submit (fn [m] (on-submitted-values (:values m))),
+                :prevent-default? true,
+                :validation #(vlad/field-errors tag-form-validation %)}
+        f (make-tag-form {:on-click-cancel on-click-cancel})]
+    [fork/form config f]))
+
+(defn button-add-new-tag-modal
+  [{:keys [on-submitted-values]}]
+  ; (prn "on-submitted-values" on-submitted-values)
+  (let [on-click-cancel #(modal! nil)
+        f (fn [values] (on-submitted-values values) (modal! nil))]
+    [btn/button
+     {:on-click #(modal! [tag-form
+                          {:on-click-cancel on-click-cancel,
+                           :on-submitted-values f}]),
+      :text "Add tag"}]))
 
 (defn button-edit-quote-modal
   [{:keys [quote-author tags quote-text on-submitted-values]}]

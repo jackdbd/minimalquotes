@@ -7,7 +7,7 @@
             [minimalquotes.components.header :refer [header]]
             [minimalquotes.components.modal :refer [modal-window]]
             [minimalquotes.components.quote-forms :refer
-             [button-add-new-quote-modal]]
+             [button-add-new-quote-modal button-add-new-tag-modal]]
             [minimalquotes.components.quotes :refer [quotes-container]]
             [minimalquotes.components.tags :refer [tags]]
             [minimalquotes.fakes :as fakes]
@@ -29,23 +29,32 @@
 (defn admin-page-content
   []
   (fn []
-    (let [on-submitted-values
-          (fn [m-form]
+    (let [on-submit-quote-form
+          (fn [m]
             (let [firestore @state/db
                   user @state/user
                   user-id (:uid user)
-                  q (assoc m-form :tags "TODO-m-tag")]
-              (prn "=== on-submitted-values q ===" q "user" user)
+                  q (assoc m :tags "TODO-m-tag")]
               (db-doc-create! {:collection "quotes",
                                :firestore firestore,
                                :m (merge q
                                          {:createdAt (server-timestamp),
                                           :createdBy user-id})})))
-          tags @state/tags]
+          tags @state/tags
+          on-submit-tag-form
+          (fn [m]
+            (let [firestore @state/db
+                  user @state/user
+                  user-id (:uid user)]
+              (db-doc-create! {:collection "tags",
+                               :firestore firestore,
+                               :m (merge m
+                                         {:createdAt (server-timestamp),
+                                          :createdBy user-id})})))]
       [:div
        [button-add-new-quote-modal
-        {:on-submitted-values on-submitted-values, :tags tags}]
-       [btn/button {:text "Add tag", :on-click #(js/alert "TODO: add tag")}]
+        {:on-submitted-values on-submit-quote-form, :tags tags}]
+       [button-add-new-tag-modal {:on-submitted-values on-submit-tag-form}]
        [btn/button
         {:text "Add user", :on-click #(js/alert "TODO: add user")}]])))
 
