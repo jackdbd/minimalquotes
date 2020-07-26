@@ -3,7 +3,7 @@
             [minimalquotes.firebase.firestore :refer
              [db-path-delete! db-path-upsert! now server-timestamp]]
             [minimalquotes.state :as state]
-            [minimalquotes.utils :refer [k->str]]))
+            [minimalquotes.utils :refer [k->str log-error]]))
 
 ; (def debug-css "bg-green-200")
 (def debug-css "")
@@ -80,6 +80,9 @@
 
 (defn present? [[_ v]] v)
 
+(defn on-successful-batch-write [])
+
+
 (defn quotes-container
   "Quotes component that extracts its required props from the app state."
   [{:keys [show-only-favorites], :or {show-only-favorites false}}]
@@ -132,7 +135,9 @@
           ; (prn "q" m-quote)
           (.set batch userRef (clj->js m-user))
           (.set batch quoteRef (clj->js m-quote))
-          (.commit batch))),
+          (-> (.commit batch)
+              (.then on-successful-batch-write)
+              (.catch log-error)))),
       :on-share-quote (fn [user quote-id]
                         (prn "TODO: share quote" user quote-id)),
       :user user}]))
