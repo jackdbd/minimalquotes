@@ -1,7 +1,8 @@
-(ns minimalquotes.components.quote-forms
+(ns minimalquotes.components.forms
   (:require [fork.reagent :as fork]
             [minimalquotes.components.buttons :as btn]
-            [minimalquotes.components.icons :refer [icon-edit icon-trash]]
+            [minimalquotes.components.icons :refer
+             [icon-edit icon-tag icon-trash]]
             [minimalquotes.components.modal :refer [modal!]]
             ["react-bootstrap-typeahead" :refer [Typeahead]]
             [vlad.core :as vlad]))
@@ -61,8 +62,8 @@
                      (let [values (js->clj js-values)
                            values-k (js->clj js-values :keywordize-keys true)
                            names (map #(get % "name") values)]
-                       (prn "=== values" values)
-                       (prn "=== values-k" values-k)
+                       ;  (prn "=== values" values)
+                       ;  (prn "=== values-k" values-k)
                        (swap! state assoc-in [:values :tags] names))),
         :options (map tag->tag-with-id tags)}]]
      [:div {:class ["flex" "items-center" "justify-between"]}
@@ -93,7 +94,7 @@
 (defn button-add-new-quote-modal
   [{:keys [on-submitted-values tags]}]
   ; (prn "on-submitted-values" on-submitted-values)
-  (prn "tags" tags)
+  ; (prn "tags" tags)
   (let [on-click-cancel #(modal! nil)
         f (fn [values] (on-submitted-values values) (modal! nil))]
     [btn/button
@@ -103,18 +104,26 @@
                            :tags tags}]),
       :text "Add quote"}]))
 
+(def tag-name-max-length 24)
+(def tag-description-max-length 48)
+
 (def tag-form-validation
-  (vlad/join (vlad/attr ["name"]
-                        (vlad/chain (vlad/present) (vlad/length-over 3)))
-             (vlad/attr ["description"]
-                        (vlad/chain (vlad/present) (vlad/length-in 1 48)))))
+  (vlad/join
+   (vlad/attr ["name"]
+              (vlad/chain (vlad/present)
+                          (vlad/length-in 3 (+ 1 tag-name-max-length))))
+   (vlad/attr ["description"]
+              (vlad/chain (vlad/present)
+                          (vlad/length-in 1
+                                          (+ 1 tag-description-max-length))))))
 
 ; TODO: use fieldset?
 
 (defn- make-tag-form
   [{:keys [on-click-cancel]}]
   (fn tag-form-inner [{:keys [errors form-id handle-blur handle-change
-                              handle-submit submitting? touched values]}]
+                              set-touched handle-submit state submitting?
+                              touched values]}]
     ; (prn "tag-form-inner" "state" state "values" values)
     [:form {:class form-css-classes, :id form-id, :on-submit handle-submit}
      [:div {:class ["mb-4"]}
@@ -126,13 +135,34 @@
         :data-testid "name",
         :name "name",
         :on-blur handle-blur,
-        :on-change handle-change,
+        :on-change
+        (fn [^js e]
+          ;; The user might keep typing and exceed the max allowed
+          ;; length for this input. If we don't set the input to be
+          ;; touched he won't see any errors, which is bad for UX.
+          (set-touched "name")
+          ;; Update form's state.
+          (handle-change e)
+          ;; Compute derived state and update form's state once more.
+          (let [current-length (count (get-in @state [:values "name"]))
+                remaining-length (- tag-name-max-length current-length)]
+            ;  (prn (str "desc-length state: " current-length  "/"
+            ;  tag-name-max-length))
+            (swap! state assoc-in
+              [:values "remaining-tag-name-length"]
+              remaining-length))),
         :value (values "name")}]
-      (when (touched "name") [:div (first (get errors (list "name")))])]
+      (let [diff (get-in @state [:values "remaining-tag-name-length"])
+            err-message (first (get errors (list "name")))]
+        (if err-message
+          (when (touched "name") [:div err-message])
+          (cond (> diff 0) [:div (str diff " remaining characters.")]
+                (= diff 0) [:div "No remaining characters."]
+                :else nil)))]
      [:div {:class ["mb-4"]}
       [:label {:class label-css-classes, :for "color"} "Color:"]
       [:select
-       {:class input-css-classes,      ;TODO: improve styling
+       {:class input-css-classes,        ;TODO: improve styling
         :id "color",
         :name "color",
         :on-blur handle-blur,
@@ -151,10 +181,30 @@
         :data-testid "description",
         :name "description",
         :on-blur handle-blur,
-        :on-change handle-change,
+        :on-change
+        (fn [^js e]
+          ;; The user might keep typing and exceed the max allowed
+          ;; length for this input. If we don't set the input to be
+          ;; touched he won't see any errors, which is bad for UX.
+          (set-touched "description")
+          ;; Update form's state.
+          (handle-change e)
+          ;; Compute derived state and update form's state once more.
+          (let [current-length (count (get-in @state [:values "description"]))
+                remaining-length (- tag-description-max-length current-length)]
+            ;  (prn (str "desc-length state: " current-length  "/"
+            ;  tag-description-max-length))
+            (swap! state assoc-in
+              [:values "remaining-tag-description-length"]
+              remaining-length))),
         :value (values "description")}]
-      (when (touched "description")
-        [:div (first (get errors (list "description")))])]
+      (let [diff (get-in @state [:values "remaining-tag-description-length"])
+            err-message (first (get errors (list "description")))]
+        (if err-message
+          (when (touched "description") [:div err-message])
+          (cond (> diff 0) [:div (str diff " remaining characters.")]
+                (= diff 0) [:div "No remaining characters."]
+                :else nil)))]
      [:div {:class ["flex" "items-center" "justify-between"]}
       [btn/button {:on-click on-click-cancel, :text "Cancel"}]
       [btn/submit {:disabled submitting?, :text "Confirm"}]]]))
@@ -181,16 +231,32 @@
   (let [on-click-cancel #(modal! nil)
         f (fn [values] (on-submitted-values values) (modal! nil))]
     [btn/button
-     {:on-click #(modal! [tag-form
+     {:icon icon-tag,
+      :on-click #(modal! [tag-form
                           {:on-click-cancel on-click-cancel,
                            :on-submitted-values f}]),
       :text "Add tag"}]))
+
+(defn button-edit-tag-modal
+  [{:keys [tag-color tag-description tag-name on-submitted-values]}]
+  (let [on-click-cancel #(modal! nil)
+        f (fn [values] (on-submitted-values values) (modal! nil))]
+    [btn/button
+     {:color tag-color,
+      :icon icon-edit,
+      :on-click #(modal! [tag-form
+                          {:on-click-cancel on-click-cancel,
+                           :on-submitted-values f,
+                           :tag-color tag-color,
+                           :tag-description tag-description,
+                           :tag-name tag-name}]),
+      :text tag-name}]))
 
 (defn button-edit-quote-modal
   [{:keys [quote-author tags quote-text on-submitted-values]}]
   (let [on-click-cancel #(modal! nil)
         f (fn [values] (on-submitted-values values) (modal! nil))]
-    (prn "button-edit-quote-modal" tags)
+    ; (prn "button-edit-quote-modal" tags)
     [btn/button
      {:icon icon-edit,
       :on-click #(modal! [quote-form

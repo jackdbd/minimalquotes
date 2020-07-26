@@ -33,13 +33,13 @@
     "M17.561 2.439c-1.442-1.443-2.525-1.227-2.525-1.227L8.984 7.264 2.21 14.037 1.2 18.799l4.763-1.01 6.774-6.771 6.052-6.052c-.001 0 .216-1.083-1.228-2.527zM5.68 17.217l-1.624.35a3.71 3.71 0 0 0-.69-.932 3.742 3.742 0 0 0-.932-.691l.35-1.623.47-.469s.883.018 1.881 1.016c.997.996 1.016 1.881 1.016 1.881l-.471.468z"}])
 
 (defn icon-like
-  "https://github.com/adamwathan/entypo-optimized/blob/master/dist/icons/heart.svg"
+  "https://github.com/adamwathan/entypo-optimized/blob/master/dist/icons/heart-outlined.svg"
   [{:keys [css-classes data-attributes], :or {css-classes default-css-classes}}]
   [icon
    {:css-classes css-classes,
     :data-attributes data-attributes,
     :d
-    "M17.19 4.155c-1.672-1.534-4.383-1.534-6.055 0L10 5.197 8.864 4.155c-1.672-1.534-4.382-1.534-6.054 0-1.881 1.727-1.881 4.52 0 6.246L10 17l7.19-6.599c1.88-1.726 1.88-4.52 0-6.246z"}])
+    "M17.19 4.156c-1.672-1.535-4.383-1.535-6.055 0L10 5.197 8.864 4.156c-1.672-1.535-4.382-1.535-6.054 0-1.881 1.726-1.881 4.519 0 6.245L10 17l7.19-6.599c1.88-1.726 1.88-4.52 0-6.245zm-1.066 5.219L10 15.09 3.875 9.375c-.617-.567-.856-1.307-.856-2.094s.138-1.433.756-1.999c.545-.501 1.278-.777 2.063-.777.784 0 1.517.476 2.062.978L10 7.308l2.099-1.826c.546-.502 1.278-.978 2.063-.978s1.518.276 2.063.777c.618.566.755 1.212.755 1.999s-.238 1.528-.856 2.095z"}])
 
 (defn icon-login
   "https://github.com/adamwathan/entypo-optimized/blob/master/dist/icons/login.svg"
@@ -67,6 +67,15 @@
     :data-attributes data-attributes,
     :d
     "M16,10c0,0.553-0.048,1-0.601,1H11v4.399C11,15.951,10.553,16,10,16c-0.553,0-1-0.049-1-0.601V11H4.601 C4.049,11,4,10.553,4,10c0-0.553,0.049-1,0.601-1H9V4.601C9,4.048,9.447,4,10,4c0.553,0,1,0.048,1,0.601V9h4.399 C15.952,9,16,9.447,16,10z"}])
+
+(defn icon-price-tag
+  "https://github.com/adamwathan/entypo-optimized/blob/master/dist/icons/price-tag.svg"
+  [{:keys [css-classes data-attributes], :or {css-classes default-css-classes}}]
+  [icon
+   {:css-classes css-classes,
+    :data-attributes data-attributes,
+    :d
+    "M19.388.405a.605.605 0 0 0-1.141.399c.929 2.67-.915 4.664-2.321 5.732l-.568-.814c-.191-.273-.618-.5-.95-.504l-3.188.014a2.162 2.162 0 0 0-1.097.338L.729 12.157a1.01 1.01 0 0 0-.247 1.404l4.269 6.108c.32.455.831.4 1.287.082l9.394-6.588c.27-.191.582-.603.692-.918l.998-3.145c.11-.314.043-.793-.148-1.066l-.346-.496c1.888-1.447 3.848-4.004 2.76-7.133zm-4.371 9.358a1.608 1.608 0 0 1-2.24-.396 1.614 1.614 0 0 1 .395-2.246 1.607 1.607 0 0 1 1.868.017c-.272.164-.459.26-.494.275a.606.606 0 0 0 .259 1.153c.086 0 .174-.02.257-.059.194-.092.402-.201.619-.33a1.615 1.615 0 0 1-.664 1.586z"}])
 
 (defn icon-print
   "https://github.com/adamwathan/entypo-optimized/blob/master/dist/icons/print.svg"
@@ -104,6 +113,15 @@
     :d
     "M10 14a1.99 1.99 0 0 0-1.981 2c0 1.104.887 2 1.981 2a1.99 1.99 0 0 0 1.98-2c0-1.105-.886-2-1.98-2zm-4.2-2.242l1.4 1.414a3.933 3.933 0 0 1 5.601 0l1.399-1.414a5.898 5.898 0 0 0-8.4 0zM3 8.928l1.4 1.414a7.864 7.864 0 0 1 11.199 0L17 8.928a9.831 9.831 0 0 0-14 0zM.199 6.1l1.4 1.414a11.797 11.797 0 0 1 16.801 0L19.8 6.1a13.763 13.763 0 0 0-19.601 0z"}])
 
+(defn icon-tag
+  "https://github.com/adamwathan/entypo-optimized/blob/master/dist/icons/tag.svg"
+  [{:keys [css-classes data-attributes], :or {css-classes default-css-classes}}]
+  [icon
+   {:css-classes css-classes,
+    :data-attributes data-attributes,
+    :d
+    "M18.662 5.521L5.237 19l.707-4.967-4.945.709L14.424 1.263c.391-.392 1.133-.308 1.412 0l2.826 2.839c.5.473.391 1.026 0 1.419z"}])
+
 (defn icon-trash
   "https://github.com/adamwathan/entypo-optimized/blob/master/dist/icons/trash.svg"
   [{:keys [css-classes data-attributes], :or {css-classes default-css-classes}}]
@@ -112,3 +130,12 @@
     :data-attributes data-attributes,
     :d
     "M3.389,7.113L4.49,18.021C4.551,18.482,6.777,19.998,10,20c3.225-0.002,5.451-1.518,5.511-1.979l1.102-10.908 C14.929,8.055,12.412,8.5,10,8.5C7.59,8.5,5.072,8.055,3.389,7.113z M13.168,1.51l-0.859-0.951C11.977,0.086,11.617,0,10.916,0 H9.085c-0.7,0-1.061,0.086-1.392,0.559L6.834,1.51C4.264,1.959,2.4,3.15,2.4,4.029v0.17C2.4,5.746,5.803,7,10,7 c4.198,0,7.601-1.254,7.601-2.801v-0.17C17.601,3.15,15.738,1.959,13.168,1.51z M12.07,4.34L11,3H9L7.932,4.34h-1.7 c0,0,1.862-2.221,2.111-2.522C8.533,1.588,8.727,1.5,8.979,1.5h2.043c0.253,0,0.447,0.088,0.637,0.318 c0.248,0.301,2.111,2.522,2.111,2.522H12.07z"}])
+
+(defn icon-unlike
+  "https://github.com/adamwathan/entypo-optimized/blob/master/dist/icons/heart.svg"
+  [{:keys [css-classes data-attributes], :or {css-classes default-css-classes}}]
+  [icon
+   {:css-classes css-classes,
+    :data-attributes data-attributes,
+    :d
+    "M17.19 4.155c-1.672-1.534-4.383-1.534-6.055 0L10 5.197 8.864 4.155c-1.672-1.534-4.382-1.534-6.054 0-1.881 1.727-1.881 4.52 0 6.246L10 17l7.19-6.599c1.88-1.726 1.88-4.52 0-6.246z"}])

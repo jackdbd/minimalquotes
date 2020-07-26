@@ -2,6 +2,7 @@
   "Tags are an appropriate use-case for the cluster layout.
    https://absolutely.every-layout.dev/layouts/cluster/"
   (:require [minimalquotes.components.buttons :as btn]
+            [minimalquotes.components.icons :refer [icon-tag]]
             [minimalquotes.state :as state]
             [minimalquotes.utils :refer [k->str]]))
 
@@ -13,6 +14,7 @@
   [btn/button
    {:color color,
     :data-attributes {:data-tag name, :data-tooltip description},
+    :icon icon-tag,
     :text name}])
 
 (defn- make-m->li
@@ -34,7 +36,7 @@
     :or {margin-tailwind-class "m-1"}}]
   (let [m->li (make-m->li margin-tailwind-class)
         on-click (make-on-click on-click-tag)]
-    [:div {:class ["overflow-hidden" "p-2" debug-css]}
+    [:div {:class ["tags" "overflow-hidden" "p-2" debug-css]}
      [:ul
       {:class ["flex" "flex-wrap" (str "-" margin-tailwind-class)],
        :on-click on-click} (map m->li entries)]]))

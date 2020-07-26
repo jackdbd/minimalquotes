@@ -1,21 +1,17 @@
 (ns minimalquotes.pages.core
   "Page components and translation from routes to pages."
-  (:require [minimalquotes.firebase.firestore :refer
-             [db-doc-create! db-path-upsert! now server-timestamp]]
-            [minimalquotes.components.buttons :as btn]
+  (:require [minimalquotes.components.admin :as admin]
             [minimalquotes.components.footer :refer [footer]]
             [minimalquotes.components.header :refer [header]]
-            [minimalquotes.components.icons :refer [icon-signal icon-trash]]
+            [minimalquotes.components.forms :refer [button-add-new-quote-modal]]
             [minimalquotes.components.modal :refer [modal-window]]
-            [minimalquotes.components.quote-forms :refer
-             [button-add-new-quote-modal button-add-new-tag-modal]]
             [minimalquotes.components.quotes :refer [quotes-container]]
-            [minimalquotes.components.tags :refer [tags]]
-            [minimalquotes.fakes :as fakes]
+            [minimalquotes.components.tags :refer [tags-container]]
             [minimalquotes.firebase.auth :as auth]
+            [minimalquotes.firebase.firestore :refer
+             [db-doc-create! now server-timestamp]]
             [minimalquotes.routes :refer [path-for]]
             [minimalquotes.state :as state]
-            [minimalquotes.utils :refer [k->str]]
             [reagent.core :as r]
             [reagent.session :as session]))
 
@@ -27,31 +23,6 @@
 (defn ul-debug-quotes [] [:ul (map f-quote->li @state/quotes)])
 
 (defn about-page-content [] (fn [] [:div "About page"]))
-
-(def label-css-classes ["block" "text-gray-700" "text-sm" "font-bold" "mb-2"])
-
-(defn user->li
-  [[k m]]
-  ^{:key k}
-  [:li {:class ["flex" "justify-between" "border" "items-center"]}
-   [:span (:displayName m)]
-   [:div
-    [btn/button
-     {:icon icon-signal,
-      :data-attributes {:data-user-id (k->str k)},
-      ; TODO: move in parent and use event delegation
-      :on-click (fn [e]
-                  (prn "dataset user id" (.. e -target -dataset -userId))
-                  (let [user-id (k->str k)
-                        user (k @state/users)]
-                    (db-path-upsert!
-                     {:doc-path (str "users/" user-id),
-                      :firestore @state/db,
-                      :m (merge user
-                                {:isAdmin true,
-                                 :lastEditedAt (server-timestamp),
-                                 :lastEditedBy (:uid @state/user)})}))),
-      :text "Make Admin"}] [btn/button {:icon icon-trash, :text "Delete"}]]])
 
 (defn admin-page-content
   []
@@ -67,23 +38,15 @@
                                :m (merge q
                                          {:createdAt (server-timestamp),
                                           :createdBy user-id})})))
-          tags @state/tags
-          on-submit-tag-form
-          (fn [m]
-            (let [firestore @state/db
-                  user @state/user
-                  user-id (:uid user)]
-              (db-doc-create! {:collection "tags",
-                               :firestore firestore,
-                               :m (merge m
-                                         {:createdAt (server-timestamp),
-                                          :createdBy user-id})})))]
+          tags @state/tags]
       [:div
        [button-add-new-quote-modal
-        {:on-submitted-values on-submit-quote-form, :tags tags}]
-       [button-add-new-tag-modal {:on-submitted-values on-submit-tag-form}]
-       [:label {:class label-css-classes, :for "users"} "Users:"]
-       [:ol {:title "users"} (map user->li @state/users)]])))
+        {:on-submitted-values on-submit-quote-form, :tags tags}] [admin/users]
+       [admin/tags]])))
+
+(defn favorite-quotes-page-content
+  []
+  (fn [] [quotes-container {:show-only-favorites true}]))
 
 (defn home-page-content
   []
@@ -108,7 +71,7 @@
                          :component-did-mount did-mount,
                          :reagent-render reagent-render})))))
 
-(defn tags-page-content [] (fn [] [:div [tags {:entries fakes/tags}]]))
+(defn tags-page-content [] (fn [] [:div [tags-container]]))
 
 (defn current-page
   []
@@ -117,6 +80,7 @@
           page (:current-page (session/get :route))]
       [:<> [modal-window]
        [:div {:class ["container"]}
+        [:div (str "You are " (:displayName @state/user))]
         [header
          {:links [{:href (path-for :index), :label "Home"}
                   {:href (path-for :tags), :label "Tags"}
@@ -136,6 +100,7 @@
     :about #'about-page-content
     :admin #'admin-page-content
     ; :admin (if @state/user #'admin-page-content #'sign-in-page-content)
+    :favorite-quotes #'favorite-quotes-page-content
     :index #'home-page-content
     :quotes #'home-page-content
     :sign-in #'sign-in-page-content

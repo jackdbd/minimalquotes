@@ -30,8 +30,5 @@
             [btn/button {:icon icon-login, :text "Sign in"}]])]]]
       [:div
        (when user
-         [btn/button
-          {:color "red",
-           :on-click #(js/alert (str "TODO: show favorite quotes for the user "
-                                     (:uid user))),
-           :text "Favorite quotes"}])]]]))
+         [:a {:href (path-for :favorite-quotes)}
+          [btn/button {:color "red", :text "Favorite quotes"}]])]]]))

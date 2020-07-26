@@ -49,8 +49,3 @@
                                                  :f log-change!,
                                                  :firestore @state/db})]
     (prn "unsubscribe!" unsubscribe!)))
-
-(defn subscribe-users!
-  "Set a subscription for the documents in the `users` collection."
-  []
-  (subscribe-collection! {:collection "users", :ratom state/users}))

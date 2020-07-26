@@ -52,19 +52,20 @@
         observer
         #js
          {:error log-error,
-          :next (fn [^js doc-snapshot]
-                  (let [hasPendingWrites (goog.object/getValueByKeys
-                                          doc-snapshot
-                                          #js ["metadata" "hasPendingWrites"])]
-                    (when hasPendingWrites (prn "Source: Local (what to do?)"))
-                    (when (goog.object/get (.data doc-snapshot) "isAdmin")
-                      (prn " === WELCOME BACK ADMIN ===")
-                      (let [unsub! (db-docs-subscribe! {:collection "users",
-                                                        :firestore firestore,
-                                                        :ratom state/users})]
-                        (prn "== unsub! ==" unsub!)))
-                    (update-state! {:doc-snapshot doc-snapshot,
-                                    :ratom ratom})))}]
+          :next
+          (fn [^js doc-snapshot]
+            (let [hasPendingWrites (goog.object/getValueByKeys
+                                    doc-snapshot
+                                    #js ["metadata" "hasPendingWrites"])]
+              (when hasPendingWrites (prn "Source: Local (what to do?)"))
+              (when (goog.object/get (.data doc-snapshot) "isAdmin")
+                (prn " === WELCOME BACK ADMIN ===")
+                (let [unsubscribe-users! (db-docs-subscribe!
+                                          {:collection "users",
+                                           :firestore firestore,
+                                           :ratom state/users})]
+                  (swap! state/subscriptions assoc :users unsubscribe-users!)))
+              (update-state! {:doc-snapshot doc-snapshot, :ratom ratom})))}]
     (.onSnapshot doc-ref observer)))
 
 (defn db-docs-change-subscribe!

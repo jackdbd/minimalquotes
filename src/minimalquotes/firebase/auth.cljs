@@ -26,13 +26,18 @@
       (add-user-if-first-time!
        {:auth-user auth-user, :firestore @state/db, :uid uid})
       (subscribe-user! uid))
-    (when-let [unsubscribe-user! (get @state/subscriptions :user)]
-      (unsubscribe-user!)
-      (reset! state/user nil)
+    (let [unsubscribe-user! (get @state/subscriptions :user)
+          unsubscribe-users! (get @state/subscriptions :users)]
       ;; If the user was an admin, he subscribed to users inside the
-      ;; subscription for user.
-      ;; TODO: I don't know if this is the best approach. Maybe not...
-      (reset! state/users {}))))
+      ;; subscription for a user (the admin himself).
+      ;; TODO: This approach seems to work, but I don't know if this is the best
+      ;; one. Maybe not...
+      (when unsubscribe-users!
+        (unsubscribe-users!)
+        (reset! state/users state/initial-users-state))
+      (when unsubscribe-user!
+        (unsubscribe-user!)
+        (reset! state/user state/initial-user-state)))))
 
 ; I would like to make this observer :private, but it's not possible to enforce
 ; def or defn as private in ClojureScript.

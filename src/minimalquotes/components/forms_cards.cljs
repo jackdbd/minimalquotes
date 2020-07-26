@@ -1,9 +1,9 @@
-(ns minimalquotes.components.quote-forms-cards
+(ns minimalquotes.components.forms-cards
   (:require
    ;;  ["@testing-library/react" :refer [cleanup render]]
    [cljs.test :include-macros true :refer [is]]
    [devcards.core :as dc :refer [defcard deftest]]
-   [minimalquotes.components.quote-forms :refer
+   [minimalquotes.components.forms :refer
     [button-add-new-quote-modal button-delete-quote-modal
      button-edit-quote-modal quote-form]]
    [minimalquotes.components.modal :refer [modal-window]]

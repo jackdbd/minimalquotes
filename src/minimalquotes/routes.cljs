@@ -6,7 +6,8 @@
 
 (def router
   (rf/router [["/" :index] ["/about" :about] ["/admin" :admin]
-              ["/quotes" :quotes] ["/sign-in" :sign-in] ["/tags" :tags]]))
+              ["/favorite-quotes" :favorite-quotes] ["/quotes" :quotes]
+              ["/sign-in" :sign-in] ["/tags" :tags]]))
 
 (defn path-for
   "Name-based (reverse) routing."
