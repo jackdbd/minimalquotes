@@ -28,5 +28,10 @@ firestore-debug.log
 pubsub-debug.log
 ui-debug.log
 
+## Firestore emulator
+firestore-past-data/
+firestore-new-data/
+
 # logs from yarn
 yarn-error.log
+

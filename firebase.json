@@ -34,7 +34,9 @@
       "port": 8085
     },
     "ui": {
-      "enabled": true
+      "enabled": true,
+      "host": "localhost",
+      "port": 4000
     }
   }
 }
