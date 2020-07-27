@@ -3,7 +3,8 @@
             [minimalquotes.firebase.firestore :refer
              [db-path-delete! db-path-upsert! now server-timestamp]]
             [minimalquotes.state :as state]
-            [minimalquotes.utils :refer [k->str log-error]]))
+            [minimalquotes.utils :refer [k->str log-error]]
+            [reagent.session :as session]))
 
 ; (def debug-css "bg-green-200")
 (def debug-css "")
@@ -82,19 +83,43 @@
 
 (defn on-successful-batch-write [])
 
+(defn has-tag?
+  [quote tag-name]
+  (let [searched-tag? (fn [[_ tag]] (= tag-name (:name tag)))
+        tag-k (first (first (filter searched-tag? @state/tags)))]
+    (if (tag-k (:tags quote)) true false)))
+
+(defn favorite?
+  [quote-k]
+  ;; (prn "favs" quote-k @state/favorite-quotes)
+  (let [favorite-quote-keys (->> @state/favorite-quotes
+                                 (filter present?)
+                                 (map #(first %)))
+        favs (filter #(= % quote-k) favorite-quote-keys)]
+    (if (seq favs) true false)))
+
+(defn make-predicate
+  [query-params]
+  (fn predicate [[quote-k quote]]
+    ;; (prn "qs" query-params (:tag query-params))
+    (let [author-name (:author query-params)
+          tag-name (:tag query-params)
+          only-favorite (if (:favorite query-params) true false)
+          cond-author (if author-name (= author-name (:author quote)) true)
+          cond-tag (if tag-name (has-tag? quote tag-name) true)
+          cond-favorite (if only-favorite (favorite? quote-k) true)]
+      ;; (prn "author" author-name "tag" tag-name "favorite" only-favorite)
+      (and cond-author cond-tag cond-favorite))))
 
 (defn quotes-container
   "Quotes component that extracts its required props from the app state."
-  [{:keys [show-only-favorites], :or {show-only-favorites false}}]
+  []
   (let [firestore @state/db
         user @state/user
         user-id (:uid user)
-        favorite-quote-keys (->> @state/favorite-quotes
-                                 (filter present?)
-                                 (map #(first %)))
-        selected-quotes (if show-only-favorites
-                          (select-keys @state/quotes favorite-quote-keys)
-                          @state/quotes)
+        query-params (session/get-in [:route :query-params])
+        predicate (make-predicate query-params)
+        selected-quotes (filter predicate @state/quotes)
         ; A quote in @state/quotes contains a map of tags
         f (fn [[k m]]
             (let [tag-keys (->> (:tags m)

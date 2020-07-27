@@ -23,8 +23,9 @@
                          name (:name (:data match))
                          route-params (:path-params match)
                          query-params (:query-params match)]
-                     ;  (prn "route-params" route-params)
-                     ;  (prn "query-params" query-params)
+                     ;;  (prn "match" match)
+                     ;;  (prn "route-params" route-params)
+                     ;;  (prn "query-params" query-params)
                      (r/after-render clerk/after-render!)
                      (session/put! :route
                                    {:current-page (page-for name),

@@ -44,16 +44,13 @@
         {:on-submitted-values on-submit-quote-form, :tags tags}] [admin/users]
        [admin/tags]])))
 
-(defn favorite-quotes-page-content
-  []
-  (fn [] [quotes-container {:show-only-favorites true}]))
+(defn favorite-quotes-page-content [] (fn [] [quotes-container]))
 
-(defn home-page-content
+(defn quotes-page-content
   []
   (fn []
     (let [tag (get-in (session/get :route) [:query-params :tag])]
-      (prn (str "=== TODO: show only quotes with tag " tag " ==="))
-      [quotes-container])))
+      [quotes-container {:only-tag tag}])))
 
 (defn sign-in-page-content
   []
@@ -82,10 +79,21 @@
        [:div {:class ["container"]}
         [:div (str "You are " (:displayName @state/user))]
         [header
-         {:links [{:href (path-for :index), :label "Home"}
-                  {:href (path-for :tags), :label "Tags"}
-                  {:href (path-for :about), :label "About"}],
-          :login-href (path-for :sign-in),
+         {:links
+          [{:href (path-for :minimalquotes.routes/index), :label "Home"}
+           {:href (path-for :minimalquotes.routes/quotes {:tag "wisdom"}),
+            :label "Wisdom quotes"}
+           {:href (path-for :minimalquotes.routes/quotes
+                            {:author "Zen", :tag "friendship"}),
+            :label "Zen Friendship quotes"}
+           {:href (path-for :minimalquotes.routes/quotes {:author "Buddha"}),
+            :label "Buddha quotes"}
+           {:href (path-for :minimalquotes.routes/quotes
+                            {:author "Buddha", :tag "wisdom"}),
+            :label "Buddha wisdom quotes"}
+           {:href (path-for :minimalquotes.routes/tags), :label "Tags"}
+           {:href (path-for :minimalquotes.routes/about), :label "About"}],
+          :login-href (path-for :minimalquotes.routes/sign-in),
           :on-logout #(auth/sign-out),
           :user user}]] (comment [ul-debug-quotes]) [page] [footer]])))
 
@@ -97,11 +105,10 @@
   [route-name]
   ; (prn "route-name" route-name)
   (case route-name
-    :about #'about-page-content
-    :admin #'admin-page-content
+    :minimalquotes.routes/about #'about-page-content
+    :minimalquotes.routes/admin #'admin-page-content
     ; :admin (if @state/user #'admin-page-content #'sign-in-page-content)
-    :favorite-quotes #'favorite-quotes-page-content
-    :index #'home-page-content
-    :quotes #'home-page-content
-    :sign-in #'sign-in-page-content
-    :tags #'tags-page-content))
+    :minimalquotes.routes/index #'quotes-page-content
+    :minimalquotes.routes/quotes #'quotes-page-content
+    :minimalquotes.routes/sign-in #'sign-in-page-content
+    :minimalquotes.routes/tags #'tags-page-content))

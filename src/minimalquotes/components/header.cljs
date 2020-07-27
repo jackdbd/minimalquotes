@@ -22,7 +22,8 @@
         (map link->li links)
         (when (:isAdmin user)
           [:li {:class [margin-tailwind-class]}
-           [:a {:href (path-for :admin)} [btn/button {:text "Admin"}]]])
+           [:a {:href (path-for :minimalquotes.routes/admin)}
+            [btn/button {:text "Admin"}]]])
         [:li {:class [margin-tailwind-class]}
          (if user
            [btn/button {:on-click #(on-logout), :text "Logout"}]
@@ -30,5 +31,5 @@
             [btn/button {:icon icon-login, :text "Sign in"}]])]]]
       [:div
        (when user
-         [:a {:href (path-for :favorite-quotes)}
+         [:a {:href (path-for :minimalquotes.routes/quotes {:favorite true})}
           [btn/button {:color "red", :text "Favorite quotes"}]])]]]))
