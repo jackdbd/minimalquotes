@@ -32,7 +32,8 @@
             (let [firestore @state/db
                   user @state/user
                   user-id (:uid user)
-                  q (assoc m :tags "TODO-m-tag")]
+                  q (assoc m :tags {})]
+              (prn "TODO: extract tags from quote")
               (db-doc-create! {:collection "quotes",
                                :firestore firestore,
                                :m (merge q

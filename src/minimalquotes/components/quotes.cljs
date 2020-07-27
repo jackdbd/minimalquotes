@@ -87,7 +87,7 @@
   [quote tag-name]
   (let [searched-tag? (fn [[_ tag]] (= tag-name (:name tag)))
         tag-k (first (first (filter searched-tag? @state/tags)))]
-    (if (tag-k (:tags quote)) true false)))
+    (if tag-k (if (tag-k (:tags quote)) true false) false)))
 
 (defn favorite?
   [quote-k]

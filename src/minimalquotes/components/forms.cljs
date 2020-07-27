@@ -23,30 +23,28 @@
     ; (prn "quote-form-inner" "tags" tags "state" state "values" values)
     [:form {:class form-css-classes, :id form-id, :on-submit handle-submit}
      [:div {:class ["mb-4"]}
-      [:label {:class label-css-classes, :for "quote-text"} "Text:"]
+      [:label {:class label-css-classes, :for "text"} "Text:"]
       [:input
-       {:id "quote-text",
+       {:id "text",
         :auto-focus true,
         :class input-css-classes,
-        :data-testid "quote-text",
-        :name "quote-text",
+        :data-testid "text",
+        :name "text",
         :on-blur handle-blur,
         :on-change handle-change,
-        :value (values "quote-text")}]
-      (when (touched "quote-text")
-        [:div (first (get errors (list "quote-text")))])]
+        :value (values "text")}]
+      (when (touched "text") [:div (first (get errors (list "text")))])]
      [:div {:class ["mb-4"]}
-      [:label {:class label-css-classes, :for "quote-author"} "Author:"]
+      [:label {:class label-css-classes, :for "author"} "Author:"]
       [:input
-       {:id "quote-author",
+       {:id "author",
         :class input-css-classes,
-        :data-testid "quote-author",
-        :name "quote-author",
+        :data-testid "author",
+        :name "author",
         :on-blur handle-blur,
         :on-change handle-change,
-        :value (values "quote-author")}]
-      (when (touched "quote-author")
-        [:div (first (get errors (list "quote-author")))])]
+        :value (values "author")}]
+      (when (touched "author") [:div (first (get errors (list "author")))])]
      [:div {:class ["mb-4"]}
       [:label {:class label-css-classes, :for "input-tags-typeahead"} "Tags:"]
       [:> Typeahead
@@ -71,20 +69,18 @@
       [btn/submit {:disabled submitting?, :text "Confirm"}]]]))
 
 (def quote-form-validation
-  (vlad/join (vlad/attr ["quote-text"]
-                        (vlad/chain (vlad/present) (vlad/length-over 5)))
-             (vlad/attr ["quote-author"]
-                        (vlad/chain (vlad/present) (vlad/length-in 1 15)))))
+  (vlad/join
+   (vlad/attr ["text"] (vlad/chain (vlad/present) (vlad/length-over 5)))
+   (vlad/attr ["author"] (vlad/chain (vlad/present) (vlad/length-in 1 15)))))
 
 (defn quote-form
   "Stateful form to create/edit a quote.
   Form's state is managed by fork. Form's validation is implemented with vlad."
-  [{:keys [on-click-cancel on-submitted-values quote-author quote-text tags],
-    :or {quote-author "", quote-text ""}}]
+  [{:keys [on-click-cancel on-submitted-values author text tags],
+    :or {author "", text ""}}]
   ; TODO: make :default-selected tags with ids
   (let [config {:clean-on-unmount? true,
-                :initial-values {"quote-author" quote-author,
-                                 "quote-text" quote-text},
+                :initial-values {"author" author, "text" text},
                 :on-submit (fn [m] (on-submitted-values (:values m))),
                 :prevent-default? true,
                 :validation #(vlad/field-errors quote-form-validation %)}
@@ -162,7 +158,7 @@
      [:div {:class ["mb-4"]}
       [:label {:class label-css-classes, :for "color"} "Color:"]
       [:select
-       {:class input-css-classes,              ;TODO: improve styling
+       {:class input-css-classes,                ;TODO: improve styling
         :id "color",
         :name "color",
         :on-blur handle-blur,
@@ -253,7 +249,7 @@
       :text tag-name}]))
 
 (defn button-edit-quote-modal
-  [{:keys [quote-author tags quote-text on-submitted-values]}]
+  [{:keys [author tags text on-submitted-values]}]
   (let [on-click-cancel #(modal! nil)
         f (fn [values] (on-submitted-values values) (modal! nil))]
     ; (prn "button-edit-quote-modal" tags)
@@ -263,26 +259,26 @@
                           {:on-click-cancel on-click-cancel,
                            :on-submitted-values f,
                            :tags tags,
-                           :quote-author quote-author,
-                           :quote-text quote-text}]),
+                           :author author,
+                           :text text}]),
       :text "Edit"}]))
 
 (defn delete-quote-dialog
-  [{:keys [quote-author on-click-cancel on-click-confirm]}]
+  [{:keys [author on-click-cancel on-click-confirm]}]
   [:div {:class ["bg-white" "shadow-md" "rounded" "px-8" "pt-6" "pb-8"]}
-   [:p (str "Are you sure you want to delete this quote by " quote-author "?")]
+   [:p (str "Are you sure you want to delete this quote by " author "?")]
    [:div {:class ["flex" "items-center" "justify-between"]}
     [btn/button {:on-click on-click-cancel, :text "Cancel"}]
     [btn/button {:on-click on-click-confirm, :text "Delete"}]]])
 
 (defn button-delete-quote-modal
-  [{:keys [on-delete quote-author]}]
+  [{:keys [on-delete author]}]
   (let [on-click-cancel #(modal! nil)
-        on-click-confirm (fn [_] (on-delete quote-author) (modal! nil))]
+        on-click-confirm (fn [_] (on-delete author) (modal! nil))]
     [btn/button
      {:icon icon-trash,
       :on-click #(modal! [delete-quote-dialog
-                          {:quote-author quote-author,
+                          {:author author,
                            :on-click-cancel on-click-cancel,
                            :on-click-confirm on-click-confirm}]),
       :text "Delete"}]))
