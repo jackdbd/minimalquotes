@@ -3,6 +3,7 @@
    https://absolutely.every-layout.dev/layouts/cluster/"
   (:require [minimalquotes.components.buttons :as btn]
             [minimalquotes.components.icons :refer [icon-tag]]
+            [minimalquotes.routes :refer [path-for]]
             [minimalquotes.state :as state]
             [minimalquotes.utils :refer [k->str]]))
 
@@ -17,13 +18,17 @@
     :icon icon-tag,
     :text name}])
 
-(defn- make-m->li
+(defn make-m->li
   [margin-tailwind-class]
   (fn m->li [[k-id props]]
-    (let [doc-id (k->str k-id)]
-      ^{:key doc-id} [:li {:class [margin-tailwind-class]} [tag props]])))
+    (let [doc-id (k->str k-id)
+          tag-name (:name props)]
+      ^{:key doc-id}
+      [:li {:class [margin-tailwind-class]}
+       [:a {:href (path-for :minimalquotes.routes/quotes {:tag tag-name})}
+        [tag props]]])))
 
-(defn- make-on-click
+(defn make-on-click
   [on-click-tag]
   (if on-click-tag
     (fn [^js e]
