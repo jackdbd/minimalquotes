@@ -6,11 +6,11 @@
 
 ;; db will be the Firestore database
 (def state
-  (r/atom {:db nil,
-           :quotes {},
-           :subscriptions {},
-           :tags {},
-           :user initial-user-state,
+  (r/atom {:db nil
+           :quotes {}
+           :subscriptions {}
+           :tags {}
+           :user initial-user-state
            :users initial-users-state}))
 
 (def db (r/cursor state [:db]))

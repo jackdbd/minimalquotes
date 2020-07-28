@@ -13,9 +13,9 @@
 (defn tag
   [{:keys [color description name]}]
   [btn/button
-   {:color color,
-    :data-attributes {:data-tag name, :data-tooltip description},
-    :icon icon-tag,
+   {:color color
+    :data-attributes {:data-tag name :data-tooltip description}
+    :icon icon-tag
     :text name}])
 
 (defn make-m->li
@@ -37,13 +37,13 @@
     nil))
 
 (defn tags
-  [{:keys [entries margin-tailwind-class on-click-tag],
+  [{:keys [entries margin-tailwind-class on-click-tag]
     :or {margin-tailwind-class "m-1"}}]
   (let [m->li (make-m->li margin-tailwind-class)
         on-click (make-on-click on-click-tag)]
     [:div {:class ["tags" "overflow-hidden" "p-2" debug-css]}
      [:ul
-      {:class ["flex" "flex-wrap" (str "-" margin-tailwind-class)],
+      {:class ["flex" "flex-wrap" (str "-" margin-tailwind-class)]
        :on-click on-click} (map m->li entries)]]))
 
 (defn tags-container [] (let [entries @state/tags] [tags {:entries entries}]))

@@ -4,17 +4,17 @@
 (def debug-css "")
 
 (defn button
-  [{:keys [color data-attributes direction icon on-click text],
-    :or {color "blue", data-attributes {}, direction "ltr"}}]
+  [{:keys [color data-attributes direction icon on-click text]
+    :or {color "blue" data-attributes {} direction "ltr"}}]
   (let [margin-tailwind-class (if (= "ltr" direction) "ml-1" "mr-1")
         button-props {:class ["font-bold" "rounded" "bg-transparent" "px-2"
                               "py-2" (str "text-" color "-500")
                               (when (:data-tooltip data-attributes) "tooltip")
                               "border" (str "border-" color "-500")
                               (str "hover:bg-" color "-700") "hover:text-white"
-                              "hover:border-transparent"],
-                      :on-click on-click,
-                      :style {:direction direction},
+                              "hover:border-transparent"]
+                      :on-click on-click
+                      :style {:direction direction}
                       :type "button"}
         icon-props {:css-classes ["w-4" "h-4" "fill-current"
                                   margin-tailwind-class]}]
@@ -44,11 +44,11 @@
 ;;            :src (:photo-url user)}]]])
 
 (defn submit
-  [{:keys [color disabled text],
-    :or {color "blue", disabled false, text "Submit"}}]
+  [{:keys [color disabled text]
+    :or {color "blue" disabled false text "Submit"}}]
   [:button
    {:class ["font-bold" "rounded" "text-white" "px-2" "py-2"
             (str "bg-" color "-500") (str "hover:bg-" color "-700")
-            "focus:outline-none" "focus:shadow-outline"],
-    :disabled disabled,
+            "focus:outline-none" "focus:shadow-outline"]
+    :disabled disabled
     :type "submit"} text])

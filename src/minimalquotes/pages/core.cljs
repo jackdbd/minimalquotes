@@ -34,15 +34,15 @@
                   user-id (:uid user)
                   q (assoc m :tags {})]
               (prn "TODO: extract tags from quote")
-              (db-doc-create! {:collection "quotes",
-                               :firestore firestore,
+              (db-doc-create! {:collection "quotes"
+                               :firestore firestore
                                :m (merge q
-                                         {:createdAt (server-timestamp),
+                                         {:createdAt (server-timestamp)
                                           :createdBy user-id})})))
           tags @state/tags]
       [:div
        [button-add-new-quote-modal
-        {:on-submitted-values on-submit-quote-form, :tags tags}] [admin/users]
+        {:on-submitted-values on-submit-quote-form :tags tags}] [admin/users]
        [admin/tags]])))
 
 (defn favorite-quotes-page-content [] (fn [] [quotes-container]))
@@ -65,8 +65,8 @@
                                  [:div {:id container-id}]])]
       (if user
         [:p "already signed in"]
-        (r/create-class {:display-name "modal-window",
-                         :component-did-mount did-mount,
+        (r/create-class {:display-name "modal-window"
+                         :component-did-mount did-mount
                          :reagent-render reagent-render})))))
 
 (defn tags-page-content [] (fn [] [:div [tags-container]]))
@@ -81,21 +81,21 @@
         [:div (str "You are " (:displayName @state/user))]
         [header
          {:links
-          [{:href (path-for :minimalquotes.routes/index), :label "Home"}
-           {:href (path-for :minimalquotes.routes/quotes {:tag "wisdom"}),
+          [{:href (path-for :minimalquotes.routes/index) :label "Home"}
+           {:href (path-for :minimalquotes.routes/quotes {:tag "wisdom"})
             :label "Wisdom quotes"}
            {:href (path-for :minimalquotes.routes/quotes
-                            {:author "Zen", :tag "friendship"}),
+                            {:author "Zen" :tag "friendship"})
             :label "Zen Friendship quotes"}
-           {:href (path-for :minimalquotes.routes/quotes {:author "Buddha"}),
+           {:href (path-for :minimalquotes.routes/quotes {:author "Buddha"})
             :label "Buddha quotes"}
            {:href (path-for :minimalquotes.routes/quotes
-                            {:author "Buddha", :tag "wisdom"}),
+                            {:author "Buddha" :tag "wisdom"})
             :label "Buddha wisdom quotes"}
-           {:href (path-for :minimalquotes.routes/tags), :label "Tags"}
-           {:href (path-for :minimalquotes.routes/about), :label "About"}],
-          :login-href (path-for :minimalquotes.routes/sign-in),
-          :on-logout #(auth/sign-out),
+           {:href (path-for :minimalquotes.routes/tags) :label "Tags"}
+           {:href (path-for :minimalquotes.routes/about) :label "About"}]
+          :login-href (path-for :minimalquotes.routes/sign-in)
+          :on-logout #(auth/sign-out)
           :user user}]] (comment [ul-debug-quotes]) [page] [footer]])))
 
 ; TODO: a non-admin user could access HOST/admin by typing in the address bar.

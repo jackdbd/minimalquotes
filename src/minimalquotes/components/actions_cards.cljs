@@ -28,21 +28,21 @@
 (defn actions-example
   []
   (let [props
-        {:id fakes/quote-id-0,
-         :on-click-action on-click-action,
-         :on-delete (fn [author] (js/alert (str "Delete quote by " author))),
+        {:id fakes/quote-id-0
+         :on-click-action on-click-action
+         :on-delete (fn [author] (js/alert (str "Delete quote by " author)))
          :on-edit (fn [values]
-                    (js/alert (js/JSON.stringify (clj->js values) nil 2))),
-         :on-like on-like,
-         :on-share on-share,
-         :quote-author fakes/author-0,
-         :quote-text fakes/text-0,
-         :tags fakes/tags,
+                    (js/alert (js/JSON.stringify (clj->js values) nil 2)))
+         :on-like on-like
+         :on-share on-share
+         :quote-author fakes/author-0
+         :quote-text fakes/text-0
+         :tags fakes/tags
          :user fakes/user}]
     [:<> [modal-window] [actions props]]))
 
 (defcard
- actions-authenticated-card
- "Actions that require confirmation (Edit, Delete) must be confirmed in a modal
+  actions-authenticated-card
+  "Actions that require confirmation (Edit, Delete) must be confirmed in a modal
   window. Like and Share require no modals."
- (dc/reagent [actions-example]))
+  (dc/reagent [actions-example]))

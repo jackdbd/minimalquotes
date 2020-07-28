@@ -12,7 +12,7 @@
    [:div
     {:class
      ["border border-t-0 border-red-400 rounded-b bg-red-100 px-4 py-3 text-red-700"]}
-    [:p detail]] [btn/button {:on-click on-click, :text "Try again"}]])
+    [:p detail]] [btn/button {:on-click on-click :text "Try again"}]])
 
 (defn error-boundary
   "TODO: create nicer error messages in this error boundary."
@@ -20,18 +20,19 @@
   (let [error (r/atom nil)
         detail (r/atom "")]
     (r/create-class
-     {:component-did-catch
-      (fn [_ ^js err ^js info]
-        (log-error err)
-        (reset! detail info)
-        (js/console.warn "Todo: send error to Firebase Crashlytics or Sentry"
-                         "info"
-                         info)),
-      :get-derived-state-from-error (fn [e] (reset! error e) #js {}),
-      :reagent-render
-      (fn [component-tree]
-        (if @error
-          [fallback-ui
-           {:detail (goog.object/getValueByKeys @detail #js ["componentStack"]),
-            :on-click #(reset! error nil)}]
-          component-tree))})))
+      {:component-did-catch
+       (fn [_ ^js err ^js info]
+         (log-error err)
+         (reset! detail info)
+         (js/console.warn "Todo: send error to Firebase Crashlytics or Sentry"
+                          "info"
+                          info))
+       :get-derived-state-from-error (fn [e] (reset! error e) #js {})
+       :reagent-render (fn [component-tree]
+                         (if @error
+                           [fallback-ui
+                            {:detail (goog.object/getValueByKeys
+                                       @detail
+                                       #js ["componentStack"])
+                             :on-click #(reset! error nil)}]
+                           component-tree))})))

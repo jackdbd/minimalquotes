@@ -33,12 +33,12 @@
   "A modal window that blocks user interaction when has a child to render."
   [{:keys [modal-backdrop-css-class modal-window-css-class
            modal-window-hidden-css-class on-after-close on-after-open
-           should-close-on-esc],
-    :or {modal-backdrop-css-class "modal-backdrop",
-         modal-window-css-class "modal-window",
-         modal-window-hidden-css-class "modal-window--hidden",
-         on-after-close nop,
-         on-after-open nop,
+           should-close-on-esc]
+    :or {modal-backdrop-css-class "modal-backdrop"
+         modal-window-css-class "modal-window"
+         modal-window-hidden-css-class "modal-window--hidden"
+         on-after-close nop
+         on-after-open nop
          should-close-on-esc true}}]
   (let [child (r/atom nil)
         close-modal (fn [] (reset! child nil) (on-after-close))
@@ -67,15 +67,15 @@
         reagent-render
         (fn []
           [:div
-           {:id modal-window-id,
+           {:id modal-window-id
             :class [modal-window-css-class
                     (when (nil? @child) modal-window-hidden-css-class)]}
            (when @child
              [:div
-              {:class [modal-backdrop-css-class],
-               :data-backdrop "true",
+              {:class [modal-backdrop-css-class]
+               :data-backdrop "true"
                :on-click on-backdrop-click} @child])])]
-    (r/create-class {:display-name "modal-window",
-                     :component-did-mount did-mount,
-                     :component-will-unmount will-unmount,
+    (r/create-class {:display-name "modal-window"
+                     :component-did-mount did-mount
+                     :component-will-unmount will-unmount
                      :reagent-render reagent-render})))

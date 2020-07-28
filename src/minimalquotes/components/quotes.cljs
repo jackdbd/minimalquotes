@@ -13,7 +13,7 @@
   "Given a user id and the callbacks that perform side-effects on a quote,
   return a function that maps a quote (id + values) to a <li> element."
   [{:keys [delete-quote! edit-quote! user]}]
-  (fn m->li [[k {:keys [author likes tags text], :as m}]]
+  (fn m->li [[k {:keys [author likes tags text] :as m}]]
     ; (prn "m->li" "m" m "user" user)
     (let [doc-id (k->str k)
           delete! (partial delete-quote! doc-id)
@@ -22,14 +22,14 @@
       ^{:key doc-id}
       [:li {:class ["flex" "items-stretch" debug-css]}
        [quote-card
-        {:delete! delete!,
-         :edit! edit!,
-         :id doc-id,
-         :like-button-text toggle-like-button-text,
-         :tags tags,
-         :quote-author author,
-         :quote-text text,
-         :unlike-button-text toggle-like-button-text,
+        {:delete! delete!
+         :edit! edit!
+         :id doc-id
+         :like-button-text toggle-like-button-text
+         :tags tags
+         :quote-author author
+         :quote-text text
+         :unlike-button-text toggle-like-button-text
          :user user}]])))
 
 (defn make-on-quotes-click
@@ -57,16 +57,16 @@
            on-toggle-like-quote user]}]
   ; (prn "=== quotes entries ===" entries)
   (let [on-click (make-on-quotes-click
-                  {:on-click-tag on-click-tag,
-                   :on-toggle-like-quote on-toggle-like-quote,
-                   :on-share-quote on-share-quote,
-                   :user user})
-        m->li (make-m->li {:delete-quote! delete-quote!,
-                           :edit-quote! edit-quote!,
+                   {:on-click-tag on-click-tag
+                    :on-toggle-like-quote on-toggle-like-quote
+                    :on-share-quote on-share-quote
+                    :user user})
+        m->li (make-m->li {:delete-quote! delete-quote!
+                           :edit-quote! edit-quote!
                            :user user})]
     [:ul
      {:class ["grid" "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
-              "gap-4"],
+              "gap-4"]
       :on-click on-click}
      ;  (when user [button-add-new-quote-modal {:on-confirm on-add-quote}])
      (map m->li entries)]))
@@ -131,21 +131,21 @@
               entry))
         entries (reduce into {} (map f selected-quotes))]
     [quotes
-     {:entries entries,
+     {:entries entries
       ; :on-click-tag (fn [name] (quotes-with-tag firestore state/quotes name)),
       :delete-quote! (fn [quote-id]
-                       (db-path-delete! {:doc-path (str "quotes/" quote-id),
-                                         :firestore firestore})),
+                       (db-path-delete! {:doc-path (str "quotes/" quote-id)
+                                         :firestore firestore}))
       :edit-quote! (fn [quote-id m-state m-form]
                      (let [m-tag (form-tags->m-tag (:tags m-form))
                            q (assoc m-form :tags m-tag)]
                        (db-path-upsert!
-                        {:doc-path (str "quotes/" quote-id),
-                         :firestore firestore,
-                         :m (merge m-state
-                                   q
-                                   {:lastEditedAt (server-timestamp),
-                                    :lastEditedBy user-id})}))),
+                         {:doc-path (str "quotes/" quote-id)
+                          :firestore firestore
+                          :m (merge m-state
+                                    q
+                                    {:lastEditedAt (server-timestamp)
+                                     :lastEditedBy user-id})})))
       :on-toggle-like-quote
       (fn [user quote-id]
         (let [k (keyword quote-id)
@@ -162,7 +162,7 @@
           (.set batch quoteRef (clj->js m-quote))
           (-> (.commit batch)
               (.then on-successful-batch-write)
-              (.catch log-error)))),
+              (.catch log-error))))
       :on-share-quote (fn [user quote-id]
-                        (prn "TODO: share quote" user quote-id)),
+                        (prn "TODO: share quote" user quote-id))
       :user user}]))

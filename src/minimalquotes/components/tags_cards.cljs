@@ -1,12 +1,12 @@
 (ns minimalquotes.components.tags-cards
   (:require
-   ;;  ["@testing-library/react" :refer [cleanup fireEvent render]]
-   [cljs.test :include-macros true :refer [is]]
-   [devcards.core :as dc :refer [defcard deftest]]
-   [minimalquotes.components.tags :refer [tag tags]]
-   [minimalquotes.fakes :as fakes]
-   [minimalquotes.utils :refer [testing-container]]
-   [reagent.core :as r]))
+    ;;  ["@testing-library/react" :refer [cleanup fireEvent render]]
+    [cljs.test :include-macros true :refer [is]]
+    [devcards.core :as dc :refer [defcard deftest]]
+    [minimalquotes.components.tags :refer [tag tags]]
+    [minimalquotes.fakes :as fakes]
+    [minimalquotes.utils :refer [testing-container]]
+    [reagent.core :as r]))
 
 (defcard "# Tag & Tags")
 
@@ -23,12 +23,12 @@
          (let [props {:entries fakes/tags}] (dc/reagent [tags props])))
 
 (defcard
- tags-custom-margins-card
- "Tags with custom margins and a single click handler for all tags (event delegation)."
- (let [props {:entries fakes/tags,
-              :margin-tailwind-class "m-3",
-              :on-click-tag on-click-tag}]
-   (dc/reagent [tags props])))
+  tags-custom-margins-card
+  "Tags with custom margins and a single click handler for all tags (event delegation)."
+  (let [props {:entries fakes/tags
+               :margin-tailwind-class "m-3"
+               :on-click-tag on-click-tag}]
+    (dc/reagent [tags props])))
 
 ;; (deftest tags-tests-card
 ;;   (let [counter (atom 0)

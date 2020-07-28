@@ -18,26 +18,26 @@
    [:div
     (if (:isAdmin user)
       [btn/button
-       {:icon icon-signal,
-        :data-attributes {:data-operation "unmake-admin",
-                          :data-user-id user-id},
+       {:icon icon-signal
+        :data-attributes {:data-operation "unmake-admin"
+                          :data-user-id user-id}
         :text "Unmake Admin"}]
       [btn/button
-       {:icon icon-signal,
-        :data-attributes {:data-operation "make-admin", :data-user-id user-id},
+       {:icon icon-signal
+        :data-attributes {:data-operation "make-admin" :data-user-id user-id}
         :text "Make Admin"}])
     [btn/button
-     {:data-attributes {:data-operation "delete", :data-user-id user-id},
-      :icon icon-trash,
+     {:data-attributes {:data-operation "delete" :data-user-id user-id}
+      :icon icon-trash
       :text "Delete"}]]])
 
-(defn user->li [[k m]] ^{:key k} [:li [user {:user m, :user-id (k->str k)}]])
+(defn user->li [[k m]] ^{:key k} [:li [user {:user m :user-id (k->str k)}]])
 
 (defn users
   []
-  [:<> [:label {:class label-css-classes, :for "users"} "Users:"]
+  [:<> [:label {:class label-css-classes :for "users"} "Users:"]
    [:ul
-    {:title "users",
+    {:title "users"
      :on-click
      (fn [^js e]
        (let [user-id (.. e -target -dataset -userId)
@@ -47,20 +47,20 @@
              doc-path (str "users/" user-id)]
          (when user-id
            (case op
-             "delete" (db-path-delete! {:doc-path doc-path, :firestore db})
-             "make-admin"
-             (db-path-upsert! {:doc-path doc-path,
-                               :firestore db,
+             "delete" (db-path-delete! {:doc-path doc-path :firestore db})
+             "make-admin" (db-path-upsert!
+                            {:doc-path doc-path
+                             :firestore db
+                             :m (merge (k @state/users)
+                                       {:isAdmin true
+                                        :lastEditedAt (server-timestamp)
+                                        :lastEditedBy (:uid @state/user)})})
+             "unmake-admin" (db-path-upsert!
+                              {:doc-path doc-path
+                               :firestore db
                                :m (merge (k @state/users)
-                                         {:isAdmin true,
-                                          :lastEditedAt (server-timestamp),
-                                          :lastEditedBy (:uid @state/user)})})
-             "unmake-admin"
-             (db-path-upsert! {:doc-path doc-path,
-                               :firestore db,
-                               :m (merge (k @state/users)
-                                         {:isAdmin false,
-                                          :lastEditedAt (server-timestamp),
+                                         {:isAdmin false
+                                          :lastEditedAt (server-timestamp)
                                           :lastEditedBy (:uid @state/user)})})
              (prn (str "Not implemented for op: " op))))))}
     (map user->li @state/users)]])
@@ -75,28 +75,28 @@
      [button-edit-tag-modal
       {:on-submitted-values
        (fn [m]
-         (db-path-upsert! {:doc-path (str "tags/" tag-id),
-                           :firestore @state/db,
+         (db-path-upsert! {:doc-path (str "tags/" tag-id)
+                           :firestore @state/db
                            :m (merge (k @state/tags)
                                      m
-                                     {:lastEditedAt (server-timestamp),
-                                      :lastEditedBy (:uid @state/user)})})),
-       :tag-color color,
-       :tag-description description,
+                                     {:lastEditedAt (server-timestamp)
+                                      :lastEditedBy (:uid @state/user)})}))
+       :tag-color color
+       :tag-description description
        :tag-name name}]
      [:div
       [btn/button
-       {:data-attributes {:data-operation "delete", :data-tag-id tag-id},
-        :icon icon-trash,
+       {:data-attributes {:data-operation "delete" :data-tag-id tag-id}
+        :icon icon-trash
         :text "Delete"}]]]))
 
-(defn tag->li [[k m]] ^{:key k} [:li [tag {:tag m, :tag-id (k->str k)}]])
+(defn tag->li [[k m]] ^{:key k} [:li [tag {:tag m :tag-id (k->str k)}]])
 
 (defn tags
   []
-  [:<> [:label {:class label-css-classes, :for "tags"} "Tags"]
+  [:<> [:label {:class label-css-classes :for "tags"} "Tags"]
    [:ul
-    {:title "tags",
+    {:title "tags"
      :on-click (fn [^js e]
                  (let [tag-id (.. e -target -dataset -tagId)
                        op (.. e -target -dataset -operation)
@@ -104,7 +104,7 @@
                        doc-path (str "tags/" tag-id)]
                    (when tag-id
                      (case op
-                       "delete" (db-path-delete! {:doc-path doc-path,
+                       "delete" (db-path-delete! {:doc-path doc-path
                                                   :firestore db})
                        (prn (str "Not implemented for op: " op))))))}
     (map tag->li @state/tags)]
@@ -114,8 +114,8 @@
                                   user @state/user
                                   user-id (:uid user)]
                               (db-doc-create!
-                               {:collection "tags",
-                                :firestore firestore,
-                                :m (merge m
-                                          {:createdAt (server-timestamp),
-                                           :createdBy user-id})})))}]])
+                                {:collection "tags"
+                                 :firestore firestore
+                                 :m (merge m
+                                           {:createdAt (server-timestamp)
+                                            :createdBy user-id})})))}]])

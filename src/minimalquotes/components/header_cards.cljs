@@ -27,12 +27,12 @@
 
 (defcard header-authenticated-card
          "Header for an authenticated user."
-         (let [props {:on-logout (fn [_] (js/alert "Logout")),
+         (let [props {:on-logout (fn [_] (js/alert "Logout"))
                       :user fakes/user}]
            (dc/reagent [header props])))
 
 (deftest header-authenticated-tests-card
-  (let [props {:on-logout (fn [_]), :user fakes/user}
+  (let [props {:on-logout (fn [_]) :user fakes/user}
         tr (render (r/as-element [header props])
                    #js {:container (testing-container)})]
     (is (.queryByText tr "Logout") "Should show 'Logout'")

@@ -24,7 +24,7 @@
   (if auth-user
     (let [uid (goog.object/get auth-user "uid")]
       (add-user-if-first-time!
-       {:auth-user auth-user, :firestore @state/db, :uid uid})
+        {:auth-user auth-user :firestore @state/db :uid uid})
       (subscribe-user! uid))
     (let [unsubscribe-user! (get @state/subscriptions :user)
           unsubscribe-users! (get @state/subscriptions :users)]
@@ -42,6 +42,6 @@
 ; I would like to make this observer :private, but it's not possible to enforce
 ; def or defn as private in ClojureScript.
 ; https://clojurescript.org/about/differences#_special_forms
-(def observer #js {:error log-error, :next on-next})
+(def observer #js {:error log-error :next on-next})
 
 (defn on-auth-state-changed [] (.onAuthStateChanged (firebase/auth) observer))

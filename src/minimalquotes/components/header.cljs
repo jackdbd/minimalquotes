@@ -12,7 +12,7 @@
 
 ;; TODO: reuse layout from tags component (maybe create cluster component?)
 (defn header
-  [{:keys [links login-href margin-tailwind-class on-logout user],
+  [{:keys [links login-href margin-tailwind-class on-logout user]
     :or {margin-tailwind-class "m-1"}}]
   (let [link->li (make-link->li margin-tailwind-class)]
     [:header
@@ -26,10 +26,10 @@
             [btn/button {:text "Admin"}]]])
         [:li {:class [margin-tailwind-class]}
          (if user
-           [btn/button {:on-click #(on-logout), :text "Logout"}]
+           [btn/button {:on-click #(on-logout) :text "Logout"}]
            [:a {:href login-href}
-            [btn/button {:icon icon-login, :text "Sign in"}]])]]]
+            [btn/button {:icon icon-login :text "Sign in"}]])]]]
       [:div
        (when user
          [:a {:href (path-for :minimalquotes.routes/quotes {:favorite true})}
-          [btn/button {:color "red", :text "Favorite quotes"}]])]]]))
+          [btn/button {:color "red" :text "Favorite quotes"}]])]]]))

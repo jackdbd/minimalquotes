@@ -13,15 +13,15 @@
       [:div {:class ["flex" "justify-between"]}
        [:div
         [btn/button
-         {:text "modal 0",
+         {:text "modal 0"
           :on-click #(modal! [:div [:p "This is inside modal 0"]
                               [btn/button
-                               {:text "Close modal 0", :on-click on-cancel}]])}]
+                               {:text "Close modal 0" :on-click on-cancel}]])}]
         [btn/button
-         {:text "modal 1",
-          :on-click #(modal!
-                       [:div [:p "This is inside modal 1"]
-                        [btn/button
-                         {:text "Close modal 1", :on-click on-cancel}]])}]]]]]))
+         {:text "modal 1"
+          :on-click #(modal! [:div [:p "This is inside modal 1"]
+                              [btn/button
+                               {:text "Close modal 1"
+                                :on-click on-cancel}]])}]]]]]))
 
 (defcard app-modal-card (dc/reagent [app-example]))

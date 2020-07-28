@@ -15,8 +15,8 @@
   "A card for a single quote. If the user is authenticated, he can
   edit/delete/like/share the quote."
   [{:keys [id like-button-text on-delete on-edit on-share on-toggle-like
-           quote-author quote-text tags unlike-button-text user],
-    :or {like-button-text "Like", unlike-button-text "Unlike"}}]
+           quote-author quote-text tags unlike-button-text user]
+    :or {like-button-text "Like" unlike-button-text "Unlike"}}]
   (let [k (keyword id)
         liked-quote (k (:favoriteQuotes user))]
     [:div
@@ -27,15 +27,15 @@
       [:span " ― "] [:span {:class "quote-author"} quote-author]]
      [:div {:class [debug-css]} [tags-ns/tags {:entries tags}]
       [actions
-       {:id id,
-        :like-button-text like-button-text,
-        :liked-quote liked-quote,
-        :on-delete on-delete,
-        :on-edit on-edit,
-        :on-share on-share,
-        :on-toggle-like on-toggle-like,
-        :tags tags,
-        :quote-author quote-author,
-        :quote-text quote-text,
-        :unlike-button-text unlike-button-text,
+       {:id id
+        :like-button-text like-button-text
+        :liked-quote liked-quote
+        :on-delete on-delete
+        :on-edit on-edit
+        :on-share on-share
+        :on-toggle-like on-toggle-like
+        :tags tags
+        :quote-author quote-author
+        :quote-text quote-text
+        :unlike-button-text unlike-button-text
         :user user}]]]))

@@ -15,18 +15,18 @@
 (defcard "# Error Boundary")
 
 (defcard
- "An error boundary catches JavaScript errors anywhere in its child
+  "An error boundary catches JavaScript errors anywhere in its child
           component tree, logs those errors, and displays a fallback UI instead
           of the component tree that crashed.")
 
 (defcard error-boundary-card (dc/reagent [error-boundary [throw-in-3-seconds]]))
 
 (defcard
- "An error boundary does not catch errors inside event handlers
+  "An error boundary does not catch errors inside event handlers
           https://reactjs.org/docs/error-boundaries.html#how-about-event-handlers")
 
 (defcard error-boundary-event-handler-card
          (dc/reagent [error-boundary
                       [btn/button
-                       {:on-click #(throw (js/Error. "Boom")),
+                       {:on-click #(throw (js/Error. "Boom"))
                         :text "Click to throw (but not catch)"}]]))

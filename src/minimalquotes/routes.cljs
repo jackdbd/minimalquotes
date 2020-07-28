@@ -1,10 +1,10 @@
 (ns minimalquotes.routes
   (:require
-   ;; [reitit.core :refer [router-name routes]]
-   ;; [reitit.dev.pretty :as pretty]
-   ;; [clojure.spec.alpha :as s]
-   [reitit.core :as r]
-   [reitit.frontend :as rf]))
+    ;; [reitit.core :refer [router-name routes]]
+    ;; [reitit.dev.pretty :as pretty]
+    ;; [clojure.spec.alpha :as s]
+    [reitit.core :as r]
+    [reitit.frontend :as rf]))
 
 (def router
   (rf/router [["/" ::index] ["/about" ::about] ["/admin" ::admin]

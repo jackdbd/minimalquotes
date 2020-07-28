@@ -19,8 +19,8 @@
   authenticated user. Call this function when the user logs in, and unsubscribe
   when the user logs out."
   [user-id]
-  (let [unsubscribe! (db-doc-subscribe! {:doc-path (str "users/" user-id),
-                                         :firestore @state/db,
+  (let [unsubscribe! (db-doc-subscribe! {:doc-path (str "users/" user-id)
+                                         :firestore @state/db
                                          :ratom state/user})]
     (swap! state/subscriptions assoc :user unsubscribe!)))
 
@@ -28,24 +28,24 @@
   "TODO"
   [{:keys [collection ratom]}]
   (let [k (keyword collection)
-        unsubscribe! (db-docs-subscribe! {:collection collection,
-                                          :firestore @state/db,
+        unsubscribe! (db-docs-subscribe! {:collection collection
+                                          :firestore @state/db
                                           :ratom ratom})]
     (swap! state/subscriptions assoc k unsubscribe!)))
 
 (defn subscribe-quotes!
   "Set a subscription for the documents in the `quotes` collection."
   []
-  (subscribe-collection! {:collection "quotes", :ratom state/quotes}))
+  (subscribe-collection! {:collection "quotes" :ratom state/quotes}))
 
 (defn subscribe-tags!
   "Set a subscription for the documents in the `tags` collection."
   []
-  (subscribe-collection! {:collection "tags", :ratom state/tags}))
+  (subscribe-collection! {:collection "tags" :ratom state/tags}))
 
 (defn subscribe-quotes-changes!
   []
-  (let [unsubscribe! (db-docs-change-subscribe! {:collection "quotes",
-                                                 :f log-change!,
+  (let [unsubscribe! (db-docs-change-subscribe! {:collection "quotes"
+                                                 :f log-change!
                                                  :firestore @state/db})]
     (prn "unsubscribe!" unsubscribe!)))

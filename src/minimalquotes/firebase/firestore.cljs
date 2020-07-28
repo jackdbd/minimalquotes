@@ -21,7 +21,7 @@
   Firestore. When syncing from Firestore, you could optionally add the document
   id in the document itself.
   TODO: to keywordize or not to keywordize?"
-  [{:keys [include-doc-id? ratom], :or {include-doc-id? false}} ^js doc]
+  [{:keys [include-doc-id? ratom] :or {include-doc-id? false}} ^js doc]
   (let [k (keyword (.. doc -id))
         m (js->clj (.data doc) :keywordize-keys true)
         v (assoc m :id k)]
@@ -39,10 +39,10 @@
   (let [^js coll-ref (.collection firestore collection)
         f (partial update-state-from-firestore! {:ratom ratom})
         observer #js
-                  {:error log-error,
+                  {:error log-error
                    :next (fn [^js query-snapshot]
-                           (reset! ratom {})
-                           (.forEach query-snapshot f))}]
+                            (reset! ratom {})
+                            (.forEach query-snapshot f))}]
     (.onSnapshot coll-ref observer)))
 
 (defn db-doc-subscribe!
@@ -51,21 +51,23 @@
   (let [^js doc-ref (.doc firestore doc-path)
         observer
         #js
-         {:error log-error,
+         {:error log-error
           :next
           (fn [^js doc-snapshot]
-            (let [hasPendingWrites (goog.object/getValueByKeys
-                                    doc-snapshot
-                                    #js ["metadata" "hasPendingWrites"])]
-              (when hasPendingWrites (prn "Source: Local (what to do?)"))
-              (when (goog.object/get (.data doc-snapshot) "isAdmin")
-                (prn " === WELCOME BACK ADMIN ===")
-                (let [unsubscribe-users! (db-docs-subscribe!
-                                          {:collection "users",
-                                           :firestore firestore,
-                                           :ratom state/users})]
-                  (swap! state/subscriptions assoc :users unsubscribe-users!)))
-              (update-state! {:doc-snapshot doc-snapshot, :ratom ratom})))}]
+             (let [hasPendingWrites (goog.object/getValueByKeys
+                                         doc-snapshot
+                                         #js ["metadata" "hasPendingWrites"])]
+                (when hasPendingWrites (prn "Source: Local (what to do?)"))
+                (when (goog.object/get (.data doc-snapshot) "isAdmin")
+                   (prn " === WELCOME BACK ADMIN ===")
+                   (let [unsubscribe-users! (db-docs-subscribe!
+                                                 {:collection "users"
+                                                   :firestore firestore
+                                                   :ratom state/users})]
+                      (swap! state/subscriptions assoc
+                         :users
+                         unsubscribe-users!)))
+                (update-state! {:doc-snapshot doc-snapshot :ratom ratom})))}]
     (.onSnapshot doc-ref observer)))
 
 (defn db-docs-change-subscribe!
@@ -76,16 +78,16 @@
   [{:keys [collection f firestore]}]
   (let [^js coll-ref (.collection firestore collection)
         observer #js
-                  {:error log-error,
+                  {:error log-error
                    :next (fn [^js query-snapshot]
-                           (let [doc-changes (.docChanges query-snapshot)]
-                             (.forEach doc-changes f)))}]
+                            (let [doc-changes (.docChanges query-snapshot)]
+                               (.forEach doc-changes f)))}]
     (.onSnapshot coll-ref observer)))
 
 (defn db-doc-create!
   "Create a new Firestore document."
-  [{:keys [collection firestore m on-reject on-resolve],
-    :or {on-reject log-error, on-resolve on-successful-creation}}]
+  [{:keys [collection firestore m on-reject on-resolve]
+    :or {on-reject log-error on-resolve on-successful-creation}}]
   (let [coll-ref (.collection firestore collection)
         doc (clj->js m)]
     (-> (.add coll-ref doc)
@@ -94,8 +96,8 @@
 
 (defn db-path-upsert!
   "Update an existing Firestore document or create a new one."
-  [{:keys [doc-path firestore m on-reject on-resolve],
-    :or {on-reject log-error, on-resolve on-successful-update}}]
+  [{:keys [doc-path firestore m on-reject on-resolve]
+    :or {on-reject log-error on-resolve on-successful-update}}]
   (let [doc-ref (.doc firestore doc-path)
         doc (clj->js m)]
     (-> (.set doc-ref doc)
@@ -106,26 +108,26 @@
   "First-time users that authenticate (e.g. by using an identity provider like
   google.com) aren't yet users of this application. So the first time they
   authenticate, we create a document for them in the users collection."
-  [{:keys [^js auth-user firestore on-reject uid], :or {on-reject log-error}}]
+  [{:keys [^js auth-user firestore on-reject uid] :or {on-reject log-error}}]
   (let [doc-path (str "users/" uid)
         doc-ref (.doc firestore doc-path)
         f (fn [doc-snapshot]
             (when (not (.-exists doc-snapshot))
-              (let [m {:displayName (goog.object/get auth-user "displayName"),
-                       :email (goog.object/get auth-user "email"),
-                       :isAdmin false,
-                       :photoUrl (goog.object/get auth-user "photoUrl"),
+              (let [m {:displayName (goog.object/get auth-user "displayName")
+                       :email (goog.object/get auth-user "email")
+                       :isAdmin false
+                       :photoUrl (goog.object/get auth-user "photoUrl")
                        :uid uid}]
                 (db-path-upsert!
-                 {:doc-path doc-path, :firestore firestore, :m m}))))]
+                  {:doc-path doc-path :firestore firestore :m m}))))]
     (-> (.get doc-ref)
         (.then f)
         (.catch on-reject))))
 
 (defn db-path-delete!
   "Delete a document in Firestore."
-  [{:keys [doc-path firestore on-reject on-resolve],
-    :or {on-reject log-error, on-resolve on-successful-deletion}}]
+  [{:keys [doc-path firestore on-reject on-resolve]
+    :or {on-reject log-error on-resolve on-successful-deletion}}]
   (let [doc-ref (.doc firestore doc-path)]
     (-> (.delete doc-ref)
         (.then on-resolve)
