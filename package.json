@@ -22,7 +22,7 @@
     "e2e:login": "node e2e/login-user.js",
     "e2e:perf": "node e2e/performance.js",
     "e2e:screenshot": "node e2e/make-screenshot-after-hover-on-tag.js",
-    "emulators": "firebase emulators:start --import=./firestore-past-data --export-on-exit=./firestore-new-data",
+    "emulators": "firebase emulators:start",
     "format": "zprint-clj --hang --input \"./src/**/*.{clj,cljc,cljs,edn}\" -o ./",
     "functions:deploy": "firebase deploy --only functions",
     "functions:format": "prettier --write functions",
