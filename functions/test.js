@@ -17,10 +17,10 @@ const theirsAuth = {
 const adminAuth = {
   uid: 'bob',
   email: 'bob@example.com',
+  roles: ['ADMIN'],
 };
 
 const adminUser = {
-  isAdmin: true,
   email: adminAuth.email,
   uid: adminAuth.uid,
 };

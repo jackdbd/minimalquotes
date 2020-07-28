@@ -25,7 +25,7 @@
     (let [uid (goog.object/get auth-user "uid")]
       (add-user-if-first-time!
         {:auth-user auth-user :firestore @state/db :uid uid})
-      (subscribe-user! uid))
+      (subscribe-user! uid auth-user))
     (let [unsubscribe-user! (get @state/subscriptions :user)
           unsubscribe-users! (get @state/subscriptions :users)]
       ;; If the user was an admin, he subscribed to users inside the

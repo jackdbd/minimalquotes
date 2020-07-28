@@ -58,6 +58,7 @@
                                          doc-snapshot
                                          #js ["metadata" "hasPendingWrites"])]
                 (when hasPendingWrites (prn "Source: Local (what to do?)"))
+                (prn "")
                 (when (goog.object/get (.data doc-snapshot) "isAdmin")
                    (prn " === WELCOME BACK ADMIN ===")
                    (let [unsubscribe-users! (db-docs-subscribe!
@@ -104,6 +105,8 @@
         (.then on-resolve)
         (.catch on-reject))))
 
+; TODO: this should become a cloud function because it must set the roles for
+; the newly created user.
 (defn add-user-if-first-time!
   "First-time users that authenticate (e.g. by using an identity provider like
   google.com) aren't yet users of this application. So the first time they
@@ -115,7 +118,6 @@
             (when (not (.-exists doc-snapshot))
               (let [m {:displayName (goog.object/get auth-user "displayName")
                        :email (goog.object/get auth-user "email")
-                       :isAdmin false
                        :photoUrl (goog.object/get auth-user "photoUrl")
                        :uid uid}]
                 (db-path-upsert!

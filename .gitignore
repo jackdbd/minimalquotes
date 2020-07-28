@@ -28,10 +28,12 @@ firestore-debug.log
 pubsub-debug.log
 ui-debug.log
 
-## Firestore emulator
+# Firestore emulator
 firestore-past-data/
 firestore-new-data/
 
+# Firebase Admin SDK service account
+functions/firebase-service-account.json
+
 # logs from yarn
 yarn-error.log
-

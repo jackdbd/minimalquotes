@@ -8,17 +8,33 @@
    previous value)."
   (:require [minimalquotes.firebase.firestore :refer
              [db-doc-subscribe! db-docs-change-subscribe! db-docs-subscribe!]]
-            [minimalquotes.state :as state]))
+            [minimalquotes.state :as state]
+            [minimalquotes.utils :refer [log-error]]))
 
 (defn log-change!
   [doc-change]
   (prn (str "Document id " (.. doc-change -doc -id) " " (.. doc-change -type))))
 
+(defn admin?
+  [^js token-result]
+  (prn "token-result" token-result)
+  (let [role (goog.object/getValueByKeys token-result #js ["claims" "roles" 0])]
+    (if (= "ADMIN" role) true false)))
+
+(defn subscribe-to-accessible-documents!
+  [is-admin]
+  (prn "TODO: subscribe-to-accessible-documents!" "is-admin" is-admin))
+
 (defn subscribe-user!
   "Set a subscription for the document associated with the currently
   authenticated user. Call this function when the user logs in, and unsubscribe
   when the user logs out."
-  [user-id]
+  [user-id user]
+  (prn "USER")
+  (-> (.getIdTokenResult user true)
+      (.then admin?)
+      (.then subscribe-to-accessible-documents!)
+      (.catch log-error))
   (let [unsubscribe! (db-doc-subscribe! {:doc-path (str "users/" user-id)
                                          :firestore @state/db
                                          :ratom state/user})]
