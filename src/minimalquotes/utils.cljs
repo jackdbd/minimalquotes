@@ -1,5 +1,6 @@
 (ns minimalquotes.utils
-  (:require [clojure.string :as str]))
+  (:require
+    [clojure.string :as str]))
 
 (defn format-price [cents] (str " €" (/ cents 100)))
 

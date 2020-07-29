@@ -1,10 +1,12 @@
 (ns minimalquotes.components.quotes
-  (:require [minimalquotes.components.quote :refer [quote-card]]
-            [minimalquotes.firebase.firestore :refer
-             [db-path-delete! db-path-upsert! now server-timestamp]]
-            [minimalquotes.state :as state]
-            [minimalquotes.utils :refer [k->str log-error]]
-            [reagent.session :as session]))
+  (:require
+    ["firebase/app" :as firebase]
+    [minimalquotes.components.quote :refer [quote-card]]
+    [minimalquotes.firebase.firestore :refer
+     [db-path-delete! db-path-upsert! now server-timestamp]]
+    [minimalquotes.state :as state]
+    [minimalquotes.utils :refer [k->str log-error]]
+    [reagent.session :as session]))
 
 ; (def debug-css "bg-green-200")
 (def debug-css "")
@@ -83,12 +85,6 @@
 
 (defn on-successful-batch-write [])
 
-(defn has-tag?
-  [quote tag-name]
-  (let [searched-tag? (fn [[_ tag]] (= tag-name (:name tag)))
-        tag-k (first (first (filter searched-tag? @state/tags)))]
-    (if tag-k (if (tag-k (:tags quote)) true false) false)))
-
 (defn favorite?
   [quote-k]
   ;; (prn "favs" quote-k @state/favorite-quotes)
@@ -97,6 +93,12 @@
                                  (map #(first %)))
         favs (filter #(= % quote-k) favorite-quote-keys)]
     (if (seq favs) true false)))
+
+(defn has-tag?
+  [quote tag-name]
+  (let [searched-tag? (fn [[_ tag]] (= tag-name (:name tag)))
+        tag-k (first (first (filter searched-tag? @state/tags)))]
+    (if tag-k (if (tag-k (:tags quote)) true false) false)))
 
 (defn make-predicate
   [query-params]
@@ -115,8 +117,9 @@
   "Quotes component that extracts its required props from the app state."
   []
   (let [firestore @state/db
-        user @state/user
-        user-id (:uid user)
+        user (.-currentUser (firebase/auth))
+        ;; TODO: pass user as props?
+        user-id (if user (.-uid user) nil)
         query-params (session/get-in [:route :query-params])
         predicate (make-predicate query-params)
         selected-quotes (filter predicate @state/quotes)

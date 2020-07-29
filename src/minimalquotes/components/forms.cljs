@@ -13,7 +13,9 @@
   ["shadow" "appearance-none" "rounded" "w-full" "border" "leading-tight"
    "text-gray-700" "py-2 px-3" "focus:outline-none" "focus:shadow-outline"])
 
-(defn tag->tag-with-id [[tag-id tag]] (merge tag {:id tag-id}))
+(defn tag->tag-with-id
+  [[tag-id tag]]
+  (merge tag {:id tag-id}))
 
 (defn- make-quote-form
   [{:keys [on-click-cancel tags]}]
@@ -55,12 +57,15 @@
         :label-key "name"
         :multiple true
         :on-blur handle-blur
+        ;; TODO: this typeahead component seems not to allow to extract new
+        ;; tags, only existing ones.
         :on-change (fn [^js js-values]
                      ;  (prn "input-tags-typeahead change" js-values)
                      (let [values (js->clj js-values)
                            values-k (js->clj js-values :keywordize-keys true)
                            names (map #(get % "name") values)]
-                       ;  (prn "=== values" values)
+                       ;;  (prn "=== quote-form values" values)
+                       (prn "=== quote-form names" names)
                        ;  (prn "=== values-k" values-k)
                        (swap! state assoc-in [:values :tags] names)))
         :options (map tag->tag-with-id tags)}]]
@@ -206,6 +211,12 @@
       [btn/button {:on-click on-click-cancel :text "Cancel"}]
       [btn/submit {:disabled submitting? :text "Confirm"}]]]))
 
+(defn dissoc-hints
+  "Dissoc any hint text values when submitting the form. They are only useful as
+  a feedback when filling the form itself."
+  [values]
+  (dissoc values "remaining-tag-description-length" "remaining-tag-name-length"))
+
 (defn tag-form
   "Stateful form to create/edit a tag.
   Form's state is managed by fork. Form's validation is implemented with vlad."
@@ -216,7 +227,8 @@
                 :initial-values {"color" tag-color
                                  "description" tag-description
                                  "name" tag-name}
-                :on-submit (fn [m] (on-submitted-values (:values m)))
+                :on-submit (fn [m]
+                             (on-submitted-values (dissoc-hints (:values m))))
                 :prevent-default? true
                 :validation #(vlad/field-errors tag-form-validation %)}
         f (make-tag-form {:on-click-cancel on-click-cancel})]

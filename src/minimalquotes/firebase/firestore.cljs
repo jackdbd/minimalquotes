@@ -58,16 +58,16 @@
                                          doc-snapshot
                                          #js ["metadata" "hasPendingWrites"])]
                 (when hasPendingWrites (prn "Source: Local (what to do?)"))
-                (prn "")
-                (when (goog.object/get (.data doc-snapshot) "isAdmin")
-                   (prn " === WELCOME BACK ADMIN ===")
-                   (let [unsubscribe-users! (db-docs-subscribe!
-                                                 {:collection "users"
-                                                   :firestore firestore
-                                                   :ratom state/users})]
-                      (swap! state/subscriptions assoc
-                         :users
-                         unsubscribe-users!)))
+                (prn "=== ? ===")
+                ;; (when (goog.object/get (.data doc-snapshot) "isAdmin")
+                ;;    (prn " === WELCOME BACK ADMIN ===")
+                ;;    (let [unsubscribe-users! (db-docs-subscribe!
+                ;;                                  {:collection "users"
+                ;;                                    :firestore firestore
+                ;;                                    :ratom state/users})]
+                ;;       (swap! state/subscriptions assoc
+                ;;          :users
+                ;;          unsubscribe-users!)))
                 (update-state! {:doc-snapshot doc-snapshot :ratom ratom})))}]
     (.onSnapshot doc-ref observer)))
 
@@ -107,24 +107,27 @@
 
 ; TODO: this should become a cloud function because it must set the roles for
 ; the newly created user.
-(defn add-user-if-first-time!
-  "First-time users that authenticate (e.g. by using an identity provider like
-  google.com) aren't yet users of this application. So the first time they
-  authenticate, we create a document for them in the users collection."
-  [{:keys [^js auth-user firestore on-reject uid] :or {on-reject log-error}}]
-  (let [doc-path (str "users/" uid)
-        doc-ref (.doc firestore doc-path)
-        f (fn [doc-snapshot]
-            (when (not (.-exists doc-snapshot))
-              (let [m {:displayName (goog.object/get auth-user "displayName")
-                       :email (goog.object/get auth-user "email")
-                       :photoUrl (goog.object/get auth-user "photoUrl")
-                       :uid uid}]
-                (db-path-upsert!
-                  {:doc-path doc-path :firestore firestore :m m}))))]
-    (-> (.get doc-ref)
-        (.then f)
-        (.catch on-reject))))
+;; (defn add-user-if-first-time!
+;;   "First-time users that authenticate (e.g. by using an identity provider
+;;   like
+;;   google.com) aren't yet users of this application. So the first time they
+;;   authenticate, we create a document for them in the users collection."
+;;   [{:keys [^js auth-user firestore on-reject uid] :or {on-reject
+;;   log-error}}]
+;;   (let [doc-path (str "users/" uid)
+;;         doc-ref (.doc firestore doc-path)
+;;         f (fn [doc-snapshot]
+;;             (when (not (.-exists doc-snapshot))
+;;               (let [m {:displayName (goog.object/get auth-user
+;;               "displayName")
+;;                        :email (goog.object/get auth-user "email")
+;;                        :photoUrl (goog.object/get auth-user "photoUrl")
+;;                        :uid uid}]
+;;                 (db-path-upsert!
+;;                   {:doc-path doc-path :firestore firestore :m m}))))]
+;;     (-> (.get doc-ref)
+;;         (.then f)
+;;         (.catch on-reject))))
 
 (defn db-path-delete!
   "Delete a document in Firestore."

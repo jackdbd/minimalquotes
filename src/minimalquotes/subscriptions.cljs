@@ -6,39 +6,40 @@
    Unsubscribing from a subscription just removes the listener. The caller will
    need to perform cleanup operations if required (e.g. resetting state to a
    previous value)."
-  (:require [minimalquotes.firebase.firestore :refer
-             [db-doc-subscribe! db-docs-change-subscribe! db-docs-subscribe!]]
-            [minimalquotes.state :as state]
-            [minimalquotes.utils :refer [log-error]]))
+  (:require
+    [minimalquotes.firebase.firestore :refer [db-docs-change-subscribe! db-docs-subscribe!]]
+    [minimalquotes.state :as state]))
 
 (defn log-change!
   [doc-change]
   (prn (str "Document id " (.. doc-change -doc -id) " " (.. doc-change -type))))
 
-(defn admin?
-  [^js token-result]
-  (prn "token-result" token-result)
-  (let [role (goog.object/getValueByKeys token-result #js ["claims" "roles" 0])]
-    (if (= "ADMIN" role) true false)))
+(defn token-result->roles
+  [^js/firebase.auth.IdTokenResult token-result]
+  (goog.object/getValueByKeys token-result #js ["claims" "roles"]))
 
-(defn subscribe-to-accessible-documents!
-  [is-admin]
-  (prn "TODO: subscribe-to-accessible-documents!" "is-admin" is-admin))
+(defn admin?
+  [^js roles]
+  (goog.object/get roles "admin"))
 
 (defn subscribe-user!
   "Set a subscription for the document associated with the currently
   authenticated user. Call this function when the user logs in, and unsubscribe
   when the user logs out."
-  [user-id user]
-  (prn "USER")
-  (-> (.getIdTokenResult user true)
-      (.then admin?)
-      (.then subscribe-to-accessible-documents!)
-      (.catch log-error))
-  (let [unsubscribe! (db-doc-subscribe! {:doc-path (str "users/" user-id)
-                                         :firestore @state/db
-                                         :ratom state/user})]
-    (swap! state/subscriptions assoc :user unsubscribe!)))
+  [^js/firebase.User user ^js/firebase.auth.IdTokenResult token-result]
+  (let [roles (token-result->roles token-result)]
+    ;; There might be no roles in the custom claims of the JWT returned by
+    ;; Firebase Auth. I still have to trigger a cloud function when a user is
+    ;; created. But even when the cloud function is implemented, for a short
+    ;; time a new user will have no roles in the custom claims of his JWT.
+    (if (and roles (admin? roles))
+      (do
+        (prn "Subscribe to admin stuff and show admin UI" (.. user -uid))
+        (reset! state/is-admin-signed-in? true))
+      (do
+        (prn "Subscribe to normal (non-admin) stuff" (.. user -uid))
+        ;; TODO: not necessary? should set false when logging out
+        (reset! state/is-admin-signed-in? false)))))
 
 (defn subscribe-collection!
   "TODO"

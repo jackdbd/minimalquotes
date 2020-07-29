@@ -21,7 +21,9 @@ const setClaims = async (email, claims) => {
 };
 
 setClaims('jackdebidda@gmail.com', {
-  roles: ['ADMIN'],
+  roles: {
+    admin: true,
+  },
 });
 
 exports.auth = auth;

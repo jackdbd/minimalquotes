@@ -17,7 +17,9 @@ const theirsAuth = {
 const adminAuth = {
   uid: 'bob',
   email: 'bob@example.com',
-  roles: ['ADMIN'],
+  roles: {
+    admin: true,
+  },
 };
 
 const adminUser = {
@@ -45,10 +47,19 @@ const dbAdmin = firebase
   })
   .firestore();
 
+const quote = {
+  author: 'Buddha',
+  tags: {
+    tagId: true,
+  },
+  text:
+    'The past is already gone, the future is not yet here. There’s only one moment for you to live.',
+};
+
 const tag = {
-  name: 'wisdom',
-  description: 'A tag about wisdom',
   color: 'green',
+  description: 'A tag about wisdom',
+  name: 'wisdom',
 };
 
 // Before ALL
@@ -81,6 +92,45 @@ describe('quote documents', () => {
   it('can be read by anyone', async () => {
     await firebase.assertSucceeds(dbPublic.doc('quotes/quoteId').get());
   });
+
+  it('can be created by an admin user', async () => {
+    await firebase.assertSucceeds(
+      dbAdmin.doc('quotes/quoteId').set({
+        ...quote,
+        createdAt: firebase.firestore.Timestamp.now(),
+        createdBy: adminUser.uid,
+      })
+    );
+  });
+
+  it('cannot be created by anyone', async () => {
+    await firebase.assertFails(
+      dbPublic.doc('quotes/quoteId').set({
+        ...quote,
+        createdAt: firebase.firestore.Timestamp.now(),
+        createdBy: adminUser.uid,
+      })
+    );
+  });
+
+  it('can be deleted by an admin user', async () => {
+    await dbAdmin.doc('quotes/quoted').set(tag);
+    await firebase.assertSucceeds(dbAdmin.doc('quotes/tagId').delete());
+  });
+
+  it('can be updated by the creator', async () => {
+    dbAdmin.doc('quotes/quoteId').set({
+      ...quote,
+      createdAt: firebase.firestore.Timestamp.now(),
+      createdBy: adminUser.uid,
+    });
+    await firebase.assertSucceeds(
+      dbAdmin.doc('quotes/quoteId').update({
+        lastUpdatedAt: firebase.firestore.Timestamp.now(),
+        lastUpdatedBy: adminUser.uid,
+      })
+    );
+  });
 });
 
 describe('tag documents', () => {
@@ -92,53 +142,55 @@ describe('tag documents', () => {
     await firebase.assertSucceeds(dbPublic.doc('tags/tagId').get());
   });
 
-  it('cannot be created by anyone', async () => {
-    await firebase.assertFails(
-      dbPublic.doc('tags/tagId').set({
-        name: 'wisdom',
-        description: 'A tag about wisdom',
-        color: 'green',
+  it('can be created by an admin user', async () => {
+    await firebase.assertSucceeds(
+      dbAdmin.doc('tags/tagId').set({
+        ...tag,
+        createdAt: firebase.firestore.Timestamp.now(),
       })
     );
   });
 
-  it('can be created by an admin user', async () => {
-    await dbAdmin.doc(`users/${adminAuth.uid}`).set(adminUser);
-    await firebase.assertSucceeds(dbAdmin.doc('tags/tagId').set(tag));
+  it('cannot be created by anyone', async () => {
+    await firebase.assertFails(
+      dbPublic.doc('tags/tagId').set({
+        ...tag,
+        createdAt: firebase.firestore.Timestamp.now(),
+        createdBy: adminUser.uid,
+      })
+    );
   });
 
   it('can be deleted by an admin user', async () => {
-    await dbAdmin.doc(`users/${adminAuth.uid}`).set(adminUser);
     await dbAdmin.doc('tags/tagId').set(tag);
     await firebase.assertSucceeds(dbAdmin.doc('tags/tagId').delete());
   });
 
   it('cannot be deleted by a normal user', async () => {
-    await dbAdmin.doc(`users/${adminAuth.uid}`).set(adminUser);
     await dbAdmin.doc('tags/tagId').set(tag);
     await firebase.assertFails(dbNormal.doc('tags/tagId').delete());
   });
 });
 
-describe('user documents', () => {
-  after(() => {
-    firebase.clearFirestoreData({ projectId: TEST_FIREBASE_PROJECT_ID });
-  });
+// describe('user documents', () => {
+//   after(() => {
+//     firebase.clearFirestoreData({ projectId: TEST_FIREBASE_PROJECT_ID });
+//   });
 
-  it('cannot be read by anyone', async () => {
-    await firebase.assertFails(dbNormal.doc('users/userId').get());
-  });
+//   it('cannot be read by anyone', async () => {
+//     await firebase.assertFails(dbNormal.doc('users/userId').get());
+//   });
 
-  it('can be read by the owner', async () => {
-    await firebase.assertSucceeds(dbNormal.doc(`users/${myAuth.uid}`).get());
-  });
+//   it('can be read by the owner', async () => {
+//     await firebase.assertSucceeds(dbNormal.doc(`users/${myAuth.uid}`).get());
+//   });
 
-  it('can be read by an admin', async () => {
-    await dbAdmin.doc(`users/${adminAuth.uid}`).set(adminUser);
-    await firebase.assertSucceeds(dbAdmin.doc('users/userId').get());
-  });
+//   it('can be read by an admin', async () => {
+//     await dbAdmin.doc(`users/${adminAuth.uid}`).set(adminUser);
+//     await firebase.assertSucceeds(dbAdmin.doc('users/userId').get());
+//   });
 
-  it('cannot be read by any other non-admin user', async () => {
-    await firebase.assertFails(dbNormal.doc(`users/${theirsAuth.uid}`).get());
-  });
-});
+//   it('cannot be read by any other non-admin user', async () => {
+//     await firebase.assertFails(dbNormal.doc(`users/${theirsAuth.uid}`).get());
+//   });
+// });

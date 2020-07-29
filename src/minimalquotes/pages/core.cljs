@@ -1,19 +1,21 @@
 (ns minimalquotes.pages.core
   "Page components and translation from routes to pages."
-  (:require [minimalquotes.components.admin :as admin]
-            [minimalquotes.components.footer :refer [footer]]
-            [minimalquotes.components.header :refer [header]]
-            [minimalquotes.components.forms :refer [button-add-new-quote-modal]]
-            [minimalquotes.components.modal :refer [modal-window]]
-            [minimalquotes.components.quotes :refer [quotes-container]]
-            [minimalquotes.components.tags :refer [tags-container]]
-            [minimalquotes.firebase.auth :as auth]
-            [minimalquotes.firebase.firestore :refer
-             [db-doc-create! now server-timestamp]]
-            [minimalquotes.routes :refer [path-for]]
-            [minimalquotes.state :as state]
-            [reagent.core :as r]
-            [reagent.session :as session]))
+  (:require
+    ["firebase/app" :as firebase]
+    [minimalquotes.components.admin :as admin]
+    [minimalquotes.components.footer :refer [footer]]
+    [minimalquotes.components.header :refer [header]]
+    [minimalquotes.components.forms :refer [button-add-new-quote-modal]]
+    [minimalquotes.components.modal :refer [modal-window]]
+    [minimalquotes.components.quotes :refer [quotes-container]]
+    [minimalquotes.components.tags :refer [tags-container]]
+    [minimalquotes.firebase.auth :as auth]
+    [minimalquotes.firebase.firestore :refer
+     [db-doc-create! now server-timestamp]]
+    [minimalquotes.routes :refer [path-for]]
+    [minimalquotes.state :as state]
+    [reagent.core :as r]
+    [reagent.session :as session]))
 
 (defn f-quote->li
   [[id m]]
@@ -24,26 +26,42 @@
 
 (defn about-page-content [] (fn [] [:div "About page"]))
 
+(defn tags-reducer
+  [acc cv]
+  (assoc acc cv true))
+
 (defn admin-page-content
   []
   (fn []
-    (let [on-submit-quote-form
-          (fn [m]
-            (let [firestore @state/db
-                  user @state/user
-                  user-id (:uid user)
-                  q (assoc m :tags {})]
-              (prn "TODO: extract tags from quote")
-              (db-doc-create! {:collection "quotes"
-                               :firestore firestore
-                               :m (merge q
-                                         {:createdAt (server-timestamp)
-                                          :createdBy user-id})})))
+    (let [user (.-currentUser (firebase/auth))
+          ;; TODO: pass user as props?
+          user-id (if user (.-uid user) nil)
+          firestore @state/db
+          on-submit-quote-form (fn [m]
+                                 ;; TODO: the quote author, text or tags should
+                                 ;; be validated by a cloud function (e.g. one
+                                 ;; could type a swear word for a tag). This
+                                 ;; form submit could write to a `pendingQuotes`
+                                 ;; collection, then a cloud function would take
+                                 ;; a quote and its tags, validate everything,
+                                 ;; then create documents in tags and quotes
+                                 ;; collections, and finally deleting the quote
+                                 ;; from the `pendingQuotes` collection. All of
+                                 ;; these operations should be executed in a
+                                 ;; transaction.
+                                 (prn "TODO: on-submit-quote-form extract tags" (:tags m))
+                                 (db-doc-create! {:collection "quotes"
+                                                  :firestore firestore
+                                                  :m (merge m
+                                                            {:tags (reduce tags-reducer {} (:tags m))}
+                                                            {:createdAt (server-timestamp)
+                                                             :createdBy user-id})}))
           tags @state/tags]
       [:div
        [button-add-new-quote-modal
-        {:on-submitted-values on-submit-quote-form :tags tags}] [admin/users]
-       [admin/tags]])))
+        {:on-submitted-values on-submit-quote-form :tags tags}]
+       [admin/users {:user-id user-id}]
+       [admin/tags {:firestore firestore :tags tags :user-id user-id}]])))
 
 (defn favorite-quotes-page-content [] (fn [] [quotes-container]))
 
@@ -56,7 +74,7 @@
 (defn sign-in-page-content
   []
   (fn []
-    (let [user @state/user
+    (let [user (.-currentUser (firebase/auth))
           ui (get @state/state :firebase-ui)
           ui-config (get @state/state :firebase-ui-config)
           container-id "firebaseui-auth-container"
@@ -73,30 +91,37 @@
 
 (defn current-page
   []
+  ;; (prn "=== Firebase Auth User ===" (goog.object/getAllPropertyNames
+  ;; (.-currentUser (firebase/auth)) false false))
   (fn []
-    (let [user @state/user
-          page (:current-page (session/get :route))]
+    (let [user (.-currentUser (firebase/auth))
+          page (:current-page (session/get :route))
+          links [{:href (path-for :minimalquotes.routes/index) :label "Home"}
+                 {:href (path-for :minimalquotes.routes/quotes {:tag "wisdom"})
+                  :label "Wisdom quotes"}
+                 {:href (path-for :minimalquotes.routes/quotes
+                                  {:author "Zen" :tag "friendship"})
+                  :label "Zen Friendship quotes"}
+                 {:href (path-for :minimalquotes.routes/quotes {:author "Buddha"})
+                  :label "Buddha quotes"}
+                 {:href (path-for :minimalquotes.routes/quotes {:author "Buddha" :tag "wisdom"}) :label "Buddha wisdom quotes"}
+                 {:href (path-for :minimalquotes.routes/tags) :label "Tags"}
+                 {:href (path-for :minimalquotes.routes/about) :label "About"}]]
       [:<> [modal-window]
        [:div {:class ["container"]}
-        [:div (str "You are " (:displayName @state/user))]
+        (when user
+          [:div (str "You are " (.-displayName user))])
         [header
-         {:links
-          [{:href (path-for :minimalquotes.routes/index) :label "Home"}
-           {:href (path-for :minimalquotes.routes/quotes {:tag "wisdom"})
-            :label "Wisdom quotes"}
-           {:href (path-for :minimalquotes.routes/quotes
-                            {:author "Zen" :tag "friendship"})
-            :label "Zen Friendship quotes"}
-           {:href (path-for :minimalquotes.routes/quotes {:author "Buddha"})
-            :label "Buddha quotes"}
-           {:href (path-for :minimalquotes.routes/quotes
-                            {:author "Buddha" :tag "wisdom"})
-            :label "Buddha wisdom quotes"}
-           {:href (path-for :minimalquotes.routes/tags) :label "Tags"}
-           {:href (path-for :minimalquotes.routes/about) :label "About"}]
+         {:links (if @state/is-admin-signed-in?
+                   (conj links {:href (path-for :minimalquotes.routes/admin)
+                                :label "Admin"})
+                   links)
           :login-href (path-for :minimalquotes.routes/sign-in)
           :on-logout #(auth/sign-out)
-          :user user}]] (comment [ul-debug-quotes]) [page] [footer]])))
+          :user user}]]
+       [page]
+       [footer]]
+      )))
 
 ; TODO: a non-admin user could access HOST/admin by typing in the address bar.
 ; How to avoid it? With a check in this page-for? By redirecting him to home?
@@ -108,7 +133,6 @@
   (case route-name
     :minimalquotes.routes/about #'about-page-content
     :minimalquotes.routes/admin #'admin-page-content
-    ; :admin (if @state/user #'admin-page-content #'sign-in-page-content)
     :minimalquotes.routes/index #'quotes-page-content
     :minimalquotes.routes/quotes #'quotes-page-content
     :minimalquotes.routes/sign-in #'sign-in-page-content

@@ -37,3 +37,6 @@ functions/firebase-service-account.json
 
 # logs from yarn
 yarn-error.log
+
+## Calva VS code extension
+.calva

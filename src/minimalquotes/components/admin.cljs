@@ -33,89 +33,100 @@
 
 (defn user->li [[k m]] ^{:key k} [:li [user {:user m :user-id (k->str k)}]])
 
+;; TODO: how to get all signed-in users from Firebase Auth?
+(def auth-users [])
+
 (defn users
-  []
-  [:<> [:label {:class label-css-classes :for "users"} "Users:"]
-   [:ul
-    {:title "users"
-     :on-click
-     (fn [^js e]
-       (let [user-id (.. e -target -dataset -userId)
-             k (keyword user-id)
-             op (.. e -target -dataset -operation)
-             db @state/db
-             doc-path (str "users/" user-id)]
-         (when user-id
-           (case op
-             "delete" (db-path-delete! {:doc-path doc-path :firestore db})
-             "make-admin" (db-path-upsert!
-                            {:doc-path doc-path
-                             :firestore db
-                             :m (merge (k @state/users)
-                                       {:isAdmin true
-                                        :lastEditedAt (server-timestamp)
-                                        :lastEditedBy (:uid @state/user)})})
-             "unmake-admin" (db-path-upsert!
-                              {:doc-path doc-path
-                               :firestore db
-                               :m (merge (k @state/users)
-                                         {:isAdmin false
-                                          :lastEditedAt (server-timestamp)
-                                          :lastEditedBy (:uid @state/user)})})
-             (prn (str "Not implemented for op: " op))))))}
-    (map user->li @state/users)]])
+  [{:keys [user-id]}]
+  [:<>
+   [:label {:class label-css-classes :for "users"} "Users:"]
+   [:ul {:title "users"
+         :on-click (fn [^js e]
+                     (let [uid (.. e -target -dataset -userId)
+                           k (keyword uid)
+                           op (.. e -target -dataset -operation)]
+                       (prn "user-id" uid "k" k "operation" op)
+                       (when user-id
+                         (case op
+                           ;;  "delete" (db-path-delete! {:doc-path doc-path
+                           ;;  :firestore db})
+                           ;;  "make-admin" (db-path-upsert!
+                           ;;                {:doc-path doc-path
+                           ;;                 :firestore db
+                           ;;                 :m (merge (k auth-users)
+                           ;;                           {:isAdmin true
+                           ;;                            :lastEditedAt
+                           ;;                            (server-timestamp)
+                           ;;                            :lastEditedBy
+                           ;;                            user-id})})
+                           ;;  "unmake-admin" (db-path-upsert!
+                           ;;                  {:doc-path doc-path
+                           ;;                   :firestore db
+                           ;;                   :m (merge (k auth-users)
+                           ;;                             {:isAdmin false
+                           ;;                              :lastEditedAt
+                           ;;                              (server-timestamp)
+                           ;;                              :lastEditedBy
+                           ;;                              user-id})})
+                           (prn (str "Not implemented for op: " op))))))}
+    (map user->li auth-users)]])
 
 (defn tag
-  [{:keys [tag-id tag]}]
+  [{:keys [firestore tag tag-id user-id]
+    :as props}]
   (let [color (:color tag)
         description (:description tag)
         name (:name tag)
         k (keyword tag-id)]
     [:div {:class ["flex" "justify-between" "border" "items-center"]}
-     [button-edit-tag-modal
-      {:on-submitted-values
-       (fn [m]
-         (db-path-upsert! {:doc-path (str "tags/" tag-id)
-                           :firestore @state/db
-                           :m (merge (k @state/tags)
-                                     m
-                                     {:lastEditedAt (server-timestamp)
-                                      :lastEditedBy (:uid @state/user)})}))
-       :tag-color color
-       :tag-description description
-       :tag-name name}]
+     [button-edit-tag-modal {:on-submitted-values (fn [m]
+                                                    (db-path-upsert! {:doc-path (str "tags/" tag-id)
+                                                                      :firestore firestore
+                                                                      :m (merge (k (:tags props))
+                                                                                m
+                                                                                {:lastEditedAt (server-timestamp)
+                                                                                 :lastEditedBy user-id})}))
+                             :tag-color color
+                             :tag-description description
+                             :tag-name name}]
      [:div
       [btn/button
        {:data-attributes {:data-operation "delete" :data-tag-id tag-id}
         :icon icon-trash
         :text "Delete"}]]]))
 
-(defn tag->li [[k m]] ^{:key k} [:li [tag {:tag m :tag-id (k->str k)}]])
+(defn make-tag->li
+  [{:keys [firestore user-id]
+    :as props}]
+  (fn tag->li
+    [[k m]]
+    ^{:key k} [:li [tag {:firestore firestore
+                         :tag m
+                         :tag-id (k->str k)
+                         :tags (:tags props)
+                         :user-id user-id}]]))
 
 (defn tags
-  []
-  [:<> [:label {:class label-css-classes :for "tags"} "Tags"]
-   [:ul
-    {:title "tags"
-     :on-click (fn [^js e]
-                 (let [tag-id (.. e -target -dataset -tagId)
-                       op (.. e -target -dataset -operation)
-                       db @state/db
-                       doc-path (str "tags/" tag-id)]
-                   (when tag-id
-                     (case op
-                       "delete" (db-path-delete! {:doc-path doc-path
-                                                  :firestore db})
-                       (prn (str "Not implemented for op: " op))))))}
-    (map tag->li @state/tags)]
-   [button-add-new-tag-modal
-    {:on-submitted-values (fn [m]
-                            (let [firestore @state/db
-                                  user @state/user
-                                  user-id (:uid user)]
-                              (db-doc-create!
-                                {:collection "tags"
-                                 :firestore firestore
-                                 :m (merge m
-                                           {:createdAt (server-timestamp)
-                                            :createdBy user-id})})))}]])
+  [{:keys [firestore user-id]
+    :as props}]
+  (let [tag->li (make-tag->li {:firestore firestore :tags (:tags props) :user-id user-id})]
+    [:<>
+     [:label {:class label-css-classes :for "tags"} "Tags"]
+     [:ul {:title "tags"
+           :on-click (fn [^js e]
+                       (let [tag-id (.. e -target -dataset -tagId)
+                             op (.. e -target -dataset -operation)
+                             doc-path (str "tags/" tag-id)]
+                         (when tag-id
+                           (case op
+                             "delete" (db-path-delete! {:doc-path doc-path
+                                                        :firestore firestore})
+                             (prn (str "Not implemented for op: " op))))))}
+      (map tag->li (:tags props))]
+     [button-add-new-tag-modal {:on-submitted-values (fn [m]
+                                                       (db-doc-create!
+                                                         {:collection "tags"
+                                                          :firestore firestore
+                                                          :m (merge m
+                                                                    {:createdAt (server-timestamp)
+                                                                     :createdBy user-id})}))}]]))

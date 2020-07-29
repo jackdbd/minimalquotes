@@ -7,7 +7,7 @@ service cloud.firestore {
 
   match /databases/{database}/documents {
     function isAdmin() {
-      return request.auth.token.roles.admin;
+      return 'admin' in request.auth.token.roles;
     }
 
     match /quotes/{quoteId} {
