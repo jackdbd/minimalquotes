@@ -6,26 +6,20 @@ service cloud.firestore {
   }
 
   match /databases/{database}/documents {
-    function isAdmin(req) {
-      // return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
-      return 'ADMIN' in req.auth.token.roles;
+    function isAdmin() {
+      return request.auth.token.roles.admin;
     }
 
     match /quotes/{quoteId} {
       allow read: if true;
       allow update: if isSignedIn() && resource.data.createdBy == request.auth.uid;
-      allow create, delete: if isSignedIn() && isAdmin(request);
+      allow create, delete: if isSignedIn() && isAdmin();
     }
 
     match /tags/{tagId} {
       allow read: if true;
-      allow create, update, delete: if isSignedIn() && isAdmin(request);
+      allow create, update, delete: if isSignedIn() && isAdmin();
     }
 
-    match /users/{userId} {
-      allow create: if isSignedIn();
-      allow read, update: if isSignedIn() && (request.auth.uid == userId || isAdmin(request));
-      allow delete: if isSignedIn() && isAdmin(request);
-    }
   }
 }
