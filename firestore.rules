@@ -4,21 +4,28 @@ service cloud.firestore {
   function isSignedIn() {
     return request.auth != null;
   }
+  
+  function isAdmin() {
+    return isSignedIn() && request.auth.token != null && request.auth.token.roles != null && 'admin' in request.auth.token.roles;
+  }
+
+  function isCreator(uid) {
+    return isSignedIn() && request.auth.uid == uid;
+  }
 
   match /databases/{database}/documents {
-    function isAdmin() {
-      return 'admin' in request.auth.token.roles;
-    }
 
     match /quotes/{quoteId} {
-      allow read: if true;
-      allow update: if isSignedIn() && resource.data.createdBy == request.auth.uid;
-      allow create, delete: if isSignedIn() && isAdmin();
+      allow get: if true;
+      allow list: if true; // TODO: limit to N quotes
+      // https://firebase.google.com/docs/firestore/security/rules-query#evaluating_constraints_on_queries
+      allow create: if isSignedIn();
+      allow update, delete: if isCreator(resource.data.createdBy) || isAdmin();
     }
 
     match /tags/{tagId} {
       allow read: if true;
-      allow create, update, delete: if isSignedIn() && isAdmin();
+      allow create, update, delete: if isAdmin();
     }
 
   }

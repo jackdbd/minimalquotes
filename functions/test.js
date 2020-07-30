@@ -93,12 +93,12 @@ describe('quote documents', () => {
     await firebase.assertSucceeds(dbPublic.doc('quotes/quoteId').get());
   });
 
-  it('can be created by an admin user', async () => {
+  it('can be created by a signed-in user', async () => {
     await firebase.assertSucceeds(
-      dbAdmin.doc('quotes/quoteId').set({
+      dbNormal.doc('quotes/quoteId').set({
         ...quote,
         createdAt: firebase.firestore.Timestamp.now(),
-        createdBy: adminUser.uid,
+        createdBy: myAuth.uid,
       })
     );
   });
@@ -171,26 +171,3 @@ describe('tag documents', () => {
     await firebase.assertFails(dbNormal.doc('tags/tagId').delete());
   });
 });
-
-// describe('user documents', () => {
-//   after(() => {
-//     firebase.clearFirestoreData({ projectId: TEST_FIREBASE_PROJECT_ID });
-//   });
-
-//   it('cannot be read by anyone', async () => {
-//     await firebase.assertFails(dbNormal.doc('users/userId').get());
-//   });
-
-//   it('can be read by the owner', async () => {
-//     await firebase.assertSucceeds(dbNormal.doc(`users/${myAuth.uid}`).get());
-//   });
-
-//   it('can be read by an admin', async () => {
-//     await dbAdmin.doc(`users/${adminAuth.uid}`).set(adminUser);
-//     await firebase.assertSucceeds(dbAdmin.doc('users/userId').get());
-//   });
-
-//   it('cannot be read by any other non-admin user', async () => {
-//     await firebase.assertFails(dbNormal.doc(`users/${theirsAuth.uid}`).get());
-//   });
-// });
