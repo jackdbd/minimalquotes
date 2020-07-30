@@ -4,7 +4,6 @@ const {
   makeGenerateFakeQuotes,
   makeGrantAdminRole,
   makeListAllUsers,
-  makeMintCustomToken,
   recursiveDelete,
   scheduledFirestoreExport,
 } = require('./src');
@@ -23,7 +22,6 @@ module.exports = {
   generateFakes: makeGenerateFakeQuotes(admin),
   grantAdminRole: makeGrantAdminRole(admin),
   listAllUsers: makeListAllUsers(admin),
-  mintCustomToken: makeMintCustomToken(admin),
   recursiveDelete,
   scheduledFirestoreExport,
 };

@@ -64,7 +64,6 @@ module.exports = {
   makeGenerateFakeQuotes: require('./generate-fake-quotes'),
   makeGrantAdminRole,
   makeListAllUsers,
-  makeMintCustomToken: require('./mint-custom-token'),
   recursiveDelete: require('./recursive-delete'),
   scheduledFirestoreExport: require('./scheduled-firestore-export'),
   // sendWelcomeEmail,
