@@ -1,6 +1,6 @@
 (ns minimalquotes.components.quotes
   (:require
-    ["firebase/app" :as firebase]
+    ; ["firebase/app" :as firebase]
     [minimalquotes.components.quote :refer [quote-card]]
     [minimalquotes.firebase.firestore :refer
      [db-path-delete! db-path-upsert! now server-timestamp]]
@@ -117,7 +117,7 @@
   "Quotes component that extracts its required props from the app state."
   []
   (let [firestore @state/db
-        user (.-currentUser (firebase/auth))
+        user (.-currentUser (js/firebase.auth))
         ;; TODO: pass user as props?
         user-id (if user (.-uid user) nil)
         query-params (session/get-in [:route :query-params])

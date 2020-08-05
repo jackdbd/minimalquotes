@@ -1,7 +1,7 @@
 (ns minimalquotes.firebase.firestore
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [cljs.core.async.interop :refer-macros [<p!]]
-            ["firebase/app" :as firebase]
+            ; ["firebase/app" :as firebase]
             [minimalquotes.state :as state]
             [minimalquotes.utils :refer [log-error]]))
 
@@ -142,13 +142,13 @@
   "ClojureScript wrapper for firebase.firestore.Timestamp.now()
   https://firebase.google.com/docs/reference/js/firebase.firestore.Timestamp#static-now"
   []
-  (.now (.. firebase -firestore -Timestamp)))
+  (.now (.. js/firebase -firestore -Timestamp)))
 
 (defn server-timestamp
   "ClojureScript wrapper for firebase.firestore.FieldValue.serverTimestamp()
   https://medium.com/firebase-developers/the-secrets-of-firestore-fieldvalue-servertimestamp-revealed-29dd7a38a82b"
   []
-  (.serverTimestamp (.. firebase -firestore -FieldValue)))
+  (.serverTimestamp (.. js/firebase -firestore -FieldValue)))
 
 
 (defn quotes-with-tag

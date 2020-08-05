@@ -1,7 +1,7 @@
 (ns minimalquotes.pages.core
   "Page components and translation from routes to pages."
   (:require
-    ["firebase/app" :as firebase]
+    ; ["firebase/app" :as firebase]
     [minimalquotes.components.admin :as admin]
     [minimalquotes.components.footer :refer [footer]]
     [minimalquotes.components.header :refer [header]]
@@ -33,7 +33,7 @@
 (defn admin-page-content
   []
   (fn []
-    (let [user (.-currentUser (firebase/auth))
+    (let [user (.-currentUser (js/firebase.auth))
           ;; TODO: pass user as props?
           user-id (if user (.-uid user) nil)
           firestore @state/db
@@ -74,7 +74,7 @@
 (defn sign-in-page-content
   []
   (fn []
-    (let [user (.-currentUser (firebase/auth))
+    (let [user (.-currentUser (js/firebase.auth))
           ui (get @state/state :firebase-ui)
           ui-config (get @state/state :firebase-ui-config)
           container-id "firebaseui-auth-container"
@@ -94,7 +94,7 @@
   ;; (prn "=== Firebase Auth User ===" (goog.object/getAllPropertyNames
   ;; (.-currentUser (firebase/auth)) false false))
   (fn []
-    (let [user (.-currentUser (firebase/auth))
+    (let [user (.-currentUser (js/firebase.auth))
           page (:current-page (session/get :route))
           links [{:href (path-for :minimalquotes.routes/index) :label "Home"}
                  {:href (path-for :minimalquotes.routes/quotes {:tag "wisdom"})
