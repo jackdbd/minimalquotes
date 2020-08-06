@@ -2,7 +2,7 @@
   "Handle authentication in Firebase with several authentication providers."
   (:require
     [minimalquotes.subscriptions :refer
-     [subscribe-favorite-quotes! subscribe-user!]]
+     [subscribe-favorite-quotes! subscribe-favorite-quotes-2! subscribe-user!]]
     [minimalquotes.state :as state]
     [minimalquotes.utils :refer [log-error]]))
 
@@ -28,6 +28,7 @@
         (-> (.getIdTokenResult user force-refresh-token)
             (.then (fn [token-result] (subscribe-user! user token-result)))
             (.catch log-error)))
+      ;; (subscribe-favorite-quotes-2! user)
       (subscribe-favorite-quotes!))
     (do
       (prn "No logged in user" user)

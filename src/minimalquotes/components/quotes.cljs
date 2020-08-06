@@ -150,8 +150,7 @@
                                                            :lastEditedBy user-id})})))
              :on-toggle-like-quote (fn [^js user quote-id]
                                      ;;  TODO: this is horrible.
-                                     (let [user-id (goog.object/getValueByKeys user #js ["providerData" 0 "uid"])
-                                           quote-k (keyword quote-id)
+                                     (let [quote-k (keyword quote-id)
                                            f (fn [[k fav]]
                                                (if (= quote-id (:quoteId fav))
                                                  (k->str k)
@@ -159,6 +158,8 @@
                                            fav-id (first (->> @state/favorite-quotes
                                                               (map f)
                                                               (filter some?)))]
+                                       (prn "fav-id" fav-id "user-id" user-id
+                                         (goog.object/getValueByKeys user #js ["providerData"]))
                                        (if (favorite? quote-k)
                                          (db-path-delete! {:doc-path (str "favorite_quotes/" fav-id)
                                                            :firestore firestore})

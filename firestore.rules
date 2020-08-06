@@ -15,7 +15,7 @@ service cloud.firestore {
 
   match /databases/{database}/documents {
 
-    match /favorite_quotes/{quoteId} {
+    match /favorite_quotes/{favoriteId} {
       allow read: if true;
       allow create: if isSignedIn();
       allow update, delete: if isCreator(resource.data.createdBy) || isAdmin();

@@ -160,3 +160,25 @@
                (.forEach query-snapshot f))
              (catch js/Error err
                (.log js/console (str "=== Error === " (ex-cause err))))))))
+
+(defn user-favorite-quotes
+  [^js firestore user-id]
+  ;; (prn "user-favorite-quotes" user-id)
+  (let [ref (-> (.collection firestore "favorite_quotes")
+                (.where "userId" "==" user-id))
+        f (fn [doc] (prn "doc id" (.-id doc) "doc data" (.data doc)))]
+    (go (try (let [query-snapshot (<p! (.get ref))]
+               (.forEach query-snapshot f))
+             (catch js/Error err
+               (log-error err))))))
+
+(defn db-collection-subscribe!
+  "Listen to the changes of a Firestore collection and update local app state."
+  [{:keys [collection ^js firestore ratom user-id]}]
+  (let [ref (-> (.collection firestore collection)
+                (.where "userId" "==" user-id))
+        observer #js
+                  {:error log-error
+                   :next (fn [^js doc-snapshot]
+                            (prn "doc-snapshot" doc-snapshot))}]
+    (.onSnapshot ref observer)))

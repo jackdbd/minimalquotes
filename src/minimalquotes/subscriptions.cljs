@@ -8,7 +8,7 @@
   previous value)."
   (:require
     [minimalquotes.firebase.firestore :refer
-     [db-docs-change-subscribe! db-docs-subscribe!]]
+     [db-docs-change-subscribe! db-docs-subscribe! db-collection-subscribe!]]
     [minimalquotes.state :as state]))
 
 (defn log-change!
@@ -69,7 +69,18 @@
                                                  :firestore @state/db})]
     (prn "unsubscribe!" unsubscribe!)))
 
+;; TODO: here I need a more flexible function than db-docs-subscribe! It needs
+;; to accept a query
 (defn subscribe-favorite-quotes!
   "Set a subscription for the documents in the `favorite_quotes` collection."
   []
   (subscribe-collection! {:collection "favorite_quotes" :ratom state/favorite-quotes}))
+
+(defn subscribe-favorite-quotes-2!
+  "Set a subscription for the documents in the `favorite_quotes` collection."
+  [^js user]
+  (prn "subscribe-favorite-quotes-2! user-id" (.-uid user))
+  (db-collection-subscribe! {:collection "favorite_quotes"
+                             :firestore @state/db
+                             :ratom state/favorite-quotes
+                             :user-id (.-uid user)}))

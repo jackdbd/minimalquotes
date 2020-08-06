@@ -2,8 +2,8 @@
   (:require
     [minimalquotes.components.buttons :as btn]
     [minimalquotes.firebase.firestore :refer
-     [db-doc-create! db-path-delete! db-path-upsert! now
-      server-timestamp]]
+     [db-doc-create! db-path-delete! db-path-upsert! now server-timestamp
+      user-favorite-quotes]]
     [minimalquotes.components.forms :refer
      [button-add-new-tag-modal button-edit-tag-modal]]
     [minimalquotes.components.icons :refer [icon-signal icon-trash]]
@@ -113,6 +113,10 @@
   (let [tag->li (make-tag->li {:firestore firestore :tags (:tags props) :user-id user-id})
         tag-ids (map #(first %) @state/tags)]
     [:<>
+     [:p "admin actions"]
+     [btn/button {:on-click (fn []
+                              (user-favorite-quotes firestore user-id))
+                  :text "get user's favorite quotes"}]
      [btn/button {:on-click (fn []
                               (let [f (.httpsCallable (js/firebase.functions) "grantAdminRole")]
                                 (-> (f #js {:email "nonexistinguser@gmail.com"})
