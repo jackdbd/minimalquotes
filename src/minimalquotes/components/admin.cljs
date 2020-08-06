@@ -1,6 +1,5 @@
 (ns minimalquotes.components.admin
   (:require
-    ["firebase/app" :as firebase]
     [minimalquotes.components.buttons :as btn]
     [minimalquotes.firebase.firestore :refer
      [db-doc-create! db-path-delete! db-path-upsert! now
@@ -8,6 +7,7 @@
     [minimalquotes.components.forms :refer
      [button-add-new-tag-modal button-edit-tag-modal]]
     [minimalquotes.components.icons :refer [icon-signal icon-trash]]
+    [minimalquotes.state :as state]
     [minimalquotes.utils :refer [k->str log-error]]))
 
 (def label-css-classes ["block" "text-gray-700" "text-sm" "font-bold" "mb-2"])
@@ -110,28 +110,35 @@
 (defn tags
   [{:keys [firestore user-id]
     :as props}]
-  (let [tag->li (make-tag->li {:firestore firestore :tags (:tags props) :user-id user-id})]
+  (let [tag->li (make-tag->li {:firestore firestore :tags (:tags props) :user-id user-id})
+        tag-ids (map #(first %) @state/tags)]
     [:<>
      [btn/button {:on-click (fn []
-                              (let [f (.httpsCallable (firebase/functions) "grantAdminRole")]
+                              (let [f (.httpsCallable (js/firebase.functions) "grantAdminRole")]
                                 (-> (f #js {:email "nonexistinguser@gmail.com"})
                                     (.then (fn [x] (prn (.. x -data -result))))
                                     (.catch log-error))))
                   :text "Cloud function grantAdminRole"}]
      [btn/button {:on-click (fn []
-                              (let [f (.httpsCallable (firebase/functions) "recursiveDelete")]
+                              (let [f (.httpsCallable (js/firebase.functions) "recursiveDelete")]
                                 (-> (f #js {:path "quotes/"})
                                     (.then prn)
                                     (.catch log-error))))
                   :text "Cloud function recursiveDelete"}]
      [btn/button {:on-click (fn []
-                              (let [f (.httpsCallable (firebase/functions) "generateFakes")]
-                                (-> (f #js {:n 3})
+                              (let [f (.httpsCallable (js/firebase.functions) "generateFakeQuotes")]
+                                (-> (f #js {:n 3 :tagIds (clj->js tag-ids)})
                                     (.then (fn [x] (prn (.. x -data -result))))
                                     (.catch log-error))))
-                  :text "Cloud function generateFakes"}]
+                  :text "Cloud function generateFakeQuotes"}]
      [btn/button {:on-click (fn []
-                              (let [f (.httpsCallable (firebase/functions) "listAllUsers")]
+                              (let [f (.httpsCallable (js/firebase.functions) "generateFakeTags")]
+                                (-> (f #js {:n 5})
+                                    (.then (fn [x] (prn (.. x -data -result))))
+                                    (.catch log-error))))
+                  :text "Cloud function generateFakeTags"}]
+     [btn/button {:on-click (fn []
+                              (let [f (.httpsCallable (js/firebase.functions) "listAllUsers")]
                                 ;; (f #js {:batchSize 10 :userProps #js ["email"
                                 ;; "displayName"]})
                                 (-> (f #js {:batchSize 10})

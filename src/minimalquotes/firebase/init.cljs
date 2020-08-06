@@ -1,24 +1,14 @@
 (ns minimalquotes.firebase.init
-  "Initialize Firebase with all the SDKs used in this app."
+  "Initialize Firebase and Firebase UI."
   (:require
-    ;  ["firebase/app" :as firebase]
-    ;; require Firebase SDKs for side-effects
-    ; ["firebase/analytics"]
-    ; ["firebase/auth"]
-    ; ["firebase/firestore"]
-    ; ["firebase/functions"]
-    ; ["firebase/performance"]
-    ["firebaseui" :as firebaseui]
     [minimalquotes.firebase.auth :refer [on-auth-state-changed]]
     [minimalquotes.state :as state]))
-
-(prn "FIREBASE" (.. firebaseui -auth -AuthUI))
 
 (defn init-firebase-ui!
   "Initialize the FirebaseUI widget with authentication providers and a redirect
   to a URL. We cannot mount it in the DOM yet."
   [sign-in-success-url]
-  (let [AuthUI (.. firebaseui -auth -AuthUI)
+  (let [AuthUI (.. js/firebaseui -auth -AuthUI)
         ui (AuthUI. (js/firebase.auth))
         google (.. js/firebase -auth -GoogleAuthProvider -PROVIDER_ID)
         facebook (.. js/firebase -auth -FacebookAuthProvider -PROVIDER_ID)
@@ -45,7 +35,6 @@
                 :messagingSenderId "152587589583"
                 :projectId "minimalquotes-5c472"
                 :storageBucket "minimalquotes-5c472.appspot.com"})]
-    (prn "APP INIZIALIED" app)
     (if (= "localhost" (.. js/window -location -hostname))
       (do (prn (str "Firebase app " (.-name app) " is running locally"))
           (prn "Configure Functions emulator")
@@ -57,8 +46,8 @@
                   (doto (js/firebase.firestore)
                     (.settings #js {:host "localhost:8080" :ssl false}))))
       (do
-        ; (js/firebase.analytics)
-        ; (js/firebase.performance)
+        (js/firebase.analytics)
+        (js/firebase.performance)
         (init-firebase-ui! "https://minimalquotes-5c472.web.app/")
         (reset! state/db (js/firebase.firestore)))))
   (on-auth-state-changed))

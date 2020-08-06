@@ -25,7 +25,7 @@
            [btn/button {:on-click #(on-logout) :text "Logout"}]
            [:a {:href login-href}
             [btn/button {:icon icon-login :text "Sign in"}]])]]]
-      [:div
+      [:div {:class ["m-2"]}
        (when user
          [:a {:href (path-for :minimalquotes.routes/quotes {:favorite true})}
           [btn/button {:color "red" :text "Favorite quotes"}]])]]]))

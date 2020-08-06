@@ -1,8 +1,9 @@
 (ns minimalquotes.components.actions-cards
-  (:require [devcards.core :as dc :refer [defcard]]
-            [minimalquotes.components.actions :refer [actions]]
-            [minimalquotes.components.modal :refer [modal-window]]
-            [minimalquotes.fakes :as fakes]))
+  (:require
+    [devcards.core :as dc :refer [defcard]]
+    [minimalquotes.components.actions :refer [actions]]
+    [minimalquotes.components.modal :refer [modal-window]]
+    [minimalquotes.fakes :as fakes]))
 
 (defcard "# Actions")
 
@@ -13,36 +14,40 @@
   [user quote-id]
   (js/alert (str (:display-name user) " shares the quote: " quote-id)))
 
-(defn on-like
+(defn on-toggle-like
   [user quote-id]
-  (js/alert (str (:display-name user) " likes the quote: " quote-id)))
+  (js/alert (str (:display-name user) " likes/unlikes the quote: " quote-id)))
 
 (defcard actions-unauthenticated-card
-         "Actions available for an unauthenticated user."
-         (let [props {:on-share on-share}] (dc/reagent [actions props])))
+  "Actions available for an unauthenticated user."
+  (let [props {:on-share on-share}]
+    (dc/reagent [actions props])))
 
 (defcard "## Actions for an authenticated user")
 
-(defn on-click-action [tag-name] (js/alert (str "click tag: " tag-name)))
+(defn on-click-action
+  [tag-name]
+  (js/alert (str "click tag: " tag-name)))
 
 (defn actions-example
   []
-  (let [props
-        {:id fakes/quote-id-0
-         :on-click-action on-click-action
-         :on-delete (fn [author] (js/alert (str "Delete quote by " author)))
-         :on-edit (fn [values]
-                    (js/alert (js/JSON.stringify (clj->js values) nil 2)))
-         :on-like on-like
-         :on-share on-share
-         :quote-author fakes/author-0
-         :quote-text fakes/text-0
-         :tags fakes/tags
-         :user fakes/user}]
-    [:<> [modal-window] [actions props]]))
+  (let [props {:id fakes/quote-id-0
+               :on-click-action on-click-action
+               :on-delete (fn [author] (js/alert (str "Delete quote by " author)))
+               :on-edit (fn [values]
+                          (js/alert (js/JSON.stringify (clj->js values) nil 2)))
+               :on-share on-share
+               :on-toggle-like on-toggle-like
+               :quote-author fakes/author-0
+               :quote-text fakes/text-0
+               :tags fakes/tags
+               :user fakes/user}]
+    [:<>
+     [modal-window]
+     [actions props]
+     [actions (merge props {:is-liked true})]]))
 
-(defcard
-  actions-authenticated-card
+(defcard actions-authenticated-card
   "Actions that require confirmation (Edit, Delete) must be confirmed in a modal
   window. Like and Share require no modals."
   (dc/reagent [actions-example]))

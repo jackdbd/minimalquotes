@@ -2,6 +2,7 @@ const admin = require('firebase-admin');
 
 const {
   makeGenerateFakeQuotes,
+  makeGenerateFakeTags,
   makeGrantAdminRole,
   makeListAllUsers,
   recursiveDelete,
@@ -19,7 +20,8 @@ admin.initializeApp();
 const context = { admin };
 
 module.exports = {
-  generateFakes: makeGenerateFakeQuotes(admin),
+  generateFakeQuotes: makeGenerateFakeQuotes(admin),
+  generateFakeTags: makeGenerateFakeTags(admin),
   grantAdminRole: makeGrantAdminRole(admin),
   listAllUsers: makeListAllUsers(admin),
   recursiveDelete,

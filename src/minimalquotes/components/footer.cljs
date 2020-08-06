@@ -1,6 +1,5 @@
 (ns minimalquotes.components.footer
-  (:require ["firebase/app" :as firebase]
-            [minimalquotes.utils :refer [log-error]]))
+  (:require [minimalquotes.utils :refer [log-error]]))
 
 (defn- on-success
   [result]
@@ -12,7 +11,7 @@
   [:footer
    {:on-click (fn [_]
                 (let [cloud-function-name "recursiveDelete"
-                      f (.httpsCallable (firebase/functions)
+                      f (.httpsCallable (js/firebase.functions)
                                         cloud-function-name)]
                   (prn "TODO: call " cloud-function-name " with a valid token")
                   (comment (-> (f #js {:path "deleteme/"})

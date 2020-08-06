@@ -37,7 +37,9 @@
                :quote-author (:author fakes/quote-0)
                :quote-text (:text fakes/quote-0)
                :user fakes/user}]
-    [:<> [modal-window] [quote-card props]]))
+    [:<>
+     [modal-window]
+     [quote-card props]]))
 
 (defcard
   quote-authenticated-card

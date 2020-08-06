@@ -1,6 +1,12 @@
-module.exports = {
+const windmill = require('@windmill/react-ui/config');
+
+module.exports = windmill({
   plugins: [],
-  variants: {
-    opacity: ['responsive', 'hover']
+  purge: [],
+  theme: {
+    extend: {},
   },
-}
+  variants: {
+    opacity: ['responsive', 'hover'],
+  },
+});

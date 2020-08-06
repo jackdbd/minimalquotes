@@ -1,9 +1,8 @@
 (ns minimalquotes.firebase.firestore
   (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require [cljs.core.async.interop :refer-macros [<p!]]
-            ; ["firebase/app" :as firebase]
-            [minimalquotes.state :as state]
-            [minimalquotes.utils :refer [log-error]]))
+  (:require
+    [cljs.core.async.interop :refer-macros [<p!]]
+    [minimalquotes.utils :refer [log-error]]))
 
 ; https://code.thheller.com/blog/shadow-cljs/2017/11/06/improved-externs-inference.html
 (set! *warn-on-infer* true)

@@ -1,9 +1,10 @@
 (ns minimalquotes.components.actions
-  (:require [minimalquotes.components.buttons :as btn]
-            [minimalquotes.components.forms :refer
-             [button-delete-quote-modal button-edit-quote-modal]]
-            [minimalquotes.components.icons :refer
-             [icon-like icon-share icon-unlike]]))
+  (:require
+    [minimalquotes.components.buttons :as btn]
+    [minimalquotes.components.forms :refer
+     [button-delete-quote-modal button-edit-quote-modal]]
+    [minimalquotes.components.icons :refer
+     [icon-like icon-share icon-unlike]]))
 
 ; (def debug-css "bg-green-300")
 (def debug-css "")
@@ -29,11 +30,11 @@
     nil))
 
 (defn actions
-  [{:keys [id like-button-text liked-quote margin-tailwind-class on-delete
+  [{:keys [id is-liked like-button-text margin-tailwind-class on-delete
            on-edit on-share on-toggle-like quote-author quote-text tags
            unlike-button-text user]
-    :or {like-button-text "Like"
-         liked-quote false
+    :or {is-liked false
+         like-button-text "Like"
          margin-tailwind-class "m-2"
          unlike-button-text "Unlike"}}]
   (let [on-click (make-on-click {:on-share on-share
@@ -47,15 +48,13 @@
        (when user
          [:<>
           [:li {:class [margin-tailwind-class]}
-           [button-edit-quote-modal
-            {:on-submitted-values on-edit
-             :quote-author quote-author
-             :quote-text quote-text
-             :tags tags}]]
+           [button-edit-quote-modal {:on-submitted-values on-edit
+                                     :quote-author quote-author
+                                     :quote-text quote-text
+                                     :tags tags}]]
           [:li {:class [margin-tailwind-class]}
-           [button-delete-quote-modal
-            {:on-delete on-delete :quote-author quote-author}]]
-          (if liked-quote
+           [button-delete-quote-modal {:on-delete on-delete :quote-author quote-author}]]
+          (if is-liked
             [:li
              {:class [margin-tailwind-class "hint--left"]
               :aria-label "Unlike this quote"}
@@ -72,29 +71,6 @@
                :text like-button-text}]])])
        [:li {:class [margin-tailwind-class "hint--right"] :aria-label "Share"}
         [btn/button
-         {:data-attributes {:data-id id
-                            :data-operation "share"
-                            ;  :data-tooltip "Share this quote"
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                             }
-          ; :direction "rtl" the direction is a user's preference,
-          ; so it should come from the user's document
+         {:data-attributes {:data-id id :data-operation "share"}
           :icon icon-share
           :text "Share"}]]]]]))

@@ -1,7 +1,6 @@
 (ns minimalquotes.pages.core
   "Page components and translation from routes to pages."
   (:require
-    ; ["firebase/app" :as firebase]
     [minimalquotes.components.admin :as admin]
     [minimalquotes.components.footer :refer [footer]]
     [minimalquotes.components.header :refer [header]]
@@ -10,21 +9,25 @@
     [minimalquotes.components.quotes :refer [quotes-container]]
     [minimalquotes.components.tags :refer [tags-container]]
     [minimalquotes.firebase.auth :as auth]
-    [minimalquotes.firebase.firestore :refer
-     [db-doc-create! now server-timestamp]]
+    [minimalquotes.firebase.firestore :refer [db-doc-create! now server-timestamp]]
     [minimalquotes.routes :refer [path-for]]
     [minimalquotes.state :as state]
     [reagent.core :as r]
+    ;;  ["@windmill/react-ui" :as windmill-react-ui]
     [reagent.session :as session]))
+
+;; (def windmill-button (r/adapt-react-class windmill-react-ui/Button))
 
 (defn f-quote->li
   [[id m]]
-  ;; (prn "id" id "m" m)
   ^{:key id} [:li (str (:text m) " -- " (:author m))])
 
-(defn ul-debug-quotes [] [:ul (map f-quote->li @state/quotes)])
-
-(defn about-page-content [] (fn [] [:div "About page"]))
+(defn about-page-content
+  []
+  (fn []
+    [:div
+     ;;  [windmill-button {:size "larger" :children "Hi there"}]
+     [:p "About page"]]))
 
 (defn tags-reducer
   [acc cv]
@@ -63,13 +66,10 @@
        [admin/users {:user-id user-id}]
        [admin/tags {:firestore firestore :tags tags :user-id user-id}]])))
 
-(defn favorite-quotes-page-content [] (fn [] [quotes-container]))
-
 (defn quotes-page-content
   []
   (fn []
-    (let [tag (get-in (session/get :route) [:query-params :tag])]
-      [quotes-container {:only-tag tag}])))
+    [quotes-container]))
 
 (defn sign-in-page-content
   []
@@ -91,8 +91,6 @@
 
 (defn current-page
   []
-  ;; (prn "=== Firebase Auth User ===" (goog.object/getAllPropertyNames
-  ;; (.-currentUser (firebase/auth)) false false))
   (fn []
     (let [user (.-currentUser (js/firebase.auth))
           page (:current-page (session/get :route))
