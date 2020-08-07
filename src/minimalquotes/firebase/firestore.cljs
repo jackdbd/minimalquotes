@@ -135,6 +135,7 @@
                (when on-each-snapshot
                  (.forEach query-snapshot on-each-snapshot)))
              (catch js/Error err
+               (js/console.error "query error: double check Firestore rules")
                (log-error err))))))
 
 (defn subscribe

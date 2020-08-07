@@ -29,6 +29,7 @@
   [err]
   (js/console.groupCollapsed (str "%c" (.. err -name) ": " (.. err -message))
                              "background: #fff; color: red;")
-  (when (.. err -code) (js/console.error (.. err -code)))
+  (when (.. err -code)
+    (js/console.error (.. err -code)))
   (js/console.trace err)
   (js/console.groupEnd))
