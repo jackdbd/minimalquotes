@@ -1,19 +1,5 @@
-(ns minimalquotes.components.footer
-  (:require [minimalquotes.utils :refer [log-error]]))
-
-(defn- on-success
-  [result]
-  (prn "Delete success!")
-  (js/console.log (js/JSON.stringify result nil 2)))
+(ns minimalquotes.components.footer)
 
 (defn footer
   []
-  [:footer
-   {:on-click (fn [_]
-                (let [cloud-function-name "recursiveDelete"
-                      f (.httpsCallable (js/firebase.functions)
-                                        cloud-function-name)]
-                  (prn "TODO: call " cloud-function-name " with a valid token")
-                  (comment (-> (f #js {:path "deleteme/"})
-                               (.then on-success)
-                               (.catch log-error)))))} "Footer here"])
+  [:footer {:class ["bg-blue-400"]} "Sticky Footer"])

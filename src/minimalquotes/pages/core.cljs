@@ -137,19 +137,17 @@
           links [{:href (path-for :minimalquotes.routes/index) :label "Home"}
                  {:href (path-for :minimalquotes.routes/tags) :label "Tags"}
                  {:href (path-for :minimalquotes.routes/about) :label "About"}]]
-      [:<> [modal-window]
-       [:div {:class ["container"]}
-        (when user
-          [:div (str "You are " (.-displayName user))])
-        [header
-         {:links (if @state/is-admin-signed-in?
-                   (conj links {:href (path-for :minimalquotes.routes/admin)
-                                :label "Admin"})
-                   links)
-          :login-href (path-for :minimalquotes.routes/sign-in)
-          :on-logout #(auth/sign-out)
-          :user user}]]
-       [page]
+      [:<>
+       [modal-window]
+       [header {:links (if @state/is-admin-signed-in?
+                         (conj links {:href (path-for :minimalquotes.routes/admin)
+                                      :label "Admin"})
+                         links)
+                :login-href (path-for :minimalquotes.routes/sign-in)
+                :on-logout #(auth/sign-out)
+                :user user}]
+       [:main {:class ["bg-green-200" "flex-1"]}
+        [page]]
        [footer]]
       )))
 
