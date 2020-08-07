@@ -285,13 +285,15 @@
     [btn/button {:on-click on-click-confirm :text "Delete"}]]])
 
 (defn button-delete-quote-modal
-  [{:keys [on-delete author]}]
+  [{:keys [on-delete quote-author]}]
   (let [on-click-cancel #(modal! nil)
-        on-click-confirm (fn [_] (on-delete author) (modal! nil))]
+        on-click-confirm (fn [_]
+                           (on-delete quote-author)
+                           (modal! nil))]
     [btn/button
      {:icon icon-trash
       :on-click #(modal! [delete-quote-dialog
-                          {:author author
+                          {:author quote-author
                            :on-click-cancel on-click-cancel
                            :on-click-confirm on-click-confirm}])
       :text "Delete"}]))

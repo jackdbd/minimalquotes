@@ -9,14 +9,13 @@
     [minimalquotes.components.quotes :refer [quotes-container]]
     [minimalquotes.components.tags :refer [tags-container]]
     [minimalquotes.firebase.auth :as auth]
-    [minimalquotes.firebase.firestore :refer [db-doc-create! now server-timestamp]]
+    [minimalquotes.firebase.firestore :refer
+     [db-doc-create! now query server-timestamp update-state-from-firestore!]]
     [minimalquotes.routes :refer [path-for]]
     [minimalquotes.state :as state]
     [reagent.core :as r]
-    ;;  ["@windmill/react-ui" :as windmill-react-ui]
-    [reagent.session :as session]))
-
-;; (def windmill-button (r/adapt-react-class windmill-react-ui/Button))
+    [reagent.session :as session]
+    ["@windmill/react-ui" :as wui]))
 
 (defn f-quote->li
   [[id m]]
@@ -26,7 +25,6 @@
   []
   (fn []
     [:div
-     ;;  [windmill-button {:size "larger" :children "Hi there"}]
      [:p "About page"]]))
 
 (defn tags-reducer
@@ -37,7 +35,6 @@
   []
   (fn []
     (let [user (.-currentUser (js/firebase.auth))
-          ;; TODO: pass user as props?
           user-id (if user (.-uid user) nil)
           firestore @state/db
           on-submit-quote-form (fn [m]
@@ -63,13 +60,56 @@
       [:div
        [button-add-new-quote-modal
         {:on-submitted-values on-submit-quote-form :tags tags}]
-       [admin/users {:user-id user-id}]
        [admin/tags {:firestore firestore :tags tags :user-id user-id}]])))
+
+(defn on-each-snapshot
+  "Callback to invoke for each QueryDocumentSnapshot.
+   https://firebase.google.com/docs/reference/js/firebase.firestore.QueryDocumentSnapshot"
+  [^js query-document-snapshot]
+  ; (prn "each id" (.-id query-document-snapshot))
+  (update-state-from-firestore! {:ratom state/quotes} query-document-snapshot))
+
+(defn on-first-snapshot
+  "Callback to invoke for the first QueryDocumentSnapshot."
+  [^js query-document-snapshot]
+  ; (prn "first id" (.-id query-document-snapshot))
+  (reset! state/first-quote query-document-snapshot))
+
+(defn on-last-snapshot
+  "Callback to invoke for the last QueryDocumentSnapshot."
+  [^js query-document-snapshot]
+  (comment
+    (prn "last id" (.-id query-document-snapshot)
+      "data" (.data query-document-snapshot)
+      "exists" (.-exists query-document-snapshot)
+      "fromCache" (.. query-document-snapshot -metadata -fromCache)
+      "hasPendingWrites" (.. query-document-snapshot -metadata -hasPendingWrites)))
+  (reset! state/last-quote query-document-snapshot))
 
 (defn quotes-page-content
   []
-  (fn []
-    [quotes-container]))
+  (let [results-per-page 10
+        m {:on-each-snapshot on-each-snapshot
+           :on-first-snapshot on-first-snapshot
+           :on-last-snapshot on-last-snapshot}
+        on-prev (fn []
+                  (reset! state/quotes {})
+                  (query @state/db "quotes" m {:limit-to-last results-per-page
+                                               :order-by [["createdAt"]]
+                                               :end-before @state/first-quote}))
+        on-next (fn []
+                  (reset! state/quotes {})
+                  (query @state/db "quotes" m {:limit results-per-page
+                                               :order-by [["createdAt"]]
+                                               :start-after @state/last-quote}))]
+    (query @state/db "quotes" m {:limit results-per-page
+                                 :order-by [["createdAt"]]})
+    (fn []
+      (reset! state/quotes {})
+      [:div
+       [quotes-container]
+       [:> wui/Button {:onClick on-prev} "Previous"]
+       [:> wui/Button {:onClick on-next} "Next"]])))
 
 (defn sign-in-page-content
   []
@@ -95,14 +135,6 @@
     (let [user (.-currentUser (js/firebase.auth))
           page (:current-page (session/get :route))
           links [{:href (path-for :minimalquotes.routes/index) :label "Home"}
-                 {:href (path-for :minimalquotes.routes/quotes {:tag "wisdom"})
-                  :label "Wisdom quotes"}
-                 {:href (path-for :minimalquotes.routes/quotes
-                                  {:author "Zen" :tag "friendship"})
-                  :label "Zen Friendship quotes"}
-                 {:href (path-for :minimalquotes.routes/quotes {:author "Buddha"})
-                  :label "Buddha quotes"}
-                 {:href (path-for :minimalquotes.routes/quotes {:author "Buddha" :tag "wisdom"}) :label "Buddha wisdom quotes"}
                  {:href (path-for :minimalquotes.routes/tags) :label "Tags"}
                  {:href (path-for :minimalquotes.routes/about) :label "About"}]]
       [:<> [modal-window]

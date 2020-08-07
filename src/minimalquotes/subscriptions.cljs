@@ -8,7 +8,7 @@
   previous value)."
   (:require
     [minimalquotes.firebase.firestore :refer
-     [db-docs-change-subscribe! db-docs-subscribe! db-collection-subscribe!]]
+     [db-docs-change-subscribe! subscribe update-state-from-firestore!]]
     [minimalquotes.state :as state]))
 
 (defn log-change!
@@ -43,24 +43,24 @@
         ;; TODO: not necessary? should set false when logging out
         (reset! state/is-admin-signed-in? false)))))
 
-(defn subscribe-collection!
-  "Set a subscription for a Firestore collection in the app state."
-  [{:keys [collection ratom]}]
-  (let [k (keyword collection)
-        unsubscribe! (db-docs-subscribe! {:collection collection
-                                          :firestore @state/db
-                                          :ratom ratom})]
-    (swap! state/subscriptions assoc k unsubscribe!)))
-
-(defn subscribe-quotes!
-  "Set a subscription for the documents in the `quotes` collection."
-  []
-  (subscribe-collection! {:collection "quotes" :ratom state/quotes}))
+(defn make-on-each-snapshot
+  [ratom]
+  (fn on-each-snapshot
+    [^js query-document-snapshot]
+    (comment
+      (prn "each doc snapshot"
+           "id" (.-id query-document-snapshot)
+           "data" (.data query-document-snapshot)))
+    (update-state-from-firestore! {:ratom ratom} query-document-snapshot)))
 
 (defn subscribe-tags!
   "Set a subscription for the documents in the `tags` collection."
   []
-  (subscribe-collection! {:collection "tags" :ratom state/tags}))
+  (let [collection-path "tags"
+        k (keyword collection-path)
+        m {:on-each-snapshot (make-on-each-snapshot state/tags)}
+        unsubscribe (subscribe @state/db collection-path m)]
+    (swap! state/subscriptions assoc k unsubscribe)))
 
 (defn subscribe-quotes-changes!
   []
@@ -69,18 +69,12 @@
                                                  :firestore @state/db})]
     (prn "unsubscribe!" unsubscribe!)))
 
-;; TODO: here I need a more flexible function than db-docs-subscribe! It needs
-;; to accept a query
 (defn subscribe-favorite-quotes!
   "Set a subscription for the documents in the `favorite_quotes` collection."
-  []
-  (subscribe-collection! {:collection "favorite_quotes" :ratom state/favorite-quotes}))
-
-(defn subscribe-favorite-quotes-2!
-  "Set a subscription for the documents in the `favorite_quotes` collection."
-  [^js user]
-  (prn "subscribe-favorite-quotes-2! user-id" (.-uid user))
-  (db-collection-subscribe! {:collection "favorite_quotes"
-                             :firestore @state/db
-                             :ratom state/favorite-quotes
-                             :user-id (.-uid user)}))
+  [user-id]
+  (let [collection-path "favorite_quotes"
+        k (keyword collection-path)
+        m {:on-each-snapshot (make-on-each-snapshot state/favorite-quotes)}
+        q {:where [["userId" "==" user-id]]}
+        unsubscribe (subscribe @state/db collection-path m q)]
+    (swap! state/subscriptions assoc k unsubscribe)))

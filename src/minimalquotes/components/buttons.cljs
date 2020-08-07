@@ -19,7 +19,7 @@
         icon-props {:css-classes ["w-4" "h-4" "fill-current"
                                   margin-tailwind-class]}]
     [:button (merge button-props data-attributes)
-     [:div {:class ["inline-flex" "items-center" debug-css]}
+     [:div (merge {:class ["inline-flex" "items-center" debug-css]} data-attributes)
       [:span data-attributes text]
       (when icon
         [icon (merge icon-props {:data-attributes data-attributes})])]]))

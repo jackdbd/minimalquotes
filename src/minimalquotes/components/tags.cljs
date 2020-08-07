@@ -36,6 +36,7 @@
         (when tag-name (on-click-tag tag-name))))
     nil))
 
+; TODO: is on-click-tag used anywhere?
 (defn tags
   [{:keys [entries margin-tailwind-class on-click-tag]
     :or {margin-tailwind-class "m-1"}}]

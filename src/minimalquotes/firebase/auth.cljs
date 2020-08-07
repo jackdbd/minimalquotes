@@ -1,9 +1,8 @@
 (ns minimalquotes.firebase.auth
   "Handle authentication in Firebase with several authentication providers."
   (:require
-    [minimalquotes.subscriptions :refer
-     [subscribe-favorite-quotes! subscribe-favorite-quotes-2! subscribe-user!]]
     [minimalquotes.state :as state]
+    [minimalquotes.subscriptions :refer [subscribe-favorite-quotes! subscribe-user!]]
     [minimalquotes.utils :refer [log-error]]))
 
 (defn sign-in-with-google
@@ -23,13 +22,12 @@
   state."
   [^js/firebase.User user]
   (if user
-    (do
-      (let [force-refresh-token true]
-        (-> (.getIdTokenResult user force-refresh-token)
-            (.then (fn [token-result] (subscribe-user! user token-result)))
-            (.catch log-error)))
-      ;; (subscribe-favorite-quotes-2! user)
-      (subscribe-favorite-quotes!))
+    (let [force-refresh-token true
+          user-id (.-uid user)]
+      (-> (.getIdTokenResult user force-refresh-token)
+          (.then (fn [token-result] (subscribe-user! user token-result)))
+          (.catch log-error))
+      (subscribe-favorite-quotes! user-id))
     (do
       (prn "No logged in user" user)
       (when-let [unsubscribe-favorite-quotes! (get @state/subscriptions :favorite_quotes)]

@@ -3,9 +3,9 @@
     [clojure.set]
     [minimalquotes.components.quote :refer [quote-card]]
     [minimalquotes.firebase.firestore :refer
-     [db-doc-create! db-path-delete! db-path-upsert! now server-timestamp]]
+     [db-doc-create! delete db-path-upsert! now server-timestamp]]
     [minimalquotes.state :as state]
-    [minimalquotes.utils :refer [k->str]]
+    [minimalquotes.utils :refer [k->str log-error]]
     [reagent.session :as session]))
 
 ; (def debug-css "bg-green-200")
@@ -17,17 +17,17 @@
   [{:keys [delete-quote! edit-quote! user]}]
   (fn m->li [[k {:keys [author is-liked likes tags text] :as m}]]
     (let [doc-id (k->str k)
-          delete! (partial delete-quote! doc-id)
-          edit! (partial edit-quote! doc-id m)
+          on-delete (partial delete-quote! doc-id)
+          on-edit (partial edit-quote! doc-id m)
           toggle-like-button-text (if (= 0 likes) "Like" (str likes " Like"))]
       ^{:key doc-id}
       [:li {:class ["flex" "items-stretch" debug-css]}
        [quote-card
-        {:delete! delete!
-         :edit! edit!
-         :id doc-id
+        {:id doc-id
          :is-liked is-liked
          :like-button-text toggle-like-button-text
+         :on-delete on-delete
+         :on-edit on-edit
          :tags tags
          :quote-author author
          :quote-text text
@@ -45,7 +45,7 @@
     (let [quote-id (.. e -target -dataset -id)
           op (.. e -target -dataset -operation)
           tag-name (.. e -target -dataset -tag)]
-      (when tag-name (on-click-tag tag-name))
+      ; (when tag-name (on-click-tag tag-name))
       (when (and user quote-id op)
         (case op
           "share" (on-share-quote user quote-id)
@@ -125,6 +125,12 @@
         entry {k (assoc m :tags tags :is-liked is-liked)}]
     entry))
 
+(defn fav->li
+  [[k {:keys [quoteId userId]}]]
+  ^{:key k} [:li "fav-id: " (k->str k) " ― " "userId: " userId " ― " "quoteId: " quoteId])
+
+; TODO: do not take selected-quotes (e.g. quotes having a certain tag, favorite
+; quotes) from app state. Instead, take them directly with a Firestore query.
 (defn quotes-container
   "Quotes component that extracts its required props from the app state."
   []
@@ -135,38 +141,46 @@
         predicate (make-predicate query-params)
         selected-quotes (filter predicate @state/quotes)
         entries (reduce into {} (map quote->entry selected-quotes))]
-    [quotes {:entries entries
-             :delete-quote! (fn [quote-id]
-                              (db-path-delete! {:doc-path (str "quotes/" quote-id)
-                                                :firestore firestore}))
-             :edit-quote! (fn [quote-id m-state m-form]
-                            (let [m-tag (form-tags->m-tag (:tags m-form))
-                                  q (assoc m-form :tags m-tag)]
-                              (db-path-upsert! {:doc-path (str "quotes/" quote-id)
-                                                :firestore firestore
-                                                :m (merge m-state
-                                                          q
-                                                          {:lastEditedAt (server-timestamp)
-                                                           :lastEditedBy user-id})})))
-             :on-toggle-like-quote (fn [^js user quote-id]
-                                     ;;  TODO: this is horrible.
-                                     (let [quote-k (keyword quote-id)
-                                           f (fn [[k fav]]
-                                               (if (= quote-id (:quoteId fav))
-                                                 (k->str k)
-                                                 nil))
-                                           fav-id (first (->> @state/favorite-quotes
-                                                              (map f)
-                                                              (filter some?)))]
-                                       (prn "fav-id" fav-id "user-id" user-id
-                                         (goog.object/getValueByKeys user #js ["providerData"]))
-                                       (if (favorite? quote-k)
-                                         (db-path-delete! {:doc-path (str "favorite_quotes/" fav-id)
-                                                           :firestore firestore})
-                                         (db-doc-create! {:collection "favorite_quotes"
-                                                          :firestore firestore
-                                                          :m {:quoteId quote-id
-                                                              :userId user-id}}))))
-             :on-share-quote (fn [^js user quote-id]
-                               (prn "TODO: share quote" user quote-id))
-             :user user}]))
+    ; (prn "@state/quotes" @state/quotes)
+    ; (prn "selected-quotes" selected-quotes)
+    [:div
+     [:label "debug favorite-quotes"]
+     [:ul (map fav->li @state/favorite-quotes)]
+     [quotes {:entries entries
+              :delete-quote! (fn [quote-id]
+                               (prn "delete quote-id" quote-id)
+                               (delete firestore
+                                       (str "quotes/" quote-id)
+                                       {:on-error log-error
+                                        :on-success #(swap! state/quotes dissoc (keyword quote-id))}))
+              :edit-quote! (fn [quote-id m-state m-form]
+                             (let [m-tag (form-tags->m-tag (:tags m-form))
+                                   q (assoc m-form :tags m-tag)]
+                               (db-path-upsert! {:doc-path (str "quotes/" quote-id)
+                                                 :firestore firestore
+                                                 :m (merge m-state
+                                                           q
+                                                           {:lastEditedAt (server-timestamp)
+                                                            :lastEditedBy user-id})})))
+              :on-toggle-like-quote (fn [^js user quote-id]
+                                      ;;  TODO: this is horrible.
+                                      (let [quote-k (keyword quote-id)
+                                            f (fn [[k fav]]
+                                                (if (= quote-id (:quoteId fav))
+                                                  (k->str k)
+                                                  nil))
+                                            fav-id (first (->> @state/favorite-quotes
+                                                               (map f)
+                                                               (filter some?)))]
+                                        (if (favorite? quote-k)
+                                          (delete firestore
+                                                  (str "favorite_quotes/" fav-id)
+                                                  {:on-error log-error
+                                                   :on-success #(swap! state/favorite-quotes dissoc (keyword fav-id))})
+                                          (db-doc-create! {:collection "favorite_quotes"
+                                                           :firestore firestore
+                                                           :m {:quoteId quote-id
+                                                               :userId user-id}}))))
+              :on-share-quote (fn [^js user quote-id]
+                                (prn "TODO: share quote" user quote-id))
+              :user user}]]))

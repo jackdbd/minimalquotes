@@ -23,7 +23,7 @@
 
 (defcard
   "An error boundary does not catch errors inside event handlers
-          https://reactjs.org/docs/error-boundaries.html#how-about-event-handlers")
+  https://reactjs.org/docs/error-boundaries.html#how-about-event-handlers")
 
 (defcard error-boundary-event-handler-card
          (dc/reagent [error-boundary
