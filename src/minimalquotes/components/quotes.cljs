@@ -40,12 +40,10 @@
   This single event handler exploits DOM event delegation. For this to work
   property, each quote must have the necessary data-attributes.
   TODO: decide which operations should be allowed for anonymous users."
-  [{:keys [on-click-tag on-share-quote on-toggle-like-quote user]}]
+  [{:keys [on-share-quote on-toggle-like-quote user]}]
   (fn on-click [^js e]
     (let [quote-id (.. e -target -dataset -id)
-          op (.. e -target -dataset -operation)
-          tag-name (.. e -target -dataset -tag)]
-      ; (when tag-name (on-click-tag tag-name))
+          op (.. e -target -dataset -operation)]
       (when (and user quote-id op)
         (case op
           "share" (on-share-quote user quote-id)
@@ -55,11 +53,10 @@
 (defn quotes
   "List of the quotes currently on screen, arranged in a grid layout.
   TODO: add filters for quotes."
-  [{:keys [delete-quote! edit-quote! entries on-click-tag on-share-quote
+  [{:keys [delete-quote! edit-quote! entries on-share-quote
            on-toggle-like-quote user]}]
   (let [on-click (make-on-quotes-click
-                   {:on-click-tag on-click-tag
-                    :on-toggle-like-quote on-toggle-like-quote
+                   {:on-toggle-like-quote on-toggle-like-quote
                     :on-share-quote on-share-quote
                     :user user})
         m->li (make-m->li {:delete-quote! delete-quote!

@@ -4,4 +4,6 @@
 
 (defcard "# Footer component")
 
-(defcard footer-card (let [props {}] (dc/reagent [footer props])))
+(defcard footer-card
+  (let [props {}]
+    (dc/reagent [footer props])))
