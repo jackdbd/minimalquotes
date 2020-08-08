@@ -3,13 +3,12 @@
     [reitit.core :as r]
     [reitit.frontend :as rf]))
 
-(def router
-  (rf/router [["/" ::index]
-              ["/about" ::about]
-              ["/admin" ::admin]
-              ["/quotes" ::quotes]
-              ["/sign-in" ::sign-in]
-              ["/tags" ::tags]]))
+(def router (rf/router [["/" ::index]
+                        ["/about" ::about]
+                        ["/admin" ::admin]
+                        ["/quotes" ::quotes]
+                        ["/sign-in" ::sign-in]
+                        ["/tags" ::tags]]))
 
 (defn path-for
   "Name-based (reverse) routing."

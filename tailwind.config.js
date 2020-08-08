@@ -1,7 +1,5 @@
-const windmill = require('@windmill/react-ui/config');
-
-module.exports = windmill({
-  plugins: [],
+module.exports = {
+  plugins: [require('@tailwindcss/custom-forms')],
   purge: [],
   theme: {
     extend: {},
@@ -9,4 +7,4 @@ module.exports = windmill({
   variants: {
     opacity: ['responsive', 'hover'],
   },
-});
+};

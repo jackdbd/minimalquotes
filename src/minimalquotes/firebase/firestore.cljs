@@ -41,6 +41,9 @@
                                (.forEach doc-changes f)))}]
     (.onSnapshot coll-ref observer)))
 
+; TODO: make function `write` to replace both db-doc-create! and
+; db-path-upsert!
+
 (defn db-doc-create!
   "Create a new Firestore document."
   [{:keys [collection firestore m on-reject on-resolve]
@@ -82,18 +85,6 @@
   https://medium.com/firebase-developers/the-secrets-of-firestore-fieldvalue-servertimestamp-revealed-29dd7a38a82b"
   []
   (.serverTimestamp (.. js/firebase -firestore -FieldValue)))
-
-
-(defn quotes-with-tag
-  [^js firestore ratom tag-name]
-  (let [ref (-> (.collection firestore "quotes")
-                (.where (str "tags." tag-name) "==" true))
-        f (partial update-state-from-firestore! {:ratom ratom})]
-    (go (try (let [query-snapshot (<p! (.get ref))]
-               (reset! ratom {})
-               (.forEach query-snapshot f))
-             (catch js/Error err
-               (.log js/console (str "=== Error === " (ex-cause err))))))))
 
 ; TODO: use clojure spec to validate query methods.
 (defn query

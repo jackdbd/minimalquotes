@@ -67,7 +67,7 @@
                   :text "Cloud function recursiveDelete"}]
      [btn/button {:on-click (fn []
                               (let [f (.httpsCallable (js/firebase.functions) "generateFakeQuotes")]
-                                (-> (f #js {:n 3 :tagIds (clj->js tag-ids)})
+                                (-> (f #js {:n 10 :tagIds (clj->js tag-ids)})
                                     (.then (fn [x] (prn (.. x -data -result))))
                                     (.catch log-error))))
                   :text "Cloud function generateFakeQuotes"}]

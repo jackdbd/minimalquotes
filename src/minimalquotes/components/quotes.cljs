@@ -149,6 +149,15 @@
                                (delete firestore
                                        (str "quotes/" quote-id)
                                        {:on-error log-error
+                                        ; TODO: whenever a quote is deleted from
+                                        ; Firestore, we remove it from the app
+                                        ; state. But this is not enough:
+                                        ; obviously
+                                        ; a deleted quote can no longer be a
+                                        ; favorite quote for any user, so we
+                                        ; need a cloud function that removes all
+                                        ; documents from the favorite_quotes
+                                        ; collection.
                                         :on-success #(swap! state/quotes dissoc (keyword quote-id))}))
               :edit-quote! (fn [quote-id m-state m-form]
                              (let [m-tag (form-tags->m-tag (:tags m-form))

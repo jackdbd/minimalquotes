@@ -2,9 +2,11 @@
   "Page components and translation from routes to pages."
   (:require
     [minimalquotes.components.admin :as admin]
+    [minimalquotes.components.buttons :as btn]
     [minimalquotes.components.footer :refer [footer]]
     [minimalquotes.components.header :refer [header]]
     [minimalquotes.components.forms :refer [button-add-new-quote-modal]]
+    [minimalquotes.components.icons :refer [icon-backward icon-forward]]
     [minimalquotes.components.modal :refer [modal-window]]
     [minimalquotes.components.quotes :refer [quotes-container]]
     [minimalquotes.components.tags :refer [tags-container]]
@@ -14,8 +16,7 @@
     [minimalquotes.routes :refer [path-for]]
     [minimalquotes.state :as state]
     [reagent.core :as r]
-    [reagent.session :as session]
-    ["@windmill/react-ui" :as wui]))
+    [reagent.session :as session]))
 
 (defn f-quote->li
   [[id m]]
@@ -108,8 +109,8 @@
       (reset! state/quotes {})
       [:div
        [quotes-container]
-       [:> wui/Button {:onClick on-prev} "Previous"]
-       [:> wui/Button {:onClick on-next} "Next"]])))
+       [btn/button {:direction "rtl" :icon icon-backward :on-click on-prev :text "Previous"}]
+       [btn/button {:icon icon-forward :on-click on-next :text "Next"}]])))
 
 (defn sign-in-page-content
   []
@@ -148,8 +149,7 @@
                 :user user}]
        [:main {:class ["bg-green-200" "flex-1"]}
         [page]]
-       [footer]]
-      )))
+       [footer]])))
 
 ; TODO: a non-admin user could access HOST/admin by typing in the address bar.
 ; How to avoid it? With a check in this page-for? By redirecting him to home?

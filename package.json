@@ -55,7 +55,6 @@
     ]
   },
   "dependencies": {
-    "@windmill/react-ui": "^0.3.1",
     "create-react-class": "^15.6.3",
     "react": "^16.13.1",
     "react-bootstrap-typeahead": "^5.1.0",
@@ -64,6 +63,7 @@
     "tailwindcss": "^1.4.6"
   },
   "devDependencies": {
+    "@tailwindcss/custom-forms": "^0.2.1",
     "@testing-library/dom": "^7.20.2",
     "@testing-library/react": "^10.4.6",
     "clj-kondo": "^2020.1.13",

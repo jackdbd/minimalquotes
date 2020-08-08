@@ -14,6 +14,15 @@
     [:svg (merge svg-props data-attributes)
      [:path (merge path-props data-attributes)]]))
 
+(defn icon-backward
+  "https://github.com/adamwathan/entypo-optimized/blob/master/dist/icons/controller-fast-backward.svg"
+  [{:keys [css-classes data-attributes] :or {css-classes default-css-classes}}]
+  [icon
+   {:css-classes css-classes
+    :data-attributes data-attributes
+    :d
+    "M17.959 4.571L10.756 9.52s-.279.201-.279.481.279.479.279.479l7.203 4.951c.572.38 1.041.099 1.041-.626V5.196c0-.727-.469-1.008-1.041-.625zm-9.076 0L1.68 9.52s-.279.201-.279.481.279.479.279.479l7.203 4.951c.572.381 1.041.1 1.041-.625v-9.61c0-.727-.469-1.008-1.041-.625z"}])
+
 (defn icon-cross
   "https://github.com/adamwathan/entypo-optimized/blob/master/dist/icons/cross.svg"
   [{:keys [css-classes data-attributes] :or {css-classes default-css-classes}}]
@@ -31,6 +40,15 @@
     :data-attributes data-attributes
     :d
     "M17.561 2.439c-1.442-1.443-2.525-1.227-2.525-1.227L8.984 7.264 2.21 14.037 1.2 18.799l4.763-1.01 6.774-6.771 6.052-6.052c-.001 0 .216-1.083-1.228-2.527zM5.68 17.217l-1.624.35a3.71 3.71 0 0 0-.69-.932 3.742 3.742 0 0 0-.932-.691l.35-1.623.47-.469s.883.018 1.881 1.016c.997.996 1.016 1.881 1.016 1.881l-.471.468z"}])
+
+(defn icon-forward
+  "https://github.com/adamwathan/entypo-optimized/blob/master/dist/icons/controller-fast-forward.svg"
+  [{:keys [css-classes data-attributes] :or {css-classes default-css-classes}}]
+  [icon
+   {:css-classes css-classes
+    :data-attributes data-attributes
+    :d
+    "M9.244 9.52L2.041 4.571C1.469 4.188 1 4.469 1 5.196v9.609c0 .725.469 1.006 1.041.625l7.203-4.951s.279-.199.279-.478c0-.28-.279-.481-.279-.481zm9.356.481c0 .279-.279.478-.279.478l-7.203 4.951c-.572.381-1.041.1-1.041-.625V5.196c0-.727.469-1.008 1.041-.625L18.32 9.52s.28.201.28.481z"}])
 
 (defn icon-like
   "https://github.com/adamwathan/entypo-optimized/blob/master/dist/icons/heart-outlined.svg"
