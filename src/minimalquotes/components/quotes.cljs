@@ -1,6 +1,8 @@
 (ns minimalquotes.components.quotes
   (:require
     [clojure.set]
+    [minimalquotes.components.back-to-top :refer [back-to-top]]
+    [minimalquotes.components.observed-spinner :refer [observed-spinner]]
     [minimalquotes.components.quote :refer [quote-card]]
     [minimalquotes.firebase.firestore :refer
      [db-doc-create! delete db-path-upsert! now server-timestamp]]
@@ -21,18 +23,17 @@
           on-edit (partial edit-quote! doc-id m)
           toggle-like-button-text (if (= 0 likes) "Like" (str likes " Like"))]
       ^{:key doc-id}
-      [:li {:class ["flex" "items-stretch" debug-css]}
-       [quote-card
-        {:id doc-id
-         :is-liked is-liked
-         :like-button-text toggle-like-button-text
-         :on-delete on-delete
-         :on-edit on-edit
-         :tags tags
-         :quote-author author
-         :quote-text text
-         :unlike-button-text toggle-like-button-text
-         :user user}]])))
+      [:li {:class ["quote-card-list-item" "flex" "items-stretch" debug-css]}
+       [quote-card {:id doc-id
+                    :is-liked is-liked
+                    :like-button-text toggle-like-button-text
+                    :on-delete on-delete
+                    :on-edit on-edit
+                    :tags tags
+                    :quote-author author
+                    :quote-text text
+                    :unlike-button-text toggle-like-button-text
+                    :user user}]])))
 
 (defn make-on-quotes-click
   "Create a single on-click event handler for operations on quotes that don't
@@ -61,12 +62,17 @@
                     :user user})
         m->li (make-m->li {:delete-quote! delete-quote!
                            :edit-quote! edit-quote!
-                           :user user})]
-    [:ul
-     {:class ["grid" "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
-              "gap-4"]
-      :on-click on-click}
-     (map m->li entries)]))
+                           :user user})
+        scrolling-container-id "scrolling-container"]
+    ; TODO: the height should be 100vh - the height of all fixed height elements
+    ; on the page (i.e. just the header in this case)
+    [:div {:id scrolling-container-id :style {:overflow-y "scroll" :height "80vh"}}
+     [:ul {:class ["grid" "gap-4"
+                   "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"]
+           :on-click on-click}
+      (map m->li entries)]
+     [observed-spinner {:root-id scrolling-container-id}]
+     [back-to-top {:elem-id scrolling-container-id}]]))
 
 (defn form-tags->m-tag
   [form-tags]
@@ -142,7 +148,8 @@
     ; (prn "selected-quotes" selected-quotes)
     [:div
      [:label "debug favorite-quotes"]
-     [:ul (map fav->li @state/favorite-quotes)]
+     [:ul {:class ["debug favorite-quotes"]}
+      (map fav->li @state/favorite-quotes)]
      [quotes {:entries entries
               :delete-quote! (fn [quote-id]
                                (prn "delete quote-id" quote-id)

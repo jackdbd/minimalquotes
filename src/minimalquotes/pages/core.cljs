@@ -2,17 +2,13 @@
   "Page components and translation from routes to pages."
   (:require
     [minimalquotes.components.admin :as admin]
-    [minimalquotes.components.buttons :as btn]
-    [minimalquotes.components.footer :refer [footer]]
-    [minimalquotes.components.header :refer [header]]
     [minimalquotes.components.forms :refer [button-add-new-quote-modal]]
-    [minimalquotes.components.icons :refer [icon-backward icon-forward]]
+    [minimalquotes.components.header :refer [header]]
     [minimalquotes.components.modal :refer [modal-window]]
     [minimalquotes.components.quotes :refer [quotes-container]]
     [minimalquotes.components.tags :refer [tags-container]]
     [minimalquotes.firebase.auth :as auth]
-    [minimalquotes.firebase.firestore :refer
-     [db-doc-create! now query server-timestamp update-state-from-firestore!]]
+    [minimalquotes.firebase.firestore :refer [db-doc-create! server-timestamp]]
     [minimalquotes.routes :refer [path-for]]
     [minimalquotes.state :as state]
     [reagent.core :as r]
@@ -63,54 +59,12 @@
         {:on-submitted-values on-submit-quote-form :tags tags}]
        [admin/tags {:firestore firestore :tags tags :user-id user-id}]])))
 
-(defn on-each-snapshot
-  "Callback to invoke for each QueryDocumentSnapshot.
-   https://firebase.google.com/docs/reference/js/firebase.firestore.QueryDocumentSnapshot"
-  [^js query-document-snapshot]
-  ; (prn "each id" (.-id query-document-snapshot))
-  (update-state-from-firestore! {:ratom state/quotes} query-document-snapshot))
-
-(defn on-first-snapshot
-  "Callback to invoke for the first QueryDocumentSnapshot."
-  [^js query-document-snapshot]
-  ; (prn "first id" (.-id query-document-snapshot))
-  (reset! state/first-quote query-document-snapshot))
-
-(defn on-last-snapshot
-  "Callback to invoke for the last QueryDocumentSnapshot."
-  [^js query-document-snapshot]
-  (comment
-    (prn "last id" (.-id query-document-snapshot)
-      "data" (.data query-document-snapshot)
-      "exists" (.-exists query-document-snapshot)
-      "fromCache" (.. query-document-snapshot -metadata -fromCache)
-      "hasPendingWrites" (.. query-document-snapshot -metadata -hasPendingWrites)))
-  (reset! state/last-quote query-document-snapshot))
-
 (defn quotes-page-content
   []
-  (let [results-per-page 10
-        m {:on-each-snapshot on-each-snapshot
-           :on-first-snapshot on-first-snapshot
-           :on-last-snapshot on-last-snapshot}
-        on-prev (fn []
-                  (reset! state/quotes {})
-                  (query @state/db "quotes" m {:limit-to-last results-per-page
-                                               :order-by [["createdAt"]]
-                                               :end-before @state/first-quote}))
-        on-next (fn []
-                  (reset! state/quotes {})
-                  (query @state/db "quotes" m {:limit results-per-page
-                                               :order-by [["createdAt"]]
-                                               :start-after @state/last-quote}))]
-    (query @state/db "quotes" m {:limit results-per-page
-                                 :order-by [["createdAt"]]})
-    (fn []
-      (reset! state/quotes {})
-      [:div
-       [quotes-container]
-       [btn/button {:direction "rtl" :icon icon-backward :on-click on-prev :text "Previous"}]
-       [btn/button {:icon icon-forward :on-click on-next :text "Next"}]])))
+  (fn []
+    ;; decide whether to reset quotes every time this component mounts
+    ;; (reset! state/quotes {})
+    [quotes-container]))
 
 (defn sign-in-page-content
   []
@@ -128,7 +82,10 @@
                          :component-did-mount did-mount
                          :reagent-render reagent-render})))))
 
-(defn tags-page-content [] (fn [] [:div [tags-container]]))
+(defn tags-page-content
+  []
+  (fn []
+    [tags-container]))
 
 (defn current-page
   []
@@ -148,8 +105,7 @@
                 :on-logout #(auth/sign-out)
                 :user user}]
        [:main {:class ["bg-green-200" "flex-1"]}
-        [page]]
-       [footer]])))
+        [page]]])))
 
 ; TODO: a non-admin user could access HOST/admin by typing in the address bar.
 ; How to avoid it? With a check in this page-for? By redirecting him to home?

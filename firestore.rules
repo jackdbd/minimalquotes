@@ -26,7 +26,7 @@ service cloud.firestore {
       // deny any query that doesn't limit the maximum number of documents
       // retrieved to a certain range.
       // https://firebase.google.com/docs/firestore/security/rules-query#evaluating_constraints_on_queries
-      allow list: if request.query.limit <= 10
+      allow list: if request.query.limit <= 20
       allow create: if isSignedIn();
       allow update, delete: if isCreator(resource.data.createdBy) || isAdmin();
     }

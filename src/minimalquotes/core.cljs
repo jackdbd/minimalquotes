@@ -14,6 +14,18 @@
     [reagent.session :as session]
     [reitit.frontend :as rf]))
 
+; (defn callback [^js entries ^js observer]
+;   (prn "entries" entries "observer" observer))
+; (def options #js {:root (js/document.querySelector "#app")
+;                   :threshold 1.0})
+; (def observer (js/IntersectionObserver. callback options))
+; (prn "options" options)
+; (prn "IntersectionObserver" observer)
+
+; (def target (js/document.querySelector "#foo"))
+; (prn "target" target)
+; (.observe observer target)
+
 (defn nav-handler
   [path]
   (let [match (rf/match-by-path router path)
