@@ -55,6 +55,7 @@
     ]
   },
   "dependencies": {
+    "@researchgate/react-intersection-observer": "^1.3.2",
     "create-react-class": "^15.6.3",
     "react": "^16.13.1",
     "react-bootstrap-typeahead": "^5.1.0",
