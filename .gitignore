@@ -40,3 +40,6 @@ yarn-error.log
 
 ## Calva VS code extension
 .calva
+
+# Environment variables for direnv
+.envrc

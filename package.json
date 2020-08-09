@@ -60,7 +60,7 @@
     "react-bootstrap-typeahead": "^5.1.0",
     "react-dom": "^16.13.1",
     "stacktrace-js": "^2.0.2",
-    "tailwindcss": "^1.4.6"
+    "tailwindcss": "^1.6.2"
   },
   "devDependencies": {
     "@tailwindcss/custom-forms": "^0.2.1",
