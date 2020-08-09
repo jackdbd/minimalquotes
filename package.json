@@ -11,6 +11,7 @@
   "scripts": {
     "build": "yarn clean && yarn build:css && shadow-cljs release app",
     "build:css": "tailwindcss build src/assets/css/styles.css -o public/css/output.css",
+    "build:dev": "yarn clean && yarn build:css && shadow-cljs compile app",
     "cards": "shadow-cljs watch cards",
     "clean": "rimraf out public/js",
     "deploy": "yarn build && firebase deploy",
