@@ -1,32 +1,26 @@
 (ns minimalquotes.core
   "Entry point of the app."
+  (:require-macros [cljs.core.async.macros :refer [go]])
   (:require
     [accountant.core :as accountant]
     [clerk.core :as clerk]
+    [cljs.core.async.interop :refer-macros [<p!]]
     [goog.object :as object]
     [minimalquotes.components.error-boundary :refer [error-boundary]]
-    [minimalquotes.pages.core :refer [current-page page-for]]
+    [minimalquotes.firebase.auth :refer [on-auth-state-changed]]
     [minimalquotes.firebase.init :refer [init-firebase!]]
+    [minimalquotes.pages.core :refer [current-page page-for]]
     [minimalquotes.routes :refer [router]]
+    [minimalquotes.state :as state]
     [minimalquotes.subscriptions :refer [subscribe-tags!]]
+    [minimalquotes.utils :refer [log-error]]
     [reagent.core :as r]
     [reagent.dom :as rdom]
     [reagent.session :as session]
     [reitit.frontend :as rf]))
 
-; (defn callback [^js entries ^js observer]
-;   (prn "entries" entries "observer" observer))
-; (def options #js {:root (js/document.querySelector "#app")
-;                   :threshold 1.0})
-; (def observer (js/IntersectionObserver. callback options))
-; (prn "options" options)
-; (prn "IntersectionObserver" observer)
-
-; (def target (js/document.querySelector "#foo"))
-; (prn "target" target)
-; (.observe observer target)
-
 (defn nav-handler
+  "Navigation handler for accountant."
   [path]
   (let [match (rf/match-by-path router path)
         name (:name (:data match))
@@ -70,12 +64,29 @@
     (rdom/render [error-boundary {:on-catch on-catch}
                   [current-page]] root-el)))
 
+(def config-callback-map
+  "Callbacks to invoke when Firebase SDKs are initialized."
+  {:on-firebase-ui-initialized (fn [ui]
+                                 (prn "Firebase UI configured")
+                                 (swap! state/state assoc :firebase-ui ui))
+   :on-firebase-ui-config-initialized (fn [ui-config]
+                                        (swap! state/state assoc :firebase-ui-config ui-config))
+   :on-firestore-emulator-initialized (fn [firestore]
+                                        (prn "Firestore emulator configured")
+                                        (reset! state/db firestore))
+   :on-firestore-initialized (fn [firestore]
+                               (prn "Firestore configured")
+                               (reset! state/db firestore))})
+
 (defn ^:export main
   "Run application startup logic."
   []
   (when goog.DEBUG (dev-setup))
-  (init-firebase!)
-  (subscribe-tags!)
-  (hook-browser-navigation!)
-  (accountant/dispatch-current!)
-  (mount-root))
+  (go (try (<p! (init-firebase! config-callback-map))
+           (on-auth-state-changed)
+           (subscribe-tags!)
+           (hook-browser-navigation!)
+           (accountant/dispatch-current!)
+           (mount-root)
+           (catch js/Error err
+             (log-error err)))))

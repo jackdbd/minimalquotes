@@ -43,3 +43,8 @@ yarn-error.log
 
 # Environment variables for direnv
 .envrc
+
+# Ignore public/index.html, created when deploying the production build.
+# This is a workaround for a bug in the shadow-cljs http dev server.
+# https://github.com/thheller/shadow-cljs/issues/773
+public/index.html

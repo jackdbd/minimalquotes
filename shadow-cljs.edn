@@ -2,9 +2,21 @@
                 :devtools {:http-port 3000
                            :http-root "public"
                            :preloads [devtools.preload]}
+                :log {:level :debug}
                 :modules {:main {:init-fn minimalquotes.core/main}}
                 :output-dir "public/js"
-                :target :browser}
+                :target :browser
+                :verbose true
+                :dev {:closure-defines {minimalquotes.firebase.init/DEVELOPMENT true
+                                        minimalquotes.firebase.init/API_KEY #shadow/env "API_KEY"
+                                        minimalquotes.firebase.init/APP_ID #shadow/env "APP_ID"
+                                        minimalquotes.firebase.init/AUTH_DOMAIN #shadow/env "AUTH_DOMAIN"
+                                        minimalquotes.firebase.init/DATABASE_URL #shadow/env "DATABASE_URL"
+                                        minimalquotes.firebase.init/MEASUREMENT_ID #shadow/env "MEASUREMENT_ID"
+                                        minimalquotes.firebase.init/MESSAGING_SENDER_ID #shadow/env "MESSAGING_SENDER_ID"
+                                        minimalquotes.firebase.init/PROJECT_ID #shadow/env "PROJECT_ID"
+                                        minimalquotes.firebase.init/STORAGE_BUCKET #shadow/env "STORAGE_BUCKET"}}
+                :release {:closure-defines {minimalquotes.firebase.init/PRODUCTION true}}}
           :cards {:asset-path "/js"
                   :compiler-options {:devcards true}
                   :modules {:main {:init-fn minimalquotes.cards/main}}
@@ -23,6 +35,11 @@
                 [reagent-utils "0.3.3"]
                 [venantius/accountant "0.2.5"]
                 [vlad "3.3.2"]]
- :dev-http {3000 "public"}
+ ;; Tell shadow-cljs' http dev server to serve a different HTML file, not
+ ;; index.html. This is because I need to initialize Firebase in a different way.
+ ;; Note: do NOT keep a index.html in the public directory because of this issue.
+ ;; https://github.com/thheller/shadow-cljs/issues/773
+ :dev-http {3000 {:push-state/index "dev.html"
+                  :root "public"}}
  :nrepl {:port 3333}
  :source-paths ["src"]}

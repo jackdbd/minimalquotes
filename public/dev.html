@@ -15,35 +15,22 @@
     
     <!-- Firebase core and SDKs -->
     <script defer src="https://www.gstatic.com/firebasejs/7.17.2/firebase-app.js"></script>
-    <!-- <script defer src="/__/firebase/7.17.2/firebase-app.js"></script> -->
 
     <script defer src="https://www.gstatic.com/firebasejs/7.17.2/firebase-auth.js"></script>
-    <!-- <script defer src="/__/firebase/7.17.2/firebase-auth.js"></script> -->
-
     <script defer src="https://www.gstatic.com/firebasejs/7.17.2/firebase-firestore.js"></script>
-    <!-- <script defer src="/__/firebase/7.17.2/firebase-firestore.js"></script> -->
-
     <script defer src="https://www.gstatic.com/firebasejs/7.17.2/firebase-functions.js"></script>
-    <!-- <script defer src="/__/firebase/7.17.2/firebase-functions.js"></script> -->
-
     <script defer src="https://www.gstatic.com/firebasejs/7.17.2/firebase-analytics.js"></script>
-    <!-- <script defer src="/__/firebase/7.17.2/firebase-analytics.js"></script> -->
-
     <script defer src="https://www.gstatic.com/firebasejs/7.17.2/firebase-performance.js"></script>
-    <!-- <script defer src="/__/firebase/7.17.2/firebase-performance.js"></script> -->
 
     <!-- Firebase UI -->
     <script defer src="https://www.gstatic.com/firebasejs/ui/4.6.1/firebase-ui-auth.js"></script>
-    <!-- <script defer src="https://www.gstatic.com/firebasejs/ui/4.6.1/firebase-ui-auth__it.js"></script> -->
 
     <!-- <link rel="icon" href="/img/minimalquotes.png"> -->
     <title>minimalquotes</title>
-    
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="app" class="flex flex-col min-h-screen"></div>
-    <!-- First Input Delay polyfill library. -->
     <script>!function(n,e){var t,o,i,c=[],f={passive:!0,capture:!0},r=new Date,a="pointerup",u="pointercancel";function p(n,c){t||(t=c,o=n,i=new Date,w(e),s())}function s(){o>=0&&o<i-r&&(c.forEach(function(n){n(o,t)}),c=[])}function l(t){if(t.cancelable){var o=(t.timeStamp>1e12?new Date:performance.now())-t.timeStamp;"pointerdown"==t.type?function(t,o){function i(){p(t,o),r()}function c(){r()}function r(){e(a,i,f),e(u,c,f)}n(a,i,f),n(u,c,f)}(o,t):p(o,t)}}function w(n){["click","mousedown","keydown","touchstart","pointerdown"].forEach(function(e){n(e,l,f)})}w(n),self.perfMetrics=self.perfMetrics||{},self.perfMetrics.onFirstInputDelay=function(n){c.push(n),s()}}(addEventListener,removeEventListener);</script>
 
     <!-- The app's bundle must be loaded with defer because it needs to load after Firebase -->
