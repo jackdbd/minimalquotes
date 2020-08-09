@@ -131,6 +131,24 @@
     :d
     "M10 14a1.99 1.99 0 0 0-1.981 2c0 1.104.887 2 1.981 2a1.99 1.99 0 0 0 1.98-2c0-1.105-.886-2-1.98-2zm-4.2-2.242l1.4 1.414a3.933 3.933 0 0 1 5.601 0l1.399-1.414a5.898 5.898 0 0 0-8.4 0zM3 8.928l1.4 1.414a7.864 7.864 0 0 1 11.199 0L17 8.928a9.831 9.831 0 0 0-14 0zM.199 6.1l1.4 1.414a11.797 11.797 0 0 1 16.801 0L19.8 6.1a13.763 13.763 0 0 0-19.601 0z"}])
 
+(defn icon-spinner
+  "https://tailwind-animation-playground.vercel.app/"
+  [{:keys [data-attributes size text-color] :or {size 32 text-color "text-indigo-400"}}]
+  (let [svg-props {:class ["animate-spin" (str "w-" size) (str "h-" size) text-color]
+                   :fill "none"
+                   :viewBox "0 0 24 24"
+                   :xmlns xmlns}
+        circle-props {:class ["opacity-25"]
+                      :cx 12 :cy 12 :r 10
+                      :stroke "currentColor"
+                      :stroke-width 4}
+        path-props {:class ["opacity-75"]
+                    :fill "currentColor"
+                    :d "M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"}]
+    [:svg (merge svg-props data-attributes)
+     [:circle (merge circle-props data-attributes)]
+     [:path (merge path-props data-attributes)]]))
+
 (defn icon-tag
   "https://github.com/adamwathan/entypo-optimized/blob/master/dist/icons/tag.svg"
   [{:keys [css-classes data-attributes] :or {css-classes default-css-classes}}]
@@ -139,6 +157,14 @@
     :data-attributes data-attributes
     :d
     "M18.662 5.521L5.237 19l.707-4.967-4.945.709L14.424 1.263c.391-.392 1.133-.308 1.412 0l2.826 2.839c.5.473.391 1.026 0 1.419z"}])
+
+(defn icon-to-top
+  "https://github.com/adamwathan/entypo-optimized/blob/master/dist/icons/arrow-long-up.svg"
+  [{:keys [css-classes data-attributes] :or {css-classes default-css-classes}}]
+  [icon
+   {:css-classes css-classes
+    :data-attributes data-attributes
+    :d "M10 .75L15.5 6H12v13H8V6H4.5L10 .75z"}])
 
 (defn icon-trash
   "https://github.com/adamwathan/entypo-optimized/blob/master/dist/icons/trash.svg"
