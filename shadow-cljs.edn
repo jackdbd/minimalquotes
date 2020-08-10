@@ -16,7 +16,9 @@
                                         minimalquotes.firebase.init/MESSAGING_SENDER_ID #shadow/env "MESSAGING_SENDER_ID"
                                         minimalquotes.firebase.init/PROJECT_ID #shadow/env "PROJECT_ID"
                                         minimalquotes.firebase.init/STORAGE_BUCKET #shadow/env "STORAGE_BUCKET"}}
-                :release {:closure-defines {minimalquotes.firebase.init/PRODUCTION true}}}
+                :release {:closure-defines {minimalquotes.firebase.init/PRODUCTION true}
+                          ;; Unfortunately, {:optimizations :advanced} breaks infinite scrolling.
+                          :compiler-options {:optimizations :simple}}}
           :cards {:asset-path "/js"
                   :compiler-options {:devcards true}
                   :modules {:main {:init-fn minimalquotes.cards/main}}
