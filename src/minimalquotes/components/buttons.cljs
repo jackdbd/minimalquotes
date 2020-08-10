@@ -3,6 +3,9 @@
 ; (def debug-css "border border-red-500 border-dashed")
 (def debug-css "")
 
+;; TODO: avoid using string concatenation to create class names
+;; https://tailwindcss.com/docs/controlling-file-size/#writing-purgeable-html
+
 (defn button
   [{:keys [color data-attributes direction icon on-click text]
     :or {color "blue" data-attributes {} direction "ltr"}}]

@@ -9,12 +9,13 @@
     "node": "10"
   },
   "scripts": {
-    "build": "yarn clean && yarn build:css && shadow-cljs release app && cp public/prod.html public/index.html",
-    "build:css": "tailwindcss build src/assets/css/styles.css -o public/css/output.css",
-    "build:dev": "yarn clean && yarn build:css && shadow-cljs compile app && cp public/dev.html public/index.html",
+    "build:css:dev": "tailwindcss build src/assets/css/styles.css -o public/css/output.css",
+    "build:css:prod": "env NODE_ENV=production tailwindcss build src/assets/css/styles.css -o public/css/output.css",
+    "build:dev": "yarn clean && yarn build:css:dev && shadow-cljs compile app && cp public/dev.html public/index.html",
+    "build:prod": "yarn clean && yarn build:css:prod && shadow-cljs release app && cp public/prod.html public/index.html",
     "cards": "shadow-cljs watch cards",
     "clean": "rimraf out/js build-report/index.html public/js",
-    "deploy": "yarn build && firebase deploy",
+    "deploy": "yarn build:prod && firebase deploy",
     "postdeploy": "rimraf public/index.html",
     "deploy:rules": "firebase deploy --only firestore:rules",
     "dev": "cp public/dev.html public/index.html && shadow-cljs watch app",
@@ -65,8 +66,7 @@
     "react": "^16.13.1",
     "react-bootstrap-typeahead": "^5.1.0",
     "react-dom": "^16.13.1",
-    "stacktrace-js": "^2.0.2",
-    "tailwindcss": "^1.6.2"
+    "stacktrace-js": "^2.0.2"
   },
   "devDependencies": {
     "@tailwindcss/custom-forms": "^0.2.1",
@@ -90,6 +90,7 @@
     "taiko": "^1.0.15",
     "taiko-diagnostics": "^0.4.0",
     "taiko-screencast": "^0.0.1",
+    "tailwindcss": "^1.6.2",
     "zprint-clj": "^0.8.0"
   }
 }

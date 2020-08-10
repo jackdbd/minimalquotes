@@ -18,7 +18,7 @@
     [:header
      [:div {:class ["flex" "justify-between"]}
       [:div {:class ["overflow-hidden" "p-2"]}
-       [:ul {:class ["flex" "flex-wrap" (str "-" margin-tailwind-class)]}
+       [:ul {:class ["flex" "flex-wrap" "list-none" (str "-" margin-tailwind-class)]}
         (map link->li links)
         [:li {:class [margin-tailwind-class]}
          (if user
