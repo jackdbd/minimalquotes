@@ -17,6 +17,12 @@
   []
   (.signOut (js/firebase.auth)))
 
+;; TODO: remove dependency from app's state
+;; on-token-result
+;; on-user-sign-in
+;; on-user-sign-out
+;; on-error
+
 (defn on-next
   "This is the `next` callback for the observer of changes to the user's sign-in
   state."
