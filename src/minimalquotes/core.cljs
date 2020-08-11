@@ -1,14 +1,13 @@
 (ns minimalquotes.core
   "Entry point of the app."
-  (:require-macros [cljs.core.async.macros :refer [go]])
   (:require
     [accountant.core :as accountant]
     [clerk.core :as clerk]
-    [cljs.core.async.interop :refer-macros [<p!]]
+    [cljs.core.async :refer [go <!]]
     [goog.object :as object]
     [minimalquotes.components.error-boundary :refer [error-boundary]]
     [minimalquotes.firebase.auth :refer [on-auth-state-changed]]
-    [minimalquotes.firebase.init :refer [init-firebase!]]
+    [minimalquotes.firebase.init :refer [init-firebase]]
     [minimalquotes.pages.core :refer [current-page page-for]]
     [minimalquotes.routes :refer [router]]
     [minimalquotes.state :as state]
@@ -82,7 +81,7 @@
   "Run application startup logic."
   []
   (when goog.DEBUG (dev-setup))
-  (go (try (<p! (init-firebase! config-callback-map))
+  (go (try (<! (init-firebase config-callback-map))
            (on-auth-state-changed)
            (subscribe-tags!)
            (hook-browser-navigation!)
