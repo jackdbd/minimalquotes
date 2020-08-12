@@ -28,8 +28,8 @@
                  :output-to "out/test.js"
                  :target :node-test}}
  :dependencies [[binaryage/devtools "1.0.2"]
-                [devcards "0.2.6"]
-                [fork "2.0.4"]
+                [devcards "0.2.7"]
+                [fork "2.1.0"]
                 [metosin/reitit "0.5.5"]
                 [metosin/reitit-dev "0.4.2"]
                 [pez/clerk "1.0.0"]
