@@ -1,6 +1,6 @@
 (ns minimalquotes.firebase.firestore
-  (:require-macros [cljs.core.async.macros :refer [go]])
   (:require
+    [cljs.core.async :refer [go]]
     [cljs.core.async.interop :refer-macros [<p!]]
     [minimalquotes.utils :refer [log-error]]))
 

@@ -5,7 +5,8 @@
     [clerk.core :as clerk]
     [cljs.core.async :refer [go <!]]
     [goog.object :as object]
-    [minimalquotes.components.error-boundary :refer [error-boundary]]
+    [minimalquotes.components.error-boundary :refer [sentry-error-boundary]]
+    [minimalquotes.components.global-catch-all :refer [global-catch-all]]
     [minimalquotes.firebase.auth :refer [on-auth-state-changed]]
     [minimalquotes.firebase.init :refer [init-firebase]]
     [minimalquotes.pages.core :refer [current-page page-for]]
@@ -16,7 +17,8 @@
     [reagent.core :as r]
     [reagent.dom :as rdom]
     [reagent.session :as session]
-    [reitit.frontend :as rf]))
+    [reitit.frontend :as rf]
+    ["@sentry/react" :as Sentry]))
 
 (defn nav-handler
   "Navigation handler for accountant."
@@ -48,20 +50,38 @@
   ;; allow to use (prn "foo") in place of (.log js/console "foo")
   (enable-console-print!))
 
-(defn on-catch
-  [^js err ^js info]
-  (let [component-stack (object/getValueByKeys info #js ["componentStack"])
-        error-stack (object/getValueByKeys err #js ["stack"])]
-    (js/console.warn "TODO: send to Sentry" "component-stack" component-stack)
-    (js/console.warn "TODO: send to Sentry" "error-stack" error-stack)))
+(defn on-error-event
+  "Listener for an ErrorEvent. To be used in a global-catch-all component.
+  It would be cool to send all app'state to Sentry (serialized), but if the
+  message payload is too big, Sentry responds with HTTP 413."
+  [^js err-ev]
+  (let [err (object/getValueByKeys err-ev #js ["error"])]
+    (.captureMessage Sentry #js
+                             {"appState" #js {"tags" (js/JSON.stringify (clj->js @state/tags) nil 2)}
+                              "errorMessage" (.. err -message)
+                              "isAdminSignedIn" @state/is-admin-signed-in?
+                              "reporter" "global-catch-all component"})))
+
+(defn init-sentry!
+  "Initialize Sentry for error reporting.
+  Do not automatically send all errors to Sentry, only unhandled rejections.
+  https://forum.sentry.io/t/recommended-way-to-initialize-a-sentry-browser-client/5098/3"
+  []
+  (.init Sentry #js
+                 {:dsn "https://89ca4db4f3b740e6b62af5f64b42a089@o157166.ingest.sentry.io/5392842"
+                  :integrations #js
+                                  [(Sentry/Integrations.GlobalHandlers. #js {:onerror false :onunhandledrejection true})]}))
 
 (defn ^:dev/after-load mount-root
   "Render the top-level component for this app."
   []
+  (init-sentry!)
   (let [root-el (.getElementById js/document "app")]
     (rdom/unmount-component-at-node root-el)
-    (rdom/render [error-boundary {:on-catch on-catch}
-                  [current-page]] root-el)))
+    (rdom/render [global-catch-all {:on-error-event on-error-event}
+                  [sentry-error-boundary
+                   [current-page]]]
+                 root-el)))
 
 (def config-callback-map
   "Callbacks to invoke when Firebase SDKs are initialized."

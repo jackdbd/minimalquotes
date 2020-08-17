@@ -4,6 +4,7 @@
     [minimalquotes.components.buttons :as btn]
     [minimalquotes.utils :refer [log-error]]
     [reagent.core :as r]
+    ["@sentry/react" :as Sentry]
     ["stacktrace-js" :as StackTrace]))
 
 (defn s->li
@@ -11,8 +12,8 @@
   ^{:key i} [:li {:class "list-decimal"} s])
 
 (defn fallback-ui
-  "Component to show in place of a component tree whenever a error boundary
-  catches an error.
+  "Whenever a error boundary catches a render error, show this component instead
+  of the original component tree.
   Styling taken from here: https://tailwindcss.com/components/alerts/#app"
   [{:keys [component-stack error-message on-click stack-frames]}]
   [:div {:role :alert}
@@ -29,6 +30,18 @@
       (map-indexed s->li stack-frames)]]]
    [btn/button {:on-click on-click :text "Try again"}]])
 
+(defn sentry-fallback-ui-hiccup
+  [{:keys [component-stack error-message on-click]}]
+  [:div {:role :alert}
+   [:div {:class ["bg-red-500 rounded-t px-4 py-2"]}
+    [:h2 {:class ["text-white text-2xl"]} "Ops. Something went wrong."]]
+   [:div {:class ["border border-t-0 border-red-400 rounded-b bg-red-100 px-4 py-3 text-red-700"]}
+    [:h3 {:class ["text-xl"]} error-message]
+    [:details
+     [:summary "Component Stack"]
+     component-stack]]
+   [btn/button {:on-click on-click :text "Try again"}]])
+
 (defn error-boundary
   "React error boundary."
   [{:keys [on-catch]} _]
@@ -37,16 +50,11 @@
         stack-frames (r/atom [])
         on-stackframes (fn [^js stackframes]
                          (let [sf->str (fn [^js sf]
-                                         ;  (prn "StackFrame properties"
-                                         ;  (object/getAllPropertyNames sf))
-                                         ;  (prn (js->clj sf))
                                          (.toString sf))]
                            (.forEach stackframes #(swap! stack-frames conj (sf->str %)))))]
     (r/create-class
       {:component-did-catch (fn [_ err ^js info]
                               (reset! component-stack (object/getValueByKeys info #js ["componentStack"]))
-                              ;  (prn "err properties"
-                              ;  (object/getAllPropertyNames err))
                               (-> (StackTrace/fromError err)
                                   (.then on-stackframes)
                                   (.catch log-error))
@@ -60,3 +68,23 @@
                                          :on-click #(reset! error nil)
                                          :stack-frames @stack-frames}]
                            component-tree))})))
+
+(defn sentry-fallback-ui
+  "React element (created from a Hiccup form) to be used as Fallback UI in the
+  Sentry ErrorBoundary component."
+  [^js props]
+  (let [component-stack (object/get props "componentStack")
+        error (goog.object/get props "error")
+        reset-error (goog.object/get props "resetError")]
+    (r/as-element [sentry-fallback-ui-hiccup {:component-stack component-stack
+                                              :error-message (.toString error)
+                                              :on-click #(reset-error)
+                                              :stack-frames []}])))
+
+(defn sentry-error-boundary
+  "React ErrorBoundary with Sentry integration.
+  https://docs.sentry.io/platforms/javascript/react/#errorboundary-options"
+  [component-tree]
+  [:> Sentry/ErrorBoundary {:fallback sentry-fallback-ui
+                            :showDialog true}
+   component-tree])
