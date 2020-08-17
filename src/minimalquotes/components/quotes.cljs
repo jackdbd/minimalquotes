@@ -1,6 +1,7 @@
 (ns minimalquotes.components.quotes
   (:require
     [clojure.set]
+    [lambdaisland.glogi :as log]
     [minimalquotes.components.back-to-top :refer [back-to-top]]
     [minimalquotes.components.observed-spinner :refer [observed-spinner]]
     [minimalquotes.components.quote :refer [quote-card]]
@@ -84,8 +85,6 @@
 
 (defn present? [[_ v]] v)
 
-(defn on-successful-batch-write [])
-
 (defn favorite?
   [quote-k]
   (let [f (fn [[_ {:keys [quoteId]}]] (keyword quoteId))
@@ -152,7 +151,7 @@
       (map fav->li @state/favorite-quotes)]
      [quotes {:entries entries
               :delete-quote! (fn [quote-id]
-                               (prn "delete quote-id" quote-id)
+                               (log/debug :delete {:message (str "delete quote-id: " quote-id)})
                                (delete firestore
                                        (str "quotes/" quote-id)
                                        {:on-error log-error

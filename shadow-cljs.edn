@@ -1,7 +1,4 @@
 {:builds {:app {:asset-path "/js"
-                :devtools {:http-port 3000
-                           :http-root "public"
-                           :preloads [devtools.preload]}
                 :log {:level :debug}
                 :modules {:main {:init-fn minimalquotes.core/main}}
                 :output-dir "public/js"
@@ -27,8 +24,7 @@
           :test {:ns-regexp "minimalquotes.cards"
                  :output-to "out/test.js"
                  :target :node-test}}
- :dependencies [[binaryage/devtools "1.0.2"]
-                [devcards "0.2.7"]
+ :dependencies [[devcards "0.2.7"]
                 [fork "2.1.0"]
                 [lambdaisland/glogi "1.0.63"]
                 [metosin/reitit "0.5.5"]

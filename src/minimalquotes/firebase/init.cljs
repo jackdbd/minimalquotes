@@ -3,6 +3,7 @@
   (:require
     [cljs.core.async :refer [chan go put! >!]]
     [cljs.core.async.interop :refer-macros [<p!]]
+    [lambdaisland.glogi :as log]
     [minimalquotes.utils :refer [log-error]]))
 
 (defn init-firebase-ui
@@ -49,15 +50,16 @@
                               on-firestore-emulator-initialized
                               on-firestore-initialized]}]
   (if (= "localhost" (.. js/window -location -hostname))
-    (do (prn (str "Firebase app " (.-name app) " (" build-type ") is running locally"))
-        (let [{:keys [ui ui-config]} (init-firebase-ui "http://localhost:3000/")]
-          (on-firebase-ui-initialized ui)
-          (on-firebase-ui-config-initialized ui-config))
-        (prn "Configure Cloud Functions emulator")
-        (doto (.functions app)
-          (.useFunctionsEmulator "http://localhost:5001"))
-        (on-firestore-emulator-initialized (doto (js/firebase.firestore)
-                                             (.settings #js {:host "localhost:8080" :ssl false}))))
+    (do
+      (log/info :firebase-config {:message (str "Firebase app " (.-name app) " (" build-type ") is running locally")})
+      (let [{:keys [ui ui-config]} (init-firebase-ui "http://localhost:3000/")]
+        (on-firebase-ui-initialized ui)
+        (on-firebase-ui-config-initialized ui-config))
+      (log/info :firebase-config {:message "Configure Cloud Functions emulator"})
+      (doto (.functions app)
+        (.useFunctionsEmulator "http://localhost:5001"))
+      (on-firestore-emulator-initialized (doto (js/firebase.firestore)
+                                           (.settings #js {:host "localhost:8080" :ssl false}))))
     (do
       (js/firebase.analytics)
       (js/firebase.performance)

@@ -23,8 +23,8 @@
     ["@sentry/react" :as Sentry]))
 
 (glogi-console/install!)
-(log/set-levels {:glogi/root :info})
-(log/info :hello {:message "Setup logger"})
+(log/set-levels {:glogi/root :debug})
+; (log/set-levels {:glogi/root :info})
 
 (defn nav-handler
   "Navigation handler for accountant."
@@ -92,15 +92,15 @@
 (def config-callback-map
   "Callbacks to invoke when Firebase SDKs are initialized."
   {:on-firebase-ui-initialized (fn [ui]
-                                 (prn "Firebase UI configured")
+                                 (log/info :firebase-config {:message "Firebase UI configured"})
                                  (swap! state/state assoc :firebase-ui ui))
    :on-firebase-ui-config-initialized (fn [ui-config]
                                         (swap! state/state assoc :firebase-ui-config ui-config))
    :on-firestore-emulator-initialized (fn [firestore]
-                                        (prn "Firestore emulator configured")
+                                        (log/info :firebase-config {:message "Firestore emulator configured"})
                                         (reset! state/db firestore))
    :on-firestore-initialized (fn [firestore]
-                               (prn "Firestore configured")
+                               (log/info :firebase-config {:message "Firestore configured"})
                                (reset! state/db firestore))})
 
 (defn ^:export main
