@@ -1,6 +1,7 @@
 (ns minimalquotes.utils
   (:require
-    [clojure.string :as str]))
+    [clojure.string :as str]
+    [lambdaisland.glogi :as log]))
 
 (defn format-price [cents] (str " €" (/ cents 100)))
 
@@ -32,4 +33,7 @@
   (when (.. err -code)
     (js/console.error (.. err -code)))
   (js/console.trace err)
-  (js/console.groupEnd))
+  (js/console.groupEnd)
+  
+  (let [k (keyword (.. err -name))]
+    (log/error k {:message (.. err -message)})))

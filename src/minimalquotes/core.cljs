@@ -5,6 +5,8 @@
     [clerk.core :as clerk]
     [cljs.core.async :refer [go <!]]
     [goog.object :as object]
+    [lambdaisland.glogi :as log]
+    [lambdaisland.glogi.console :as glogi-console]
     [minimalquotes.components.error-boundary :refer [sentry-error-boundary]]
     [minimalquotes.components.global-catch-all :refer [global-catch-all]]
     [minimalquotes.firebase.auth :refer [on-auth-state-changed]]
@@ -19,6 +21,10 @@
     [reagent.session :as session]
     [reitit.frontend :as rf]
     ["@sentry/react" :as Sentry]))
+
+(glogi-console/install!)
+(log/set-levels {:glogi/root :info})
+(log/info :hello {:message "Setup logger"})
 
 (defn nav-handler
   "Navigation handler for accountant."
