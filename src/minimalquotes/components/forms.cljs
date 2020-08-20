@@ -1,8 +1,10 @@
 (ns minimalquotes.components.forms
   (:require
     [fork.reagent :as fork]
+    [lambdaisland.glogi :as log]
     [minimalquotes.components.buttons :as btn]
-    [minimalquotes.components.icons :refer [icon-edit icon-tag icon-trash]]
+    [minimalquotes.components.icons :refer
+     [icon-edit icon-tag icon-trash icon-upload-to-cloud]]
     [minimalquotes.components.modal :refer [modal!]]
     ["react-bootstrap-typeahead" :refer [Typeahead]]
     [vlad.core :as vlad]))
@@ -16,12 +18,13 @@
   [[tag-id tag]]
   (merge tag {:id tag-id}))
 
-(defn- make-quote-form
+(defn make-quote-form
+  "This function returns a form to create/edit a quote.
+  The returned form has no state and no validation."
   [{:keys [on-click-cancel tags]}]
   (fn quote-form-inner [{:keys [errors form-id handle-blur handle-change
                                 handle-submit submitting? state touched
                                 values]}]
-    ; (prn "quote-form-inner" "tags" tags "state" state "values" values)
     [:form {:class form-css-classes :id form-id :on-submit handle-submit}
      [:div {:class ["mb-4"]}
       [:label {:class label-css-classes :for "text"} "Text:"]
@@ -59,13 +62,11 @@
         ;; TODO: this typeahead component seems not to allow to extract new
         ;; tags, only existing ones.
         :on-change (fn [^js js-values]
-                     ;  (prn "input-tags-typeahead change" js-values)
+                     (log/debug :typeahead {:message "input-tags-typeahead change"
+                                            :js-values js-values})
                      (let [values (js->clj js-values)
                            values-k (js->clj js-values :keywordize-keys true)
                            names (map #(get % "name") values)]
-                       ;;  (prn "=== quote-form values" values)
-                       (prn "=== quote-form names" names)
-                       ;  (prn "=== values-k" values-k)
                        (swap! state assoc-in [:values :tags] names)))
         :options (map tag->tag-with-id tags)}]]
      [:div {:class ["flex" "items-center" "justify-between"]}
@@ -93,8 +94,6 @@
 
 (defn button-add-new-quote-modal
   [{:keys [on-submitted-values tags]}]
-  ; (prn "on-submitted-values" on-submitted-values)
-  ; (prn "tags" tags)
   (let [on-click-cancel #(modal! nil)
         f (fn [values] (on-submitted-values values) (modal! nil))]
     [btn/button {:on-click #(modal! [quote-form {:on-click-cancel on-click-cancel
@@ -117,7 +116,9 @@
 
 ; TODO: use fieldset?
 
-(defn- make-tag-form
+(defn make-tag-form
+  "This function returns a form to create/edit a tag.
+  The returned form has no state and no validation."
   [{:keys [on-click-cancel]}]
   (fn tag-form-inner [{:keys [errors form-id handle-blur handle-change
                               set-touched handle-submit state submitting?
@@ -134,9 +135,6 @@
                            ;; more.
                            (let [current-length (count (get-in @state [:values "name"]))
                                  remaining-length (- tag-name-max-length current-length)]
-                             ;  (prn (str "desc-length state: " current-length
-                             ;  "/"
-                             ;  tag-name-max-length))
                              (swap! state assoc-in
                                [:values "remaining-tag-name-length"]
                                remaining-length)))
@@ -148,7 +146,6 @@
                                     (swap! state assoc-in
                                       [:values "remaining-tag-description-length"]
                                       remaining-length)))]
-      ; (prn "tag-form-inner" "state" state "values" values)
       [:form {:class form-css-classes :id form-id :on-submit handle-submit}
        [:div {:class ["mb-4"]}
         [:label {:class label-css-classes :for "name"} "Name:"]
@@ -230,7 +227,6 @@
 
 (defn button-add-new-tag-modal
   [{:keys [on-submitted-values]}]
-  ; (prn "on-submitted-values" on-submitted-values)
   (let [on-click-cancel #(modal! nil)
         f (fn [values] (on-submitted-values values) (modal! nil))]
     [btn/button {:icon icon-tag
@@ -255,7 +251,6 @@
   [{:keys [author tags text on-submitted-values]}]
   (let [on-click-cancel #(modal! nil)
         f (fn [values] (on-submitted-values values) (modal! nil))]
-    ; (prn "button-edit-quote-modal" tags)
     [btn/button {:icon icon-edit
                  :on-click #(modal! [quote-form {:on-click-cancel on-click-cancel
                                                  :on-submitted-values f
@@ -283,3 +278,54 @@
                                                           :on-click-cancel on-click-cancel
                                                           :on-click-confirm on-click-confirm}])
                  :text "Delete"}]))
+
+(defn make-media-capture-form
+  "This function returns a form to upload an image.
+  The returned form has no state and no validation."
+  [{:keys [on-click-cancel]}]
+  (fn form-inner [{:keys [form-id handle-blur handle-change handle-submit
+                          set-touched state
+                          submitting? values]}]
+    ; See onMediaFileSelected
+    ; https://github.com/firebase/codelab-friendlychat-web/blob/d7e130877d57930858049cdc0887bdac363163af/cloud-functions-start/public/scripts/main.js#L140
+    (let [on-change (fn [^js e]
+                      (let [blob (first (.. e -target -files))]
+                        (handle-change e)
+                        (swap! state assoc-in [:values "blob"] blob)))]
+      [:form {:class form-css-classes :id form-id :on-submit handle-submit}
+       [:div {:class ["mb-4"]}
+        [:label {:class label-css-classes :for "media-capture"} "Image:"]
+        [:input {:id "media-capture"
+                 :accept "image/*"
+                 :auto-focus true
+                 :capture "camera"
+                 :class input-css-classes
+                 :data-testid "media-capture"
+                 :name "media-capture"
+                 :on-blur handle-blur
+                 :on-change on-change
+                 :type "file"
+                 :value (values "media-capture")}]]
+       [:div {:class ["flex" "items-center" "justify-between"]}
+        [btn/button {:on-click on-click-cancel :text "Cancel"}]
+        [btn/submit {:disabled submitting? :text "Upload"}]]])))
+
+(defn media-capture-form
+  [{:keys [on-click-cancel on-submitted-values]}]
+  (let [config {:clean-on-unmount? true
+                :on-submit (fn [m]
+                             (on-submitted-values (dissoc-hints (:values m))))
+                :prevent-default? true}
+        f (make-media-capture-form {:on-click-cancel on-click-cancel})]
+    [fork/form config f]))
+
+(defn button-upload-image
+  [{:keys [on-submitted-values]}]
+  (let [dismiss-modal #(modal! nil)
+        f (fn [values]
+            (on-submitted-values values)
+            (dismiss-modal))]
+    [btn/button {:icon icon-upload-to-cloud
+                 :on-click #(modal! [media-capture-form {:on-click-cancel dismiss-modal
+                                                         :on-submitted-values f}])
+                 :text "Upload Image"}]))
