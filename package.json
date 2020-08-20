@@ -17,7 +17,7 @@
     "clean": "rimraf out/js build-report/index.html public/js",
     "deploy": "yarn build:prod && firebase deploy",
     "postdeploy": "rimraf public/index.html",
-    "deploy:rules": "firebase deploy --only firestore:rules",
+    "deploy:rules": "firebase deploy --only firestore:rules,storage:rules",
     "dev": "cp public/dev.html public/index.html && shadow-cljs watch app",
     "e2e:css": "node e2e/unused-css.js",
     "e2e:format": "prettier --write e2e",
