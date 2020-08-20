@@ -3,8 +3,9 @@
     [minimalquotes.components.buttons :as btn]
     [minimalquotes.firebase.firestore :refer
      [db-doc-create! delete db-path-upsert! now server-timestamp]]
+    [minimalquotes.firebase.storage :refer [upload-file]]
     [minimalquotes.components.forms :refer
-     [button-add-new-tag-modal button-edit-tag-modal]]
+     [button-add-new-tag-modal button-edit-tag-modal button-upload-image]]
     [minimalquotes.components.icons :refer [icon-trash]]
     [minimalquotes.state :as state]
     [minimalquotes.utils :refer [k->str log-error]]))
@@ -105,4 +106,12 @@
                                                           :firestore firestore
                                                           :m (merge m
                                                                     {:createdAt (server-timestamp)
-                                                                     :createdBy user-id})}))}]]))
+                                                                     :createdBy user-id})}))}]
+     [button-upload-image {:on-submitted-values (fn [m]
+                                                  (upload-file
+                                                    {:auth (js/firebase.auth)
+                                                     :storage (js/firebase.storage)
+                                                     :file (get m "blob")
+                                                     :on-error log-error
+                                                     :on-success (fn [url]
+                                                                   (prn "Uploaded at: " url))}))}]]))
