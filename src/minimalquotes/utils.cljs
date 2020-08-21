@@ -37,3 +37,6 @@
   
   (let [k (keyword (.. err -name))]
     (log/error k {:message (.. err -message)})))
+
+(defn encode [s]
+  (js/encodeURIComponent s))

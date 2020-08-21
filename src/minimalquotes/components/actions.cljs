@@ -4,7 +4,8 @@
     [minimalquotes.components.forms :refer
      [button-delete-quote-modal button-edit-quote-modal]]
     [minimalquotes.components.icons :refer
-     [icon-like icon-share icon-unlike]]))
+     [icon-like icon-share icon-unlike]]
+    [minimalquotes.utils :refer [encode]]))
 
 ; (def debug-css "bg-green-300")
 (def debug-css "")
@@ -39,7 +40,8 @@
          unlike-button-text "Unlike"}}]
   (let [on-click (make-on-click {:on-share on-share
                                  :on-toggle-like on-toggle-like
-                                 :user user})]
+                                 :user user})
+        encoded-uri (encode (str quote-text " ― " quote-author))]
     [:div {:class ["actions" "overflow-hidden" "p-2" debug-css]}
      [:ul
       {:class ["flex" "flex-wrap" (str "-" margin-tailwind-class)]
@@ -69,6 +71,14 @@
               {:data-attributes {:data-id id :data-operation "toggle-like"}
                :icon icon-like
                :text like-button-text}]])])
+       [:li {:class [margin-tailwind-class "hint--left"]}
+        [btn/share-on-twitter {:encoded-uri encoded-uri}]]
+       [:li {:class [margin-tailwind-class "hint--left"]}
+        [btn/share-on-whatsapp {:encoded-uri encoded-uri}]]
+       [:li {:class [margin-tailwind-class "hint--left"]}
+        [btn/share-on-telegram {:encoded-uri encoded-uri}]]
+       [:li {:class [margin-tailwind-class "hint--left"]}
+        [btn/share-on-reddit {:encoded-uri encoded-uri}]]
        [:li {:class [margin-tailwind-class "hint--right"] :aria-label "Share"}
         [btn/button
          {:data-attributes {:data-id id :data-operation "share"}
