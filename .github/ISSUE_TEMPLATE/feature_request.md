@@ -1,7 +1,7 @@
 ---
 name: Feature request
 about: Use this template to propose a new feature.
-title: 'As a {type of user (e.g. authenticated user, admin user)}, I want to {task}, so that {goal}'
+title: ''
 labels: 'enhancement'
 assignees: ''
 ---
@@ -10,7 +10,7 @@ assignees: ''
 
 Describe your feature request with a [user story](https://www.visual-paradigm.com/guide/agile-software-development/what-is-user-story/). Use the following template:
 
-As a {role}, I want to {action}, so that {benefit}
+> As a {role}, I want to {action}, so that {benefit}
 
 `role` is the **who** of this story. It must be one of:
 
@@ -23,7 +23,9 @@ As a {role}, I want to {action}, so that {benefit}
 
 `benefit` is **why** you want to do it, the goal you want to achieve.
 
-*Example*: As an authenticated user, I want to navigate to my profile page, so that I can see my stats.
+*Example*:
+
+> As an authenticated user, I want to navigate to my profile page, so that I can see my stats.
 
 ## Context
 
