@@ -2,9 +2,8 @@
 name: Bug report
 about: Use this template to report a bug.
 title: ''
-labels: ''
+labels: 'bug'
 assignees: ''
-
 ---
 
 ## Description
